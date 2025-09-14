@@ -1,0 +1,5 @@
+{
+  "prefixes": ["Whispering", "Soaring", "Zephyrous", "Gusting", "Howling", "Breathless"],
+  "cores": ["Plume", "Current", "Draft", "Whirl", "Vapor", "Breeze"],
+  "suffixes": ["leaf", "petal", "plume", "whisp", "song", "gale"]
+}

@@ -56,6 +56,7 @@ public class PacketHandler
     protected static final byte CULTIVATOR_TECHNIQUES = 98;
     protected static final byte CULTIVATOR_STATS = 99;
     protected static final byte FROZEN_BLOCK_RENDER = 100;
+    protected static final byte PLANT_CATALOG_SYNC = 101;
     protected static final String PROTOCOL_VERSION = "1";
 
     public static final SimpleChannel channel = NetworkRegistry.newSimpleChannel(
@@ -88,6 +89,7 @@ public class PacketHandler
         channel.registerMessage(BODY_FORGE_SELECTION, BodyForgeSelectionPacket.class, BodyForgeSelectionPacket::encode, BodyForgeSelectionPacket::decode, BodyForgeSelectionPacket::handle);
         channel.registerMessage(BODY_MODIFICATIONS, BodyModificationsPacket.class, BodyModificationsPacket::encode, BodyModificationsPacket::decode, BodyModificationsPacket::handle);
         channel.registerMessage(CULTIVATOR_TECH_STAT, TechniqueStatSelectionPacket.class, TechniqueStatSelectionPacket::encode, TechniqueStatSelectionPacket::decode, TechniqueStatSelectionPacket::handle);
+        channel.registerMessage(PLANT_CATALOG_SYNC, DaoOfModding.Cultivationcraft.Network.Packets.PlantCatalogSyncPacket.class, DaoOfModding.Cultivationcraft.Network.Packets.PlantCatalogSyncPacket::encode, DaoOfModding.Cultivationcraft.Network.Packets.PlantCatalogSyncPacket::decode, DaoOfModding.Cultivationcraft.Network.Packets.PlantCatalogSyncPacket::handle);
     }
 
     public static void sendAttackToClient(UUID playerID, HitResult.Type type, Vec3 pos, UUID targetID, Direction direction, int slot)
@@ -212,5 +214,17 @@ public class PacketHandler
 
         CultivatorTechniquesPacket pack = new CultivatorTechniquesPacket(player.getUUID(), techs);
         channel.send(PacketDistributor.PLAYER.with(() -> toSend), pack);
+    }
+
+    // ===== Procedural Plant catalog sync =====
+    public static void sendPlantCatalogToClient(ServerPlayer player,
+                                                java.util.List<DaoOfModding.Cultivationcraft.Common.Blocks.Plants.world.PlantCatalogSavedData.Entry> entries)
+    {
+        java.util.ArrayList<DaoOfModding.Cultivationcraft.Network.Packets.PlantCatalogSyncPacket.Entry> list = new java.util.ArrayList<>(entries.size());
+        for (var e : entries) {
+            list.add(new DaoOfModding.Cultivationcraft.Network.Packets.PlantCatalogSyncPacket.Entry(e.id, e.displayName, e.genome.colorRGB()));
+        }
+        DaoOfModding.Cultivationcraft.Network.Packets.PlantCatalogSyncPacket pkt = new DaoOfModding.Cultivationcraft.Network.Packets.PlantCatalogSyncPacket(list);
+        channel.send(PacketDistributor.PLAYER.with(() -> player), pkt);
     }
 }

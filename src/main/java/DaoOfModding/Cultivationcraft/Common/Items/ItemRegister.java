@@ -2,6 +2,7 @@ package DaoOfModding.Cultivationcraft.Common.Items;
 
 import DaoOfModding.Cultivationcraft.Cultivationcraft;
 import DaoOfModding.Cultivationcraft.Common.Blocks.BlockRegister;
+import DaoOfModding.Cultivationcraft.Common.Items.ProceduralPlantItem;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -14,7 +15,7 @@ public class ItemRegister {
             DeferredRegister.create(ForgeRegistries.ITEMS, Cultivationcraft.MODID);
 
     public static final RegistryObject<Item> PROCEDURAL_PLANT_ITEM =
-            ITEMS.register("procedural_plant", () -> new BlockItem(BlockRegister.PROCEDURAL_PLANT.get(), new Item.Properties()));
+            ITEMS.register("procedural_plant", () -> new ProceduralPlantItem(BlockRegister.PROCEDURAL_PLANT.get(), new Item.Properties()));
 
 
     public static void init(IEventBus bus) {

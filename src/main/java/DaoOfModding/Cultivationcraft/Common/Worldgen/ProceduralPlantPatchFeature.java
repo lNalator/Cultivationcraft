@@ -5,6 +5,9 @@ import com.mojang.serialization.Codec;
 import DaoOfModding.Cultivationcraft.Common.Blocks.BlockRegister;
 import DaoOfModding.Cultivationcraft.Common.Blocks.Plants.world.PlantGenomes;
 import DaoOfModding.Cultivationcraft.Common.Blocks.Plants.world.PlantGenome;
+import DaoOfModding.Cultivationcraft.Common.Blocks.Plants.world.PlantCatalogSavedData;
+import DaoOfModding.Cultivationcraft.Common.Blocks.Plants.ProceduralPlantBlock;
+import DaoOfModding.Cultivationcraft.Common.Blocks.Plants.utils.Seeds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Blocks;
@@ -46,8 +49,15 @@ public class ProceduralPlantPatchFeature extends Feature<NoneFeatureConfiguratio
 
             if (!canPlaceHere(level, pos)) continue;
 
-            // optional: species/biome gating via your genome
-            var g = PlantGenomes.forWorldPos(level.getLevel(), pos);
+            // Choose a species id from per-world catalog, stable per region
+            var server = level.getLevel();
+            PlantCatalogSavedData catalog = PlantCatalogSavedData.getOrCreate(server, DaoOfModding.Cultivationcraft.Common.Config.Server.procPlantCatalogSize());
+            int regionSize = DaoOfModding.Cultivationcraft.Common.Config.Server.procPlantRegionSizeChunks() * 16;
+            BlockPos regionPos = new BlockPos(pos.getX() / regionSize, 0, pos.getZ() / regionSize);
+            int id = Seeds.forPos(server.getSeed(), regionPos, 0xC0FFEE).nextInt(Math.max(1, catalog.size()));
+            var entry = catalog.getById(id);
+            if (entry == null) continue;
+            var g = entry.genome;
             if (g.spawnsInCold()) {
                 // tiny example: skip if biome is hot
                 float temp = level.getBiome(pos).value().getBaseTemperature();
@@ -56,7 +66,7 @@ public class ProceduralPlantPatchFeature extends Feature<NoneFeatureConfiguratio
 
             // place plant block at pos if air
             if (level.isEmptyBlock(pos)) {
-                level.setBlock(pos, BlockRegister.PROCEDURAL_PLANT.get().defaultBlockState(), 2);
+                level.setBlock(pos, BlockRegister.PROCEDURAL_PLANT.get().defaultBlockState().setValue(ProceduralPlantBlock.SPECIES, id), 2);
                 placed++;
             }
         }

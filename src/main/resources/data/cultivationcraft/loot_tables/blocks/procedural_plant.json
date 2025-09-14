@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "cultivationcraft:procedural_plant",
+          "functions": [
+            {
+              "function": "minecraft:copy_state",
+              "block": "cultivationcraft:procedural_plant",
+              "properties": ["species"]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+

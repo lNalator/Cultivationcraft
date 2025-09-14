@@ -1,0 +1,6 @@
+{
+  "prefixes": ["Dusky", "Luminous", "Bitter", "Verdant", "Crimson", "Azure", "Gleaming", "Mellow", "Stormy", "Silent"],
+  "cores": ["Bramble", "Bloom", "Spore", "Thorn", "Petal", "Reed", "Fern", "Moss", "Sedge", "Vetch"],
+  "suffixes": ["wort", "root", "leaf", "flower", "weed", "shrub", "grass", "vine", "cap", "bud"]
+}
+

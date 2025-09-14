@@ -1,0 +1,5 @@
+{
+  "prefixes": ["Earthen", "Stony", "Loamy", "Gritty", "Burrowed", "Dusty"],
+  "cores": ["Stone", "Pebble", "Root", "Clay", "Boulder", "Soil"],
+  "suffixes": ["wort", "moss", "shrub", "root", "sprout", "weed"]
+}
