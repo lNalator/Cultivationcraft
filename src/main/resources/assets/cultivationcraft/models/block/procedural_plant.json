@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cross",
+  "textures": { "cross": "cultivationcraft:block/procedural_plant" },
+  "render_type": "cutout",
+  "tintindex": 0
+}

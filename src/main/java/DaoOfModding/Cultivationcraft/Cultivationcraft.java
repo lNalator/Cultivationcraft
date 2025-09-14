@@ -16,6 +16,8 @@ import DaoOfModding.Cultivationcraft.Common.Qi.ExternalCultivationHandler;
 import DaoOfModding.Cultivationcraft.Common.Qi.QiSourceConfig;
 import DaoOfModding.Cultivationcraft.Common.Qi.TechniqueControl;
 import DaoOfModding.Cultivationcraft.Common.Qi.Techniques.TechniqueStats.DefaultTechniqueStatIDs;
+import DaoOfModding.Cultivationcraft.Common.Worldgen.ModBiomeModifiers;
+import DaoOfModding.Cultivationcraft.Common.Worldgen.ModWorldgen;
 import DaoOfModding.Cultivationcraft.Common.Reflection;
 import DaoOfModding.Cultivationcraft.Common.Register;
 import DaoOfModding.Cultivationcraft.Network.PacketHandler;
@@ -52,6 +54,8 @@ public class Cultivationcraft {
         Register.init(modEventBus);
         BlockRegister.init(modEventBus);
         ItemRegister.init(modEventBus);
+        ModWorldgen.init();
+        ModBiomeModifiers.init();
         BodyPartNames.registerLungLocations();
         CultivationAdvancements.init(modEventBus);
     }

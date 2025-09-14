@@ -1,5 +1,6 @@
 package DaoOfModding.Cultivationcraft.Common.Blocks;
 
+import DaoOfModding.Cultivationcraft.Common.Blocks.Plants.ProceduralPlantBlock;
 import DaoOfModding.Cultivationcraft.Common.Blocks.custom.FrozenBlock;
 import DaoOfModding.Cultivationcraft.Common.Blocks.entity.FrozenBlockEntity;
 import DaoOfModding.Cultivationcraft.Common.Items.ItemRegister;
@@ -19,8 +20,10 @@ import java.util.function.Supplier;
 
 public class BlockRegister {
 
-    public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, Cultivationcraft.MODID);
-    public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, Cultivationcraft.MODID);
+    public static final DeferredRegister<Block> BLOCKS = 
+            DeferredRegister.create(ForgeRegistries.BLOCKS, Cultivationcraft.MODID);
+    public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = 
+            DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, Cultivationcraft.MODID);
 /*
     public static final DeferredRegister<ConfiguredFeature<?, ?>> CONFIGURED_FEATURE = DeferredRegister.create(Registry.CONFIGURED_FEATURE_REGISTRY, Cultivationcraft.MODID);
 */
@@ -33,6 +36,9 @@ public class BlockRegister {
                     FROZEN_BLOCK.get()
             ).build(null)
     );
+
+    public static final RegistryObject<Block> PROCEDURAL_PLANT =
+            BLOCKS.register("procedural_plant", ProceduralPlantBlock::new);
 
     public static void init(IEventBus bus) {
         BLOCKS.register(bus);
