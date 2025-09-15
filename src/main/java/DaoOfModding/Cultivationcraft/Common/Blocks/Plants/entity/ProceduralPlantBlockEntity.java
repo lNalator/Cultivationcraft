@@ -15,6 +15,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class ProceduralPlantBlockEntity extends BlockEntity {
     private CompoundTag qiHostData; // Serialized QiSource data
+    private int age; // increments on plant random ticks (dynamic tier source)
 
     public ProceduralPlantBlockEntity(BlockPos pos, BlockState state) {
         super(BlockRegister.PROCEDURAL_PLANT_ENTITY.get(), pos, state);
@@ -27,6 +28,23 @@ public class ProceduralPlantBlockEntity extends BlockEntity {
 
     public CompoundTag getQiHostData() {
         return qiHostData == null ? null : qiHostData.copy();
+    }
+
+    public int getAge() { return age; }
+    public void incrementAge(int amount) { this.age += amount; if (this.age < 0) this.age = 0; setChanged(); }
+    public int dynamicTier() { if (age >= 100) return 3; if (age >= 50) return 2; return 1; }
+    public void setAge(int newAge) { this.age = Math.max(0, newAge); setChanged(); }
+
+    public void attachQiSourceIfMissing(ServerLevel srv, net.minecraft.resources.ResourceLocation element) {
+        if (qiHostData != null) return;
+        var state = getBlockState();
+        if (!(state.getBlock() instanceof ProceduralPlantBlock)) return;
+        var source = new QiSource(worldPosition, QiSourceConfig.generateRandomSize(), element, QiSourceConfig.generateRandomQiStorage(), QiSourceConfig.generateRandomQiRegen());
+        var cap = ChunkQiSources.getChunkQiSources(srv.getChunkAt(worldPosition));
+        cap.getQiSources().add(source);
+        this.qiHostData = source.SerializeNBT();
+        setChanged();
+        PacketHandler.sendChunkQiSourcesToClient(srv.getChunkAt(worldPosition));
     }
 
     @Override
@@ -59,6 +77,7 @@ public class ProceduralPlantBlockEntity extends BlockEntity {
     protected void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);
         if (qiHostData != null) tag.put("QiHostData", qiHostData);
+        tag.putInt("Age", age);
     }
 
     @Override
@@ -66,5 +85,6 @@ public class ProceduralPlantBlockEntity extends BlockEntity {
         super.load(tag);
         if (tag.contains("QiHostData")) this.qiHostData = tag.getCompound("QiHostData");
         else this.qiHostData = null;
+        this.age = tag.getInt("Age");
     }
 }

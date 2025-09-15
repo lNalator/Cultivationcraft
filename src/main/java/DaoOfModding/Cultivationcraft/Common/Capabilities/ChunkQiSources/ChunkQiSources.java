@@ -77,7 +77,8 @@ public class ChunkQiSources implements IChunkQiSources
     {
         boolean updated = false;
 
-        for (QiSource source : getQiSources())
+        // Iterate over a snapshot to avoid concurrent modification if sources are added/removed externally during tick
+        for (QiSource source : new ArrayList<>(getQiSources()))
             if (source.tick(level))
                 updated = true;
 

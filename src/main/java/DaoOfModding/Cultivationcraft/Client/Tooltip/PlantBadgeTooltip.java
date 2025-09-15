@@ -39,5 +39,14 @@ public class PlantBadgeTooltip implements ClientTooltipComponent {
         if (data.host()) {
             GuiComponent.fill(pose, x + 8, y - 2, x + 14, y + 4, 0xAA00FFFF);
         }
+
+        // Tiny dynamic tier label (T1/T2/T3) when available
+        if (data.dynTier() > 0) {
+            String t = "T" + data.dynTier();
+            int bx = x + 1;
+            int by = y + 1;
+            GuiComponent.fill(pose, bx, by, bx + 11, by + 9, 0xAA000000);
+            font.draw(pose, t, bx + 2, by + 1, 0xFFFFFFFF);
+        }
     }
 }

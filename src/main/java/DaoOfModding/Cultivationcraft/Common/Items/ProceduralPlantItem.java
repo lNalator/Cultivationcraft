@@ -1,10 +1,10 @@
 package DaoOfModding.Cultivationcraft.Common.Items;
 
-import DaoOfModding.Cultivationcraft.Common.Blocks.Plants.ProceduralPlantBlock;
+import DaoOfModding.Cultivationcraft.Common.Blocks.Plants.world.ClientPlantCatalog;
 import DaoOfModding.Cultivationcraft.Common.Blocks.Plants.world.PlantGenomes;
 import DaoOfModding.Cultivationcraft.Common.Qi.Elements.Elements;
-import DaoOfModding.Cultivationcraft.Common.Blocks.Plants.world.ClientPlantCatalog;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
@@ -27,7 +27,7 @@ public class ProceduralPlantItem extends BlockItem {
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
         super.appendHoverText(stack, level, tooltip, flag);
 
-        // Try to read species from BlockStateTag written by getCloneItemStack
+        // Species id from BlockStateTag (set by pick block)
         int species = 0;
         if (stack.hasTag() && stack.getTag().contains("BlockStateTag")) {
             var bst = stack.getTag().getCompound("BlockStateTag");
@@ -36,10 +36,10 @@ public class ProceduralPlantItem extends BlockItem {
             }
         }
 
+        // Name and element
         String name = null;
-        if (level instanceof ServerLevel server) {
-            name = PlantGenomes.getNameById(server, species);
-        } else {
+        if (level instanceof ServerLevel server) name = PlantGenomes.getNameById(server, species);
+        else {
             var e = ClientPlantCatalog.get(species);
             if (e != null) name = e.name;
         }
@@ -47,23 +47,16 @@ public class ProceduralPlantItem extends BlockItem {
         int nameColor = 0xFFFFFF;
         String elementStr = null;
         if (level instanceof ServerLevel server) {
-            // derive element color from server catalog
             var g = PlantGenomes.getById(server, species);
-            if (g != null) {
-                nameColor = g.colorRGB();
-                elementStr = g.qiElement().toString();
-            }
+            if (g != null) { nameColor = g.colorRGB(); elementStr = g.qiElement().toString(); }
         } else {
             var e = ClientPlantCatalog.get(species);
-            if (e != null) {
-                nameColor = e.color;
-                elementStr = e.element;
-            }
+            if (e != null) { nameColor = e.color; elementStr = e.element; }
         }
 
         if (name == null || name.isEmpty()) name = "Species";
-        final int displayNameColor = nameColor;
-        tooltip.add(Component.literal(name).withStyle(s -> s.withColor(displayNameColor)));
+        Style style = Style.EMPTY.withColor(nameColor);
+        tooltip.add(Component.literal(name).setStyle(style));
 
         if (elementStr != null) {
             var rl = new ResourceLocation(elementStr);
@@ -74,28 +67,22 @@ public class ProceduralPlantItem extends BlockItem {
             }
         }
 
-        // Tier and host info
-        int tier = 0;
-        if (level instanceof ServerLevel server) {
-            var g = PlantGenomes.getById(server, species);
-            if (g != null) tier = g.tier();
-        } else {
-            var e = ClientPlantCatalog.get(species);
-            if (e != null) tier = e.tier;
+        // Dynamic Tier (age), only if PlantAge is present on the item NBT
+        if (stack.hasTag() && stack.getTag().contains("PlantAge")) {
+            int plantAge = stack.getTag().getInt("PlantAge");
+            int dynTier = plantAge >= 100 ? 3 : (plantAge >= 50 ? 2 : 1);
+            String stars = dynTier >= 3 ? "★★★" : (dynTier == 2 ? "★★" : "★");
+            tooltip.add(Component.literal("Tier (age): " + stars).withStyle(s -> s.withColor(0xFFD700)));
         }
-        if (tier > 0) {
-            String stars = tier >= 3 ? "★★★" : (tier == 2 ? "★★" : "★");
-            tooltip.add(Component.literal("Tier: " + stars).withStyle(s -> s.withColor(0xFFD700)));
-        }
+
+        // Host info
         boolean hostFlag = false;
         if (stack.hasTag() && stack.getTag().contains("QiHostData")) hostFlag = true;
         else if (stack.hasTag() && stack.getTag().contains("BlockStateTag")) {
             var bst = stack.getTag().getCompound("BlockStateTag");
             if ("true".equalsIgnoreCase(bst.getString("host_qi"))) hostFlag = true;
         }
-        if (hostFlag) {
-            tooltip.add(Component.literal("Hosts Qi Source").withStyle(s -> s.withColor(0x00FFFF)));
-        }
+        if (hostFlag) tooltip.add(Component.literal("Hosts Qi Source").withStyle(s -> s.withColor(0x00FFFF)));
     }
 
     @Override
@@ -113,6 +100,12 @@ public class ProceduralPlantItem extends BlockItem {
             var bst = stack.getTag().getCompound("BlockStateTag");
             if ("true".equalsIgnoreCase(bst.getString("host_qi"))) host = true;
         }
-        return Optional.of(new DaoOfModding.Cultivationcraft.Client.Tooltip.PlantBadgeTooltipData(species, host));
+        int dynTier = 0;
+        if (stack.hasTag() && stack.getTag().contains("PlantAge")) {
+            int plantAge = stack.getTag().getInt("PlantAge");
+            dynTier = plantAge >= 100 ? 3 : (plantAge >= 50 ? 2 : 1);
+        }
+        return Optional.of(new DaoOfModding.Cultivationcraft.Client.Tooltip.PlantBadgeTooltipData(species, host, dynTier));
     }
 }
+

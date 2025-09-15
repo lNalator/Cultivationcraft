@@ -31,21 +31,7 @@ public class Config
         private static ForgeConfigSpec.IntValue procPlantQiGrowthRadius;
         private static ForgeConfigSpec.IntValue procPlantQiSpawnRadius;
 
-        // Element growth multipliers
-        private static ForgeConfigSpec.DoubleValue fireHotMult;
-        private static ForgeConfigSpec.DoubleValue fireColdMult;
-        private static ForgeConfigSpec.DoubleValue waterNearMult;
-        private static ForgeConfigSpec.DoubleValue waterFarMult;
-        private static ForgeConfigSpec.DoubleValue iceColdMult;
-        private static ForgeConfigSpec.DoubleValue iceWarmMult;
-        private static ForgeConfigSpec.DoubleValue windHighAltMult;
-        private static ForgeConfigSpec.DoubleValue windLowAltMult;
-        private static ForgeConfigSpec.DoubleValue lightningBrightMult;
-        private static ForgeConfigSpec.DoubleValue lightningDimMult;
-        private static ForgeConfigSpec.DoubleValue earthGoodGroundMult;
-        private static ForgeConfigSpec.DoubleValue earthBadGroundMult;
-        private static ForgeConfigSpec.DoubleValue woodGoodLightMult;
-        private static ForgeConfigSpec.DoubleValue woodBadLightMult;
+        // Removed element growth multipliers (growth now boosted only by Qi Sources)
 
         // Per-element spawn multipliers
         private static ForgeConfigSpec.DoubleValue spawnMultFire;
@@ -98,13 +84,13 @@ public class Config
             procPlantRarityT3 = builder.comment("Base placement chance per attempt for tier 3")
                     .defineInRange("rarity_t3", 0.15D, 0.0D, 1.0D);
             procPlantPatchCapT1 = builder.comment("Max plants placed per patch for tier 1")
-                    .defineInRange("patch_cap_t1", 3, 1, 16);
+                    .defineInRange("patch_cap_t1", 6, 1, 16);
             procPlantPatchCapT2 = builder.comment("Max plants placed per patch for tier 2")
-                    .defineInRange("patch_cap_t2", 2, 1, 16);
+                    .defineInRange("patch_cap_t2", 3, 1, 16);
             procPlantPatchCapT3 = builder.comment("Max plants placed per patch for tier 3")
                     .defineInRange("patch_cap_t3", 1, 1, 16);
             procPlantPatchCapNoneBonus = builder.comment("Bonus patch cap for none-element entries")
-                    .defineInRange("patch_cap_none_bonus", 1, 0, 16);
+                    .defineInRange("patch_cap_none_bonus", 2, 0, 16);
             procPlantGrowthBoostQiAny = builder.comment("Growth multiplier when any Qi Source is nearby")
                     .defineInRange("growth_boost_qi_any", 1.2D, 1.0D, 10.0D);
             procPlantGrowthBoostQiMatch = builder.comment("Growth multiplier when matching-element Qi Source is nearby")
@@ -113,36 +99,7 @@ public class Config
                     .defineInRange("qi_growth_radius", 16, 1, 128);
             procPlantQiSpawnRadius = builder.comment("Radius (blocks) to search for Qi Sources to boost spawn chance")
                     .defineInRange("qi_spawn_radius", 24, 1, 128);
-            builder.push("Element Growth Multipliers");
-            builder.push("fire");
-            fireHotMult = builder.defineInRange("hot_mult", 1.4D, 0.0D, 10.0D);
-            fireColdMult = builder.defineInRange("cold_mult", 0.7D, 0.0D, 10.0D);
-            builder.pop();
-            builder.push("water");
-            waterNearMult = builder.defineInRange("near_mult", 1.3D, 0.0D, 10.0D);
-            waterFarMult = builder.defineInRange("far_mult", 0.7D, 0.0D, 10.0D);
-            builder.pop();
-            builder.push("ice");
-            iceColdMult = builder.defineInRange("cold_mult", 1.3D, 0.0D, 10.0D);
-            iceWarmMult = builder.defineInRange("warm_mult", 0.6D, 0.0D, 10.0D);
-            builder.pop();
-            builder.push("wind");
-            windHighAltMult = builder.defineInRange("high_alt_mult", 1.2D, 0.0D, 10.0D);
-            windLowAltMult = builder.defineInRange("low_alt_mult", 1.0D, 0.0D, 10.0D);
-            builder.pop();
-            builder.push("lightning");
-            lightningBrightMult = builder.defineInRange("bright_mult", 1.2D, 0.0D, 10.0D);
-            lightningDimMult = builder.defineInRange("dim_mult", 0.8D, 0.0D, 10.0D);
-            builder.pop();
-            builder.push("earth");
-            earthGoodGroundMult = builder.defineInRange("good_ground_mult", 1.15D, 0.0D, 10.0D);
-            earthBadGroundMult = builder.defineInRange("bad_ground_mult", 1.0D, 0.0D, 10.0D);
-            builder.pop();
-            builder.push("wood");
-            woodGoodLightMult = builder.defineInRange("good_light_mult", 1.10D, 0.0D, 10.0D);
-            woodBadLightMult = builder.defineInRange("bad_light_mult", 1.0D, 0.0D, 10.0D);
-            builder.pop();
-            builder.pop();
+            // Removed: Element Growth Multipliers section
             builder.push("Element Spawn Multipliers");
             spawnMultFire = builder.defineInRange("fire", 1.0D, 0.0D, 10.0D);
             spawnMultEarth = builder.defineInRange("earth", 1.0D, 0.0D, 10.0D);
@@ -190,21 +147,7 @@ public class Config
         public static int procPlantQiGrowthRadius() { return procPlantQiGrowthRadius.get(); }
         public static int procPlantQiSpawnRadius() { return procPlantQiSpawnRadius.get(); }
 
-        // Element growth multipliers getters
-        public static double fireHotMult() { return fireHotMult.get(); }
-        public static double fireColdMult() { return fireColdMult.get(); }
-        public static double waterNearMult() { return waterNearMult.get(); }
-        public static double waterFarMult() { return waterFarMult.get(); }
-        public static double iceColdMult() { return iceColdMult.get(); }
-        public static double iceWarmMult() { return iceWarmMult.get(); }
-        public static double windHighAltMult() { return windHighAltMult.get(); }
-        public static double windLowAltMult() { return windLowAltMult.get(); }
-        public static double lightningBrightMult() { return lightningBrightMult.get(); }
-        public static double lightningDimMult() { return lightningDimMult.get(); }
-        public static double earthGoodGroundMult() { return earthGoodGroundMult.get(); }
-        public static double earthBadGroundMult() { return earthBadGroundMult.get(); }
-        public static double woodGoodLightMult() { return woodGoodLightMult.get(); }
-        public static double woodBadLightMult() { return woodBadLightMult.get(); }
+        // Removed: element growth multipliers getters
 
         // Element spawn multipliers getters
         public static double spawnMultFire() { return spawnMultFire.get(); }

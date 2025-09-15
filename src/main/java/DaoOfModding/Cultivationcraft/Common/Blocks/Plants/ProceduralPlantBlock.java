@@ -59,8 +59,22 @@ public class ProceduralPlantBlock extends BushBlock implements BonemealableBlock
     public void randomTick(BlockState state, Level level, BlockPos pos, RandomSource rng) {
         if (level.isClientSide) return;
 
-        int age = state.getValue(AGE);
-        if (age >= 3) return;
+        // Increment dynamic age stored on BlockEntity and enforce Tier-3 host rule
+        ProceduralPlantBlockEntity be = (ProceduralPlantBlockEntity) level.getBlockEntity(pos);
+        if (be != null) {
+            be.incrementAge(1);
+            int dynTier = be.dynamicTier();
+            if (dynTier >= 3 && !state.getValue(HOST_QI)) {
+                level.setBlock(pos, state.setValue(HOST_QI, true), 3);
+                var srv = (ServerLevel) level;
+                int species = state.getValue(SPECIES);
+                var g0 = PlantGenomes.getById(srv, species);
+                if (g0 != null) be.attachQiSourceIfMissing(srv, g0.qiElement());
+            }
+        }
+
+        int growthStage = state.getValue(AGE);
+        if (growthStage >= 3) return;
 
         int species = state.getValue(SPECIES);
         var g = level.isClientSide ? PlantGenomes.forWorldPos(level, pos)
@@ -75,7 +89,7 @@ public class ProceduralPlantBlock extends BushBlock implements BonemealableBlock
             chance *= elementGrowthModifier(level, pos, g);
             chance *= tierGrowthModifier(level, pos, g);
             if (rng.nextFloat() < chance) {
-                level.setBlock(pos, state.setValue(AGE, age + 1), 2);
+                level.setBlock(pos, state.setValue(AGE, growthStage + 1), 2);
             }
         }
     }
@@ -117,6 +131,7 @@ public class ProceduralPlantBlock extends BushBlock implements BonemealableBlock
         if (level.getBlockEntity(pos) instanceof ProceduralPlantBlockEntity be) {
             var data = be.getQiHostData();
             if (data != null) stack.getOrCreateTag().put("QiHostData", data);
+            stack.getOrCreateTag().putInt("PlantAge", be.getAge());
         }
         return stack;
     }
@@ -180,67 +195,44 @@ public class ProceduralPlantBlock extends BushBlock implements BonemealableBlock
     }
 
     private float elementGrowthModifier(Level level, BlockPos pos, PlantGenome genome) {
+        // Only qiSource proximity aids plant growth per new rules
         float mult = 1.0f;
-        String path = genome.qiElement().getPath();
-        float temp = level.getBiome(pos).value().getBaseTemperature();
-
-        if (path.contains("fire")) {
-            if (temp > 0.8f) mult *= (float)Config.Server.fireHotMult();
-            else mult *= (float)Config.Server.fireColdMult();
-        }
-        if (path.contains("water")) {
-            if (nearWater(level, pos, 3)) mult *= (float)Config.Server.waterNearMult();
-            else mult *= (float)Config.Server.waterFarMult();
-        }
-        if (path.contains("ice")) {
-            if (temp < 0.3f) mult *= (float)Config.Server.iceColdMult();
-            else mult *= (float)Config.Server.iceWarmMult();
-        }
-        if (path.contains("wind") || path.contains("air")) {
-            int sea = level.getSeaLevel();
-            if (pos.getY() > sea + 40) mult *= (float)Config.Server.windHighAltMult();
-            else mult *= (float)Config.Server.windLowAltMult();
-        }
-        if (path.contains("lightning")) {
-            int sky = level.getMaxLocalRawBrightness(pos);
-            if (sky >= 12) mult *= (float)Config.Server.lightningBrightMult();
-            else mult *= (float)Config.Server.lightningDimMult();
-        }
-        if (path.contains("earth")) {
-            var below = level.getBlockState(pos.below());
-            if (below.is(Blocks.STONE) || below.is(Blocks.DEEPSLATE) || below.is(BlockTags.DIRT)) mult *= (float)Config.Server.earthGoodGroundMult();
-            else mult *= (float)Config.Server.earthBadGroundMult();
-        }
-        if (path.contains("wood")) {
-            int light = level.getMaxLocalRawBrightness(pos);
-            if (light >= 9) mult *= (float)Config.Server.woodGoodLightMult();
-            else mult *= (float)Config.Server.woodBadLightMult();
-        }
-
-        // Qi source proximity boosts
         if (!level.isClientSide) {
             var srv = (ServerLevel) level;
             int radius = Config.Server.procPlantQiGrowthRadius();
             var sources = ChunkQiSources.getQiSourcesInRange(srv, new Vec3(pos.getX(), pos.getY(), pos.getZ()), radius);
             boolean any = false; boolean match = false;
             for (var s : sources) { any = true; if (s.getElement().equals(genome.qiElement())) { match = true; break; } }
-            if (match) mult *= 1.8f; else if (any) mult *= 1.2f;
+            if (match) mult *= (float)Config.Server.procPlantGrowthBoostQiMatch(); else if (any) mult *= (float)Config.Server.procPlantGrowthBoostQiAny();
         }
-
         return mult;
     }
 
     private float tierGrowthModifier(Level level, BlockPos pos, PlantGenome g) {
-        float mult = switch (g.tier()) { case 3 -> 0.35f; case 2 -> 0.6f; default -> 1.0f; };
-        // Penalty if higher-tier plants nearby "feed" on qi
+        // Use dynamic tier derived from per-plant age instead of static genome tier
+        int selfTier = 1;
+        if (!level.isClientSide) {
+            var be = (ProceduralPlantBlockEntity) level.getBlockEntity(pos);
+            if (be != null) selfTier = be.dynamicTier();
+        }
+        float mult = switch (selfTier) { case 3 -> 0.35f; case 2 -> 0.6f; default -> 1.0f; };
+
+        // Penalty if nearby higher-tier plants (dynamic) are present
         int radius = 6;
-        for (BlockPos p : BlockPos.betweenClosed(pos.offset(-radius, -1, -radius), pos.offset(radius, 1, radius))) {
-            var st = level.getBlockState(p);
-            if (st.getBlock() instanceof ProceduralPlantBlock) {
-                int species2 = st.getValue(SPECIES);
-                if (!level.isClientSide) {
-                    var g2 = PlantGenomes.getById((ServerLevel) level, species2);
-                    if (g2 != null && g2.tier() > g.tier()) { mult *= 0.7f; break; }
+        if (!level.isClientSide) {
+            for (BlockPos p : BlockPos.betweenClosed(pos.offset(-radius, -1, -radius), pos.offset(radius, 1, radius))) {
+                var st = level.getBlockState(p);
+                if (st.getBlock() instanceof ProceduralPlantBlock) {
+                    var be2 = (ProceduralPlantBlockEntity) level.getBlockEntity(p);
+                    int t2 = 1;
+                    if (be2 != null) t2 = be2.dynamicTier();
+                    else {
+                        // Fallback to genome tier if BE missing
+                        int species2 = st.getValue(SPECIES);
+                        var g2 = PlantGenomes.getById((ServerLevel) level, species2);
+                        if (g2 != null) t2 = g2.tier();
+                    }
+                    if (t2 > selfTier) { mult *= 0.7f; break; }
                 }
             }
         }
