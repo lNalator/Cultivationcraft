@@ -27,8 +27,11 @@ import DaoOfModding.mlmanimator.Client.MultiLimbedRenderer;
 import DaoOfModding.mlmanimator.Client.Poses.PlayerPoseHandler;
 import DaoOfModding.mlmanimator.Client.Poses.PoseHandler;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
@@ -238,6 +241,28 @@ public class ClientListeners
         if (event.getOverlay().id() == VanillaGuiOverlay.HOTBAR.id())
         {
             SkillHotbarOverlay.PostRenderSkillHotbar(event.getPoseStack());
+
+            // Draw dynamic Tier/Age HUD when looking at a Procedural Plant (visible only during Divine Sense)
+            if (Renderer.QiSourcesVisible) {
+                var mc = Minecraft.getInstance();
+                if (mc.hitResult instanceof BlockHitResult bhr && mc.level != null) {
+                    BlockPos pos = bhr.getBlockPos();
+                    var st = mc.level.getBlockState(pos);
+                    if (st.getBlock() instanceof DaoOfModding.Cultivationcraft.Common.Blocks.Plants.ProceduralPlantBlock) {
+                        var be = mc.level.getBlockEntity(pos);
+                        if (be instanceof DaoOfModding.Cultivationcraft.Common.Blocks.Plants.entity.ProceduralPlantBlockEntity plant) {
+                            int age = plant.getAge();
+                            int tier = plant.dynamicTier();
+                            Font font = mc.font;
+                            String text = "Tier: T" + tier + "  Age: " + age;
+                            int w = font.width(text);
+                            int x = (mc.getWindow().getGuiScaledWidth() - w) / 2;
+                            int y = mc.getWindow().getGuiScaledHeight() / 2 + 12; // just below crosshair
+                            font.draw(event.getPoseStack(), text, x, y, 0xFFFFFF);
+                        }
+                    }
+                }
+            }
         }
     }
 

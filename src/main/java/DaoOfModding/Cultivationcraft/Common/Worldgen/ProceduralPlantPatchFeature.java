@@ -72,7 +72,7 @@ public class ProceduralPlantPatchFeature extends Feature<NoneFeatureConfiguratio
 
             if (!ElementRules.canSpawnAt(server, level, pos, g.qiElement().getPath())) continue;
 
-            // Choose a pre-aging pattern for this patch
+            // Choose a pre-aging pattern for this patch, with optional bias near QiSources
             int patchTier = choosePatchTier(rng); // 1,2,3 represent age ranges
 
             // Base patch size tuned by element multiplier; then reshaped by patch tier type
@@ -101,9 +101,8 @@ public class ProceduralPlantPatchFeature extends Feature<NoneFeatureConfiguratio
                 if (pp == null) continue;
                 if (!ElementRules.canSpawnAt(server, level, pp, g.qiElement().getPath())) continue;
 
-                // HOST_QI: always true for T3; otherwise use config chance
-                boolean none = contains(g.qiElement().getPath(), "none");
-                boolean host = (patchTier == 3) || rng.nextDouble() < (none ? Config.Server.procPlantHostChanceNone() : Config.Server.procPlantHostChanceElement());
+                // HOST_QI: only for Tier-3 (age 100+). Lower tiers never host at spawn.
+                boolean host = (patchTier == 3);
 
                 var state = BlockRegister.PROCEDURAL_PLANT.get()
                         .defaultBlockState()
@@ -127,9 +126,9 @@ public class ProceduralPlantPatchFeature extends Feature<NoneFeatureConfiguratio
 
     private int choosePatchTier(RandomSource rng) {
         int r = rng.nextInt(100);
-        if (r < 10) return 3;   // 10% T3
-        if (r < 40) return 2;   // 30% T2
-        return 1;               // 60% T1
+        if (r < 1) return 3;    // 1% T3 (epic)
+        if (r < 14) return 2;   // 14% T2 (rare)
+        return 1;               // 85% T1 (common)
     }
 
     private static boolean contains(String s, String k) { return s != null && s.contains(k); }
@@ -187,7 +186,7 @@ public class ProceduralPlantPatchFeature extends Feature<NoneFeatureConfiguratio
         if (path.contains("fire")) return Config.Server.spawnMultFire();
         if (path.contains("earth")) return Config.Server.spawnMultEarth();
         if (path.contains("wood")) return Config.Server.spawnMultWood();
-        if (path.contains("wind") || path.contains("air")) return Config.Server.spawnMultWind();
+        if (path.contains("wind")) return Config.Server.spawnMultWind();
         if (path.contains("water")) return Config.Server.spawnMultWater();
         if (path.contains("ice")) return Config.Server.spawnMultIce();
         if (path.contains("lightning")) return Config.Server.spawnMultLightning();
@@ -203,10 +202,11 @@ public class ProceduralPlantPatchFeature extends Feature<NoneFeatureConfiguratio
             if (path.contains("fire")) return fire(server, level, pos);
             if (path.contains("earth")) return earth(level, pos);
             if (path.contains("ice")) return ice(level, pos);
-            if (path.contains("wind") || path.contains("air")) return wind(level, pos);
+            if (path.contains("wind")) return wind(level, pos);
             if (path.contains("lightning")) return lightning(level, pos);
             if (path.contains("wood")) return wood(level, pos);
             if (path.contains("water")) return water(level, pos);
+            if (path.contains("none")) return none(level, pos);
             return true; // none
         }
 
@@ -265,6 +265,12 @@ public class ProceduralPlantPatchFeature extends Feature<NoneFeatureConfiguratio
             if (nearWater(level, pos, 4)) return true;
             String biome = level.getBiome(pos).unwrapKey().map(k -> k.location().getPath()).orElse("");
             return biome.contains("ocean") || biome.contains("river") || biome.contains("swamp") || biome.contains("beach");
+        }
+
+        private static boolean none(WorldGenLevel level, BlockPos pos) {
+            BlockState below = level.getBlockState(pos.below());
+            boolean ground = below.is(Blocks.DIRT) || below.is(Blocks.GRASS_BLOCK);
+            return ground && below.isFaceSturdy(level, pos.below(), Direction.UP);
         }
 
         private static boolean isOpenArea(WorldGenLevel level, BlockPos pos, int clearance) {

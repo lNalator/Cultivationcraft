@@ -10,6 +10,8 @@ import DaoOfModding.Cultivationcraft.Network.PacketHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.network.Connection;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -54,6 +56,12 @@ public class ProceduralPlantBlockEntity extends BlockEntity {
         var state = level.getBlockState(worldPosition);
         if (!(state.getBlock() instanceof ProceduralPlantBlock)) return;
         if (!state.hasProperty(ProceduralPlantBlock.HOST_QI)) return;
+
+        // Enforce: Only Tier 3 (age 100+) may host a Qi Source
+        if (state.getValue(ProceduralPlantBlock.HOST_QI) && dynamicTier() < 3) {
+            level.setBlock(worldPosition, state.setValue(ProceduralPlantBlock.HOST_QI, false), 3);
+            return;
+        }
         if (!state.getValue(ProceduralPlantBlock.HOST_QI)) return;
 
         // Only create once: if no stored data (worldgen), create and persist one now
@@ -86,5 +94,28 @@ public class ProceduralPlantBlockEntity extends BlockEntity {
         if (tag.contains("QiHostData")) this.qiHostData = tag.getCompound("QiHostData");
         else this.qiHostData = null;
         this.age = tag.getInt("Age");
+    }
+
+    // Client sync for HUD usage
+    @Override
+    public CompoundTag getUpdateTag() {
+        CompoundTag tag = new CompoundTag();
+        saveAdditional(tag);
+        return tag;
+    }
+
+    @Override
+    public void handleUpdateTag(CompoundTag tag) {
+        load(tag);
+    }
+
+    @Override
+    public ClientboundBlockEntityDataPacket getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    @Override
+    public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
+        load(pkt.getTag());
     }
 }

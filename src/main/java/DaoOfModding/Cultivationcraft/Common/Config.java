@@ -29,9 +29,6 @@ public class Config
         private static ForgeConfigSpec.DoubleValue procPlantGrowthBoostQiAny;
         private static ForgeConfigSpec.DoubleValue procPlantGrowthBoostQiMatch;
         private static ForgeConfigSpec.IntValue procPlantQiGrowthRadius;
-        private static ForgeConfigSpec.IntValue procPlantQiSpawnRadius;
-
-        // Removed element growth multipliers (growth now boosted only by Qi Sources)
 
         // Per-element spawn multipliers
         private static ForgeConfigSpec.DoubleValue spawnMultFire;
@@ -84,9 +81,9 @@ public class Config
             procPlantRarityT3 = builder.comment("Base placement chance per attempt for tier 3")
                     .defineInRange("rarity_t3", 0.15D, 0.0D, 1.0D);
             procPlantPatchCapT1 = builder.comment("Max plants placed per patch for tier 1")
-                    .defineInRange("patch_cap_t1", 6, 1, 16);
+                    .defineInRange("patch_cap_t1", 3, 1, 16);
             procPlantPatchCapT2 = builder.comment("Max plants placed per patch for tier 2")
-                    .defineInRange("patch_cap_t2", 3, 1, 16);
+                    .defineInRange("patch_cap_t2", 2, 1, 16);
             procPlantPatchCapT3 = builder.comment("Max plants placed per patch for tier 3")
                     .defineInRange("patch_cap_t3", 1, 1, 16);
             procPlantPatchCapNoneBonus = builder.comment("Bonus patch cap for none-element entries")
@@ -97,9 +94,6 @@ public class Config
                     .defineInRange("growth_boost_qi_match", 1.8D, 1.0D, 10.0D);
             procPlantQiGrowthRadius = builder.comment("Radius (blocks) to search for Qi Sources to boost growth")
                     .defineInRange("qi_growth_radius", 16, 1, 128);
-            procPlantQiSpawnRadius = builder.comment("Radius (blocks) to search for Qi Sources to boost spawn chance")
-                    .defineInRange("qi_spawn_radius", 24, 1, 128);
-            // Removed: Element Growth Multipliers section
             builder.push("Element Spawn Multipliers");
             spawnMultFire = builder.defineInRange("fire", 1.0D, 0.0D, 10.0D);
             spawnMultEarth = builder.defineInRange("earth", 1.0D, 0.0D, 10.0D);
@@ -145,9 +139,6 @@ public class Config
         public static double procPlantGrowthBoostQiAny() { return procPlantGrowthBoostQiAny.get(); }
         public static double procPlantGrowthBoostQiMatch() { return procPlantGrowthBoostQiMatch.get(); }
         public static int procPlantQiGrowthRadius() { return procPlantQiGrowthRadius.get(); }
-        public static int procPlantQiSpawnRadius() { return procPlantQiSpawnRadius.get(); }
-
-        // Removed: element growth multipliers getters
 
         // Element spawn multipliers getters
         public static double spawnMultFire() { return spawnMultFire.get(); }

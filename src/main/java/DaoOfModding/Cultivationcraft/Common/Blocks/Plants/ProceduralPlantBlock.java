@@ -71,6 +71,8 @@ public class ProceduralPlantBlock extends BushBlock implements BonemealableBlock
                 var g0 = PlantGenomes.getById(srv, species);
                 if (g0 != null) be.attachQiSourceIfMissing(srv, g0.qiElement());
             }
+            // Sync BE age for client HUD
+            level.sendBlockUpdated(pos, state, state, 3);
         }
 
         int growthStage = state.getValue(AGE);
@@ -139,11 +141,24 @@ public class ProceduralPlantBlock extends BushBlock implements BonemealableBlock
     @Override
     public void setPlacedBy(Level level, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
         super.setPlacedBy(level, pos, state, placer, stack);
-        if (!level.isClientSide && state.getValue(HOST_QI)) {
+        if (!level.isClientSide) {
             var srv = (ServerLevel) level;
             int species = state.getValue(SPECIES);
             var g = PlantGenomes.getById(srv, species);
-            if (g != null) {
+
+            // Restore BE dynamic age from item NBT if present
+            if (level.getBlockEntity(pos) instanceof ProceduralPlantBlockEntity be) {
+                if (stack.hasTag() && stack.getTag().contains("PlantAge")) {
+                    be.setAge(stack.getTag().getInt("PlantAge"));
+                }
+                // If item was T3 by age but host flag was false, enforce T3 host rule on placement
+                if (be.dynamicTier() >= 3 && !state.getValue(HOST_QI)) {
+                    level.setBlock(pos, state.setValue(HOST_QI, true), 3);
+                }
+            }
+
+            // Attach QiSource if HOST_QI true after placement
+            if (state.getValue(HOST_QI) && g != null) {
                 IChunkQiSources chunk = ChunkQiSources.getChunkQiSources(srv.getChunkAt(pos));
                 QiSource source;
                 if (stack.hasTag() && stack.getTag().contains("QiHostData")) {

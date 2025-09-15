@@ -189,7 +189,7 @@ public class PlantCatalogSavedData extends SavedData {
         if (el == null) return false;
         String path = element.getPath();
         // favor cold for water/ice/wind-like
-        if (path.contains("water") || path.contains("ice") || path.contains("wind") || path.contains("air")) return true;
+        if (path.contains("water") || path.contains("ice") || path.contains("wind")) return true;
         if (path.contains("fire")) return false;
         return false;
     }

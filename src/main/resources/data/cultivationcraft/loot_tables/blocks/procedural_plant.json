@@ -17,12 +17,17 @@
               "function": "minecraft:copy_nbt",
               "source": "block_entity",
               "ops": [
+                { "source": "Age", "target": "PlantAge", "op": "replace" },
                 { "source": "QiHostData", "target": "QiHostData", "op": "replace" }
               ]
             }
           ]
         }
+      ],
+      "conditions": [
+        { "condition": "minecraft:survives_explosion" }
       ]
     }
   ]
 }
+
