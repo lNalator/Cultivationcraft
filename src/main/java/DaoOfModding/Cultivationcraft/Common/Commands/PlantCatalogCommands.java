@@ -2,9 +2,13 @@ package DaoOfModding.Cultivationcraft.Common.Commands;
 
 import DaoOfModding.Cultivationcraft.Common.Config;
 import DaoOfModding.Cultivationcraft.Common.Blocks.Plants.world.PlantCatalogSavedData;
+import DaoOfModding.Cultivationcraft.Common.Capabilities.ChunkQiSources.ChunkQiSources;
 import DaoOfModding.Cultivationcraft.Common.Items.ItemRegister;
 import DaoOfModding.Cultivationcraft.Common.Qi.QiSource;
 import DaoOfModding.Cultivationcraft.Common.Qi.QiSourceConfig;
+import DaoOfModding.Cultivationcraft.Network.PacketHandler;
+
+import java.util.List;
 
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -115,7 +119,7 @@ public class PlantCatalogCommands {
     private static int giveFiltered(CommandSourceStack src, ServerPlayer player, ResourceLocation element, int tier, boolean host, int count) {
         ServerLevel level = src.getLevel();
         PlantCatalogSavedData data = PlantCatalogSavedData.getOrCreate(level, Config.Server.procPlantCatalogSize());
-        java.util.List<PlantCatalogSavedData.Entry> list = new java.util.ArrayList<>();
+        List<PlantCatalogSavedData.Entry> list = new java.util.ArrayList<>();
         for (var e : data.entries()) {
             if (!e.genome.qiElement().equals(element)) continue;
             if (tier != 0 && e.genome.tier() != tier) continue;
@@ -157,8 +161,9 @@ public class PlantCatalogCommands {
         double st = storage != null ? storage : QiSourceConfig.generateRandomQiStorage();
         int rg = regen != null ? regen : QiSourceConfig.generateRandomQiRegen();
         QiSource source = new QiSource(pos, s, element, st, rg);
-        var chunkCap = DaoOfModding.Cultivationcraft.Common.Capabilities.ChunkQiSources.ChunkQiSources.getChunkQiSources(level.getChunkAt(pos));
+        var chunkCap = ChunkQiSources.getChunkQiSources(level.getChunkAt(pos));
         chunkCap.getQiSources().add(source);
+        PacketHandler.sendChunkQiSourcesToClient(level.getChunkAt(pos));
         src.sendSuccess(Component.literal("Added QiSource at " + pos.getX()+","+pos.getY()+","+pos.getZ()+" elem="+element+" size="+s+" storage="+st+" regen="+rg), true);
         return 1;
     }

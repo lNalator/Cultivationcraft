@@ -5,6 +5,7 @@ import DaoOfModding.Cultivationcraft.Common.Capabilities.ChunkQiSources.ChunkQiS
 import DaoOfModding.Cultivationcraft.Common.Capabilities.ChunkQiSources.IChunkQiSources;
 import DaoOfModding.Cultivationcraft.Common.Qi.QiSource;
 import DaoOfModding.Cultivationcraft.Common.Qi.QiSourceConfig;
+import DaoOfModding.Cultivationcraft.Network.PacketHandler;
 import DaoOfModding.Cultivationcraft.Common.Config;
 import DaoOfModding.Cultivationcraft.Common.Blocks.Plants.entity.ProceduralPlantBlockEntity;
 import DaoOfModding.Cultivationcraft.Common.Blocks.Plants.world.PlantCatalogSavedData;
@@ -142,6 +143,7 @@ public class ProceduralPlantBlock extends BushBlock implements BonemealableBlock
                 if (level.getBlockEntity(pos) instanceof ProceduralPlantBlockEntity be) {
                     be.setQiHostData(source.SerializeNBT());
                 }
+                PacketHandler.sendChunkQiSourcesToClient(srv.getChunkAt(pos));
             }
         }
     }
@@ -164,6 +166,7 @@ public class ProceduralPlantBlock extends BushBlock implements BonemealableBlock
                     if (closest != null) {
                         var chunk = ChunkQiSources.getChunkQiSources(srv.getChunkAt(closest.getPos()));
                         chunk.getQiSources().remove(closest);
+                        PacketHandler.sendChunkQiSourcesToClient(srv.getChunkAt(closest.getPos()));
                     }
                 }
             }

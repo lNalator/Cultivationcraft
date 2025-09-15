@@ -6,6 +6,7 @@ import DaoOfModding.Cultivationcraft.Common.Blocks.Plants.world.PlantGenomes;
 import DaoOfModding.Cultivationcraft.Common.Capabilities.ChunkQiSources.ChunkQiSources;
 import DaoOfModding.Cultivationcraft.Common.Qi.QiSource;
 import DaoOfModding.Cultivationcraft.Common.Qi.QiSourceConfig;
+import DaoOfModding.Cultivationcraft.Network.PacketHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -50,6 +51,7 @@ public class ProceduralPlantBlockEntity extends BlockEntity {
             cap.getQiSources().add(source);
             this.qiHostData = source.SerializeNBT();
             setChanged();
+            PacketHandler.sendChunkQiSourcesToClient(srv.getChunkAt(worldPosition));
         }
     }
 
