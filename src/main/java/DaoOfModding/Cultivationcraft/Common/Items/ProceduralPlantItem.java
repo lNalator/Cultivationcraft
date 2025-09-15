@@ -63,7 +63,7 @@ public class ProceduralPlantItem extends BlockItem {
 
         if (name == null || name.isEmpty()) name = "Species";
         final int displayNameColor = nameColor;
-        tooltip.add(Component.literal(name + " (#" + species + ")").withStyle(s -> s.withColor(displayNameColor)));
+        tooltip.add(Component.literal(name).withStyle(s -> s.withColor(displayNameColor)));
 
         if (elementStr != null) {
             var rl = new ResourceLocation(elementStr);
@@ -79,6 +79,9 @@ public class ProceduralPlantItem extends BlockItem {
         if (level instanceof ServerLevel server) {
             var g = PlantGenomes.getById(server, species);
             if (g != null) tier = g.tier();
+        } else {
+            var e = ClientPlantCatalog.get(species);
+            if (e != null) tier = e.tier;
         }
         if (tier > 0) {
             String stars = tier >= 3 ? "★★★" : (tier == 2 ? "★★" : "★");

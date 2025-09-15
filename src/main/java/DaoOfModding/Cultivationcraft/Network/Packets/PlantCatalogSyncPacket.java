@@ -16,8 +16,9 @@ public class PlantCatalogSyncPacket extends Packet {
         public final String name;
         public final int color;
         public final String element; // ResourceLocation string
-        public Entry(int id, String name, int color, String element) {
-            this.id = id; this.name = name; this.color = color; this.element = element;
+        public final int tier;
+        public Entry(int id, String name, int color, String element, int tier) {
+            this.id = id; this.name = name; this.color = color; this.element = element; this.tier = tier;
         }
     }
 
@@ -34,6 +35,7 @@ public class PlantCatalogSyncPacket extends Packet {
             buf.writeUtf(e.name);
             buf.writeVarInt(e.color);
             buf.writeUtf(e.element);
+            buf.writeVarInt(e.tier);
         }
     }
 
@@ -46,7 +48,8 @@ public class PlantCatalogSyncPacket extends Packet {
                 String name = buf.readUtf(32767);
                 int color = buf.readVarInt();
                 String element = buf.readUtf(32767);
-                list.add(new Entry(id, name, color, element));
+                int tier = buf.readVarInt();
+                list.add(new Entry(id, name, color, element, tier));
             }
             return new PlantCatalogSyncPacket(list);
         } catch (Exception e) {
@@ -60,7 +63,7 @@ public class PlantCatalogSyncPacket extends Packet {
         ctx.enqueueWork(() -> {
             ClientPlantCatalog.clear();
             for (Entry e : entries) {
-                ClientPlantCatalog.put(e.id, e.name, e.color, e.element);
+                ClientPlantCatalog.put(e.id, e.name, e.color, e.element, e.tier);
             }
         });
         ctx.setPacketHandled(true);

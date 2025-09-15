@@ -226,7 +226,7 @@ public class PacketHandler
         ArrayList<PlantCatalogSyncPacket.Entry> list = new ArrayList<>(entries.size());
         for (var e : entries) {
             list.add(new PlantCatalogSyncPacket.Entry(
-                e.id, e.displayName, e.genome.colorRGB(), e.genome.qiElement().toString()));
+                e.id, e.displayName, e.genome.colorRGB(), e.genome.qiElement().toString(), e.genome.tier()));
         }
         PlantCatalogSyncPacket pkt = new PlantCatalogSyncPacket(list);
         channel.send(PacketDistributor.PLAYER.with(() -> player), pkt);
