@@ -31,7 +31,7 @@ public class ProceduralPlantPatchFeature extends Feature<NoneFeatureConfiguratio
 
         // Try multiple attempts around origin to make a patch
         int placed = 0;
-        int tries = 64;                 // base attempts per patch
+        int tries = 64;                 // scan multiple positions; place at most one patch per chunk
         int radiusXZ = 6;               // spread – tweakable
         int ySpread = 2;
 
@@ -56,17 +56,13 @@ public class ProceduralPlantPatchFeature extends Feature<NoneFeatureConfiguratio
             if (entry == null) continue;
             var g = entry.genome;
             ElementSpawnCondition cond = SpawnConditions.forPath(g.qiElement().getPath());
-            if (!basicAirAndLight(level, pos)) continue;
+            boolean allowDark = g.qiElement().getPath().contains("earth") || g.qiElement().getPath().contains("wood");
+            if (!basicAirAndLight(level, pos, allowDark)) continue;
             if (!cond.canPlaceOn(level, pos, g)) continue;
             if (!cond.extraRules(server, level, pos, g)) continue;
 
-            // Rarity weighting by tier (skip QiSource proximity to avoid cross-chunk loads during worldgen)
-            double baseChance = switch (g.tier()) { case 3 -> Config.Server.procPlantRarityT3(); case 2 -> Config.Server.procPlantRarityT2(); default -> Config.Server.procPlantRarityT1(); };
-            // Per-element spawn multiplier
-            baseChance *= elementSpawnMult(g.qiElement().getPath());
-            // Environmental boosts by element and biome/height
-            baseChance *= cond.environmentBoost(level, pos, g);
-            if (rng.nextDouble() > baseChance) continue;
+            // Guaranteed spawn if conditions are met: skip chance gating
+            // We still allow per-element environmentBoost to influence patch size later if needed.
 
             // Patch cap 1-4 based on tier (higher tier smaller patches). Non-element (none) can be larger
             int patchCapBase = switch (g.tier()) { case 3 -> Config.Server.procPlantPatchCapT3(); case 2 -> Config.Server.procPlantPatchCapT2(); default -> Config.Server.procPlantPatchCapT1(); };
@@ -95,6 +91,7 @@ public class ProceduralPlantPatchFeature extends Feature<NoneFeatureConfiguratio
                 // Host QiSource will be created on block entity load or on player placement.
                 placed++;
             }
+            if (placed > 0) break; // one patch max per chunk
         }
 
         return placed > 0; // tell the engine if we placed anything
@@ -118,8 +115,9 @@ public class ProceduralPlantPatchFeature extends Feature<NoneFeatureConfiguratio
         return null;
     }
 
-    private boolean basicAirAndLight(WorldGenLevel level, BlockPos pos) {
+    private boolean basicAirAndLight(WorldGenLevel level, BlockPos pos, boolean allowDark) {
         if (!level.isEmptyBlock(pos)) return false;
+        if (allowDark) return true;
         int light = level.getMaxLocalRawBrightness(pos);
         return light >= 7;
     }

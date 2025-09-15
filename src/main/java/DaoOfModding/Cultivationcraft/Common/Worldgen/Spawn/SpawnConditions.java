@@ -2,6 +2,7 @@ package DaoOfModding.Cultivationcraft.Common.Worldgen.Spawn;
 
 import DaoOfModding.Cultivationcraft.Common.Blocks.Plants.world.PlantGenome;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.WorldGenLevel;
@@ -25,17 +26,29 @@ public final class SpawnConditions {
     private static boolean contains(String path, String key) { return path != null && path.contains(key); }
 
     public static final ElementSpawnCondition NONE = new ElementSpawnCondition() {
-        public boolean canPlaceOn(WorldGenLevel level, BlockPos pos, PlantGenome g) { return true; }
-        public boolean extraRules(ServerLevel server, WorldGenLevel level, BlockPos pos, PlantGenome g) { return true; }
+        public boolean canPlaceOn(WorldGenLevel level, BlockPos pos, PlantGenome g) { 
+            BlockState below = level.getBlockState(pos.below());
+            boolean ground = below.is(Blocks.GRASS_BLOCK) || below.is(Blocks.DIRT) || below.is(Blocks.COARSE_DIRT) || below.is(Blocks.ROOTED_DIRT)
+                    || below.is(Blocks.PODZOL) || below.is(Blocks.MOSS_BLOCK);
+            return ground && below.isFaceSturdy(level, pos.below(), Direction.UP);
+         }
+        public boolean extraRules(ServerLevel server, WorldGenLevel level, BlockPos pos, PlantGenome g) {
+            int sea = level.getLevel().getSeaLevel();
+            // Only underground and not sky-exposed
+            if (pos.getY() >= sea - 5) return false;
+            if (level.canSeeSkyFromBelowWater(pos)) return false;
+            return true;
+        }
         public double environmentBoost(WorldGenLevel level, BlockPos pos, PlantGenome g) { return 1.0; }
     };
 
     public static final ElementSpawnCondition EARTH = new ElementSpawnCondition() {
         public boolean canPlaceOn(WorldGenLevel level, BlockPos pos, PlantGenome g) {
             BlockState below = level.getBlockState(pos.below());
-            // Spawn on stone-like and groundy materials
-            return below.is(Blocks.STONE) || below.is(Blocks.GRANITE) || below.is(Blocks.DIORITE) || below.is(Blocks.ANDESITE)
-                    || below.is(Blocks.DEEPSLATE) || below.is(Blocks.GRAVEL) || below.is(Blocks.SAND) || below.is(Blocks.DIRT) || below.is(Blocks.COARSE_DIRT) || below.is(Blocks.ROOTED_DIRT);
+            // Spawn on stone-like and groundy materials with sturdy top surface
+            boolean ground = below.is(Blocks.STONE) || below.is(Blocks.GRANITE) || below.is(Blocks.DIORITE) || below.is(Blocks.ANDESITE)
+                    || below.is(Blocks.DEEPSLATE) || below.is(Blocks.GRAVEL) || below.is(Blocks.SAND) || below.is(Blocks.DIRT) || below.is(Blocks.COARSE_DIRT) || below.is(Blocks.ROOTED_DIRT) || below.is(Blocks.TUFF);
+            return ground && below.isFaceSturdy(level, pos.below(), Direction.UP);
         }
         public boolean extraRules(ServerLevel server, WorldGenLevel level, BlockPos pos, PlantGenome g) { return true; }
         public double environmentBoost(WorldGenLevel level, BlockPos pos, PlantGenome g) {
@@ -51,7 +64,8 @@ public final class SpawnConditions {
     public static final ElementSpawnCondition ICE = new ElementSpawnCondition() {
         public boolean canPlaceOn(WorldGenLevel level, BlockPos pos, PlantGenome g) {
             BlockState below = level.getBlockState(pos.below());
-            return below.is(Blocks.ICE) || below.is(Blocks.PACKED_ICE) || below.is(Blocks.BLUE_ICE) || below.is(Blocks.FROSTED_ICE) || below.is(Blocks.SNOW_BLOCK);
+            return (below.is(Blocks.ICE) || below.is(Blocks.PACKED_ICE) || below.is(Blocks.BLUE_ICE) || below.is(Blocks.FROSTED_ICE) || below.is(Blocks.SNOW_BLOCK))
+                    && below.isFaceSturdy(level, pos.below(), Direction.UP);
         }
         public boolean extraRules(ServerLevel server, WorldGenLevel level, BlockPos pos, PlantGenome g) {
             String biome = level.getBiome(pos).unwrapKey().map(k -> k.location().getPath()).orElse("");
@@ -63,8 +77,9 @@ public final class SpawnConditions {
     public static final ElementSpawnCondition FIRE = new ElementSpawnCondition() {
         public boolean canPlaceOn(WorldGenLevel level, BlockPos pos, PlantGenome g) {
             BlockState below = level.getBlockState(pos.below());
-            return below.is(Blocks.NETHERRACK) || below.is(Blocks.CRIMSON_NYLIUM) || below.is(Blocks.WARPED_NYLIUM)
-                    || below.is(Blocks.BASALT) || below.is(Blocks.BLACKSTONE) || below.is(Blocks.SOUL_SAND) || below.is(Blocks.SOUL_SOIL);
+            return (below.is(Blocks.NETHERRACK) || below.is(Blocks.CRIMSON_NYLIUM) || below.is(Blocks.WARPED_NYLIUM)
+                    || below.is(Blocks.BASALT) || below.is(Blocks.BLACKSTONE) || below.is(Blocks.SOUL_SAND) || below.is(Blocks.SOUL_SOIL))
+                    && below.isFaceSturdy(level, pos.below(), Direction.UP);
         }
         public boolean extraRules(ServerLevel server, WorldGenLevel level, BlockPos pos, PlantGenome g) {
             return server.dimension() == Level.NETHER;
@@ -73,7 +88,12 @@ public final class SpawnConditions {
     };
 
     public static final ElementSpawnCondition WIND = new ElementSpawnCondition() {
-        public boolean canPlaceOn(WorldGenLevel level, BlockPos pos, PlantGenome g) { return true; }
+        public boolean canPlaceOn(WorldGenLevel level, BlockPos pos, PlantGenome g) {
+            BlockState below = level.getBlockState(pos.below());
+            boolean ground = below.is(Blocks.GRASS_BLOCK) || below.is(Blocks.DIRT) || below.is(Blocks.COARSE_DIRT) || below.is(Blocks.SAND) || below.is(Blocks.GRAVEL)
+                    || below.is(Blocks.STONE) || below.is(Blocks.DEEPSLATE);
+            return ground && below.isFaceSturdy(level, pos.below(), Direction.UP);
+        }
         public boolean extraRules(ServerLevel server, WorldGenLevel level, BlockPos pos, PlantGenome g) { return isOpenArea(level, pos); }
         public double environmentBoost(WorldGenLevel level, BlockPos pos, PlantGenome g) {
             int sea = level.getLevel().getSeaLevel();
@@ -86,7 +106,12 @@ public final class SpawnConditions {
     };
 
     public static final ElementSpawnCondition LIGHTNING = new ElementSpawnCondition() {
-        public boolean canPlaceOn(WorldGenLevel level, BlockPos pos, PlantGenome g) { return isOpenArea(level, pos); }
+        public boolean canPlaceOn(WorldGenLevel level, BlockPos pos, PlantGenome g) {
+            BlockState below = level.getBlockState(pos.below());
+            boolean ground = below.is(Blocks.GRASS_BLOCK) || below.is(Blocks.DIRT) || below.is(Blocks.COARSE_DIRT) || below.is(Blocks.SAND) || below.is(Blocks.GRAVEL)
+                    || below.is(Blocks.STONE) || below.is(Blocks.DEEPSLATE);
+            return ground && below.isFaceSturdy(level, pos.below(), Direction.UP) && isOpenArea(level, pos);
+        }
         public boolean extraRules(ServerLevel server, WorldGenLevel level, BlockPos pos, PlantGenome g) {
             String biome = level.getBiome(pos).unwrapKey().map(k -> k.location().getPath()).orElse("");
             return biome.contains("mountain") || biome.contains("peaks") || biome.contains("hills") || biome.contains("windswept");
@@ -95,7 +120,12 @@ public final class SpawnConditions {
     };
 
     public static final ElementSpawnCondition WOOD = new ElementSpawnCondition() {
-        public boolean canPlaceOn(WorldGenLevel level, BlockPos pos, PlantGenome g) { return true; }
+        public boolean canPlaceOn(WorldGenLevel level, BlockPos pos, PlantGenome g) {
+            BlockState below = level.getBlockState(pos.below());
+            boolean ground = below.is(Blocks.GRASS_BLOCK) || below.is(Blocks.DIRT) || below.is(Blocks.COARSE_DIRT) || below.is(Blocks.ROOTED_DIRT)
+                    || below.is(Blocks.PODZOL) || below.is(Blocks.MOSS_BLOCK);
+            return ground && below.isFaceSturdy(level, pos.below(), Direction.UP);
+        }
         public boolean extraRules(ServerLevel server, WorldGenLevel level, BlockPos pos, PlantGenome g) {
             String biome = level.getBiome(pos).unwrapKey().map(k -> k.location().getPath()).orElse("");
             return biome.contains("forest") || biome.contains("jungle");
@@ -111,7 +141,8 @@ public final class SpawnConditions {
     public static final ElementSpawnCondition WATER = new ElementSpawnCondition() {
         public boolean canPlaceOn(WorldGenLevel level, BlockPos pos, PlantGenome g) {
             BlockState below = level.getBlockState(pos.below());
-            return below.is(Blocks.SAND) || below.is(Blocks.CLAY) || below.is(Blocks.DIRT) || below.is(Blocks.GRASS_BLOCK);
+            boolean ground = below.is(Blocks.SAND) || below.is(Blocks.CLAY) || below.is(Blocks.DIRT) || below.is(Blocks.GRASS_BLOCK) || below.is(Blocks.MUD);
+            return ground && below.isFaceSturdy(level, pos.below(), Direction.UP);
         }
         public boolean extraRules(ServerLevel server, WorldGenLevel level, BlockPos pos, PlantGenome g) {
             // near water or in water biomes
@@ -145,4 +176,3 @@ public final class SpawnConditions {
         return false;
     }
 }
-
