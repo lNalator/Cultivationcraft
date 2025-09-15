@@ -14,6 +14,7 @@ import net.minecraft.world.level.levelgen.placement.HeightmapPlacement;
 import net.minecraft.world.level.levelgen.placement.InSquarePlacement;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.placement.RarityFilter;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
 
@@ -44,7 +45,7 @@ public class ModWorldgen {
                     ));
 
     public static void init() {
-        CONFIGURED.register(net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext.get().getModEventBus());
-        PLACED.register(net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext.get().getModEventBus());
+        CONFIGURED.register(FMLJavaModLoadingContext.get().getModEventBus());
+        PLACED.register(FMLJavaModLoadingContext.get().getModEventBus());
     }
 }

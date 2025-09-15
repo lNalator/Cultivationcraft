@@ -1,5 +1,6 @@
 {
-  "prefixes": ["Frozen", "Glacial", "Frosted", "Crystalline", "Shivering", "Snowbound"],
-  "cores": ["Shard", "Crystal", "Fang", "Flake", "Icicle", "Prism"],
-  "suffixes": ["bud", "bloom", "spine", "flake", "petal", "cap"]
+  "prefixes": ["Frost", "Icy", "Glacial", "Snowy", "Chill", "Hoarfrost"],
+  "cores": ["Bloom", "Thorn", "Moss", "Lichen", "Spine", "Petal"],
+  "suffixes": ["bud", "flake", "crystal", "shard", "tuft", "leaf"]
 }
+

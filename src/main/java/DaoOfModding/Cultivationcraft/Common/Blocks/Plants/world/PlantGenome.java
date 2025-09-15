@@ -10,5 +10,6 @@ public record PlantGenome(
     int heightPixels,     // for hitbox/shape choice if you like
     boolean prefersShade, // growth rule example
     boolean spawnsInCold, // worldgen rule example
-    ResourceLocation qiElement // element type
+    ResourceLocation qiElement, // element type
+    int tier              // 1..3 rarity tier (3 = max)
 ) {}

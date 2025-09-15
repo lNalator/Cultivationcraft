@@ -1,5 +1,6 @@
 {
-  "prefixes": ["Flowing", "Misty", "Briny", "Dewy", "Tidal", "Drifting"],
-  "cores": ["Wave", "Drop", "Brook", "Stream", "Mist", "Foam"],
-  "suffixes": ["weed", "reed", "fern", "bloom", "cap", "kelp"]
+  "prefixes": ["Misty", "Flowing", "Briny", "Shore", "Deep", "Tidal"],
+  "cores": ["Reed", "Moss", "Kelp", "Bloom", "Spore", "Lily"],
+  "suffixes": ["weed", "wort", "leaf", "pad", "frond", "bud"]
 }
+

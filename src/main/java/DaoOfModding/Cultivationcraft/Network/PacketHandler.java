@@ -1,5 +1,6 @@
 package DaoOfModding.Cultivationcraft.Network;
 
+import DaoOfModding.Cultivationcraft.Common.Blocks.Plants.world.PlantCatalogSavedData;
 import DaoOfModding.Cultivationcraft.Common.Capabilities.BodyModifications.BodyModifications;
 import DaoOfModding.Cultivationcraft.Common.Capabilities.BodyModifications.IBodyModifications;
 import DaoOfModding.Cultivationcraft.Common.Capabilities.ChunkQiSources.ChunkQiSources;
@@ -30,6 +31,8 @@ import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class PacketHandler
@@ -218,13 +221,14 @@ public class PacketHandler
 
     // ===== Procedural Plant catalog sync =====
     public static void sendPlantCatalogToClient(ServerPlayer player,
-                                                java.util.List<DaoOfModding.Cultivationcraft.Common.Blocks.Plants.world.PlantCatalogSavedData.Entry> entries)
+                                                List<PlantCatalogSavedData.Entry> entries)
     {
-        java.util.ArrayList<DaoOfModding.Cultivationcraft.Network.Packets.PlantCatalogSyncPacket.Entry> list = new java.util.ArrayList<>(entries.size());
+        ArrayList<PlantCatalogSyncPacket.Entry> list = new ArrayList<>(entries.size());
         for (var e : entries) {
-            list.add(new DaoOfModding.Cultivationcraft.Network.Packets.PlantCatalogSyncPacket.Entry(e.id, e.displayName, e.genome.colorRGB()));
+            list.add(new PlantCatalogSyncPacket.Entry(
+                e.id, e.displayName, e.genome.colorRGB(), e.genome.qiElement().toString()));
         }
-        DaoOfModding.Cultivationcraft.Network.Packets.PlantCatalogSyncPacket pkt = new DaoOfModding.Cultivationcraft.Network.Packets.PlantCatalogSyncPacket(list);
+        PlantCatalogSyncPacket pkt = new PlantCatalogSyncPacket(list);
         channel.send(PacketDistributor.PLAYER.with(() -> player), pkt);
     }
 }

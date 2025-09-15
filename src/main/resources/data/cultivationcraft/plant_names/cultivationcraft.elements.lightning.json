@@ -1,5 +1,6 @@
 {
-  "prefixes": ["Shocking", "Thundering", "Crackling", "Electrified", "Stormbound", "Charged"],
-  "cores": ["Bolt", "Spark", "Arc", "Storm", "Surge", "Flash"],
-  "suffixes": ["vine", "thorn", "blossom", "spark", "bud", "flare"]
+  "prefixes": ["Crackling", "Storm", "Spark", "Jolt", "Thunder", "Shocking"],
+  "cores": ["Spine", "Bloom", "Bramble", "Bolt", "Arc", "Flash"],
+  "suffixes": ["bud", "thorn", "spur", "flare", "spark", "bloom"]
 }
+

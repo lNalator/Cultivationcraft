@@ -3,6 +3,7 @@ package DaoOfModding.Cultivationcraft.Common.Blocks;
 import DaoOfModding.Cultivationcraft.Common.Blocks.Plants.ProceduralPlantBlock;
 import DaoOfModding.Cultivationcraft.Common.Blocks.custom.FrozenBlock;
 import DaoOfModding.Cultivationcraft.Common.Blocks.entity.FrozenBlockEntity;
+import DaoOfModding.Cultivationcraft.Common.Blocks.Plants.entity.ProceduralPlantBlockEntity;
 import DaoOfModding.Cultivationcraft.Common.Items.ItemRegister;
 import DaoOfModding.Cultivationcraft.Cultivationcraft;
 import net.minecraft.world.item.BlockItem;
@@ -39,6 +40,12 @@ public class BlockRegister {
 
     public static final RegistryObject<Block> PROCEDURAL_PLANT =
             BLOCKS.register("procedural_plant", ProceduralPlantBlock::new);
+    public static RegistryObject<BlockEntityType<ProceduralPlantBlockEntity>> PROCEDURAL_PLANT_ENTITY = BLOCK_ENTITIES.register("procedural_plant_entity",
+            () -> BlockEntityType.Builder.of(
+                    ProceduralPlantBlockEntity::new,
+                    PROCEDURAL_PLANT.get()
+            ).build(null)
+    );
 
     public static void init(IEventBus bus) {
         BLOCKS.register(bus);

@@ -1,5 +1,6 @@
 {
-  "prefixes": ["Verdant", "Barkbound", "Leafy", "Timbered", "Sapling", "Rooted"],
-  "cores": ["Oak", "Sprout", "Sap", "Twig", "Branch", "Root"],
-  "suffixes": ["leaf", "bud", "vine", "shrub", "stem", "bark"]
+  "prefixes": ["Verdant", "Leafy", "Bark", "Twiggy", "Forest", "Grove"],
+  "cores": ["Vine", "Fern", "Thorn", "Bloom", "Root", "Sap"],
+  "suffixes": ["leaf", "bud", "briar", "branch", "shoot", "sprout"]
 }
+

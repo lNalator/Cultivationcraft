@@ -15,6 +15,47 @@ public class Config
         private static ForgeConfigSpec.DoubleValue procPlantGrowthMax;
         private static ForgeConfigSpec.IntValue procPlantHeightMin;
         private static ForgeConfigSpec.IntValue procPlantHeightMax;
+        private static ForgeConfigSpec.IntValue procPlantTier3ChancePercent;
+        private static ForgeConfigSpec.IntValue procPlantTier2ChancePercent;
+        private static ForgeConfigSpec.DoubleValue procPlantHostChanceElement;
+        private static ForgeConfigSpec.DoubleValue procPlantHostChanceNone;
+        private static ForgeConfigSpec.DoubleValue procPlantRarityT1;
+        private static ForgeConfigSpec.DoubleValue procPlantRarityT2;
+        private static ForgeConfigSpec.DoubleValue procPlantRarityT3;
+        private static ForgeConfigSpec.IntValue procPlantPatchCapT1;
+        private static ForgeConfigSpec.IntValue procPlantPatchCapT2;
+        private static ForgeConfigSpec.IntValue procPlantPatchCapT3;
+        private static ForgeConfigSpec.IntValue procPlantPatchCapNoneBonus;
+        private static ForgeConfigSpec.DoubleValue procPlantGrowthBoostQiAny;
+        private static ForgeConfigSpec.DoubleValue procPlantGrowthBoostQiMatch;
+        private static ForgeConfigSpec.IntValue procPlantQiGrowthRadius;
+        private static ForgeConfigSpec.IntValue procPlantQiSpawnRadius;
+
+        // Element growth multipliers
+        private static ForgeConfigSpec.DoubleValue fireHotMult;
+        private static ForgeConfigSpec.DoubleValue fireColdMult;
+        private static ForgeConfigSpec.DoubleValue waterNearMult;
+        private static ForgeConfigSpec.DoubleValue waterFarMult;
+        private static ForgeConfigSpec.DoubleValue iceColdMult;
+        private static ForgeConfigSpec.DoubleValue iceWarmMult;
+        private static ForgeConfigSpec.DoubleValue windHighAltMult;
+        private static ForgeConfigSpec.DoubleValue windLowAltMult;
+        private static ForgeConfigSpec.DoubleValue lightningBrightMult;
+        private static ForgeConfigSpec.DoubleValue lightningDimMult;
+        private static ForgeConfigSpec.DoubleValue earthGoodGroundMult;
+        private static ForgeConfigSpec.DoubleValue earthBadGroundMult;
+        private static ForgeConfigSpec.DoubleValue woodGoodLightMult;
+        private static ForgeConfigSpec.DoubleValue woodBadLightMult;
+
+        // Per-element spawn multipliers
+        private static ForgeConfigSpec.DoubleValue spawnMultFire;
+        private static ForgeConfigSpec.DoubleValue spawnMultEarth;
+        private static ForgeConfigSpec.DoubleValue spawnMultWood;
+        private static ForgeConfigSpec.DoubleValue spawnMultWind;
+        private static ForgeConfigSpec.DoubleValue spawnMultWater;
+        private static ForgeConfigSpec.DoubleValue spawnMultIce;
+        private static ForgeConfigSpec.DoubleValue spawnMultLightning;
+        private static ForgeConfigSpec.DoubleValue spawnMultNone;
 
         public static final ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
         public static final ForgeConfigSpec spec;
@@ -42,8 +83,78 @@ public class Config
                     .defineInRange("height_min", 10, 1, 64);
             procPlantHeightMax = builder.comment("Maximum visual height in pixels")
                     .defineInRange("height_max", 22, 1, 64);
+            procPlantTier3ChancePercent = builder.comment("Percent chance of tier 3 (epic) entries in catalog")
+                    .defineInRange("tier3_percent", 5, 0, 100);
+            procPlantTier2ChancePercent = builder.comment("Percent chance of tier 2 (rare) entries in catalog; rest are tier 1")
+                    .defineInRange("tier2_percent", 25, 0, 100);
+            procPlantHostChanceElement = builder.comment("Chance [0..1] that a tier 3 elemental plant hosts a Qi Source")
+                    .defineInRange("host_chance_element", 0.20D, 0.0D, 1.0D);
+            procPlantHostChanceNone = builder.comment("Chance [0..1] that a tier 3 none-element plant hosts a Qi Source")
+                    .defineInRange("host_chance_none", 0.05D, 0.0D, 1.0D);
+            procPlantRarityT1 = builder.comment("Base placement chance per attempt for tier 1")
+                    .defineInRange("rarity_t1", 0.85D, 0.0D, 1.0D);
+            procPlantRarityT2 = builder.comment("Base placement chance per attempt for tier 2")
+                    .defineInRange("rarity_t2", 0.40D, 0.0D, 1.0D);
+            procPlantRarityT3 = builder.comment("Base placement chance per attempt for tier 3")
+                    .defineInRange("rarity_t3", 0.15D, 0.0D, 1.0D);
+            procPlantPatchCapT1 = builder.comment("Max plants placed per patch for tier 1")
+                    .defineInRange("patch_cap_t1", 3, 1, 16);
+            procPlantPatchCapT2 = builder.comment("Max plants placed per patch for tier 2")
+                    .defineInRange("patch_cap_t2", 2, 1, 16);
+            procPlantPatchCapT3 = builder.comment("Max plants placed per patch for tier 3")
+                    .defineInRange("patch_cap_t3", 1, 1, 16);
+            procPlantPatchCapNoneBonus = builder.comment("Bonus patch cap for none-element entries")
+                    .defineInRange("patch_cap_none_bonus", 1, 0, 16);
+            procPlantGrowthBoostQiAny = builder.comment("Growth multiplier when any Qi Source is nearby")
+                    .defineInRange("growth_boost_qi_any", 1.2D, 1.0D, 10.0D);
+            procPlantGrowthBoostQiMatch = builder.comment("Growth multiplier when matching-element Qi Source is nearby")
+                    .defineInRange("growth_boost_qi_match", 1.8D, 1.0D, 10.0D);
+            procPlantQiGrowthRadius = builder.comment("Radius (blocks) to search for Qi Sources to boost growth")
+                    .defineInRange("qi_growth_radius", 16, 1, 128);
+            procPlantQiSpawnRadius = builder.comment("Radius (blocks) to search for Qi Sources to boost spawn chance")
+                    .defineInRange("qi_spawn_radius", 24, 1, 128);
+            builder.push("Element Growth Multipliers");
+            builder.push("fire");
+            fireHotMult = builder.defineInRange("hot_mult", 1.4D, 0.0D, 10.0D);
+            fireColdMult = builder.defineInRange("cold_mult", 0.7D, 0.0D, 10.0D);
             builder.pop();
-
+            builder.push("water");
+            waterNearMult = builder.defineInRange("near_mult", 1.3D, 0.0D, 10.0D);
+            waterFarMult = builder.defineInRange("far_mult", 0.7D, 0.0D, 10.0D);
+            builder.pop();
+            builder.push("ice");
+            iceColdMult = builder.defineInRange("cold_mult", 1.3D, 0.0D, 10.0D);
+            iceWarmMult = builder.defineInRange("warm_mult", 0.6D, 0.0D, 10.0D);
+            builder.pop();
+            builder.push("wind");
+            windHighAltMult = builder.defineInRange("high_alt_mult", 1.2D, 0.0D, 10.0D);
+            windLowAltMult = builder.defineInRange("low_alt_mult", 1.0D, 0.0D, 10.0D);
+            builder.pop();
+            builder.push("lightning");
+            lightningBrightMult = builder.defineInRange("bright_mult", 1.2D, 0.0D, 10.0D);
+            lightningDimMult = builder.defineInRange("dim_mult", 0.8D, 0.0D, 10.0D);
+            builder.pop();
+            builder.push("earth");
+            earthGoodGroundMult = builder.defineInRange("good_ground_mult", 1.15D, 0.0D, 10.0D);
+            earthBadGroundMult = builder.defineInRange("bad_ground_mult", 1.0D, 0.0D, 10.0D);
+            builder.pop();
+            builder.push("wood");
+            woodGoodLightMult = builder.defineInRange("good_light_mult", 1.10D, 0.0D, 10.0D);
+            woodBadLightMult = builder.defineInRange("bad_light_mult", 1.0D, 0.0D, 10.0D);
+            builder.pop();
+            builder.pop();
+            builder.push("Element Spawn Multipliers");
+            spawnMultFire = builder.defineInRange("fire", 1.0D, 0.0D, 10.0D);
+            spawnMultEarth = builder.defineInRange("earth", 1.0D, 0.0D, 10.0D);
+            spawnMultWood = builder.defineInRange("wood", 1.0D, 0.0D, 10.0D);
+            spawnMultWind = builder.defineInRange("wind", 1.0D, 0.0D, 10.0D);
+            spawnMultWater = builder.defineInRange("water", 1.0D, 0.0D, 10.0D);
+            spawnMultIce = builder.defineInRange("ice", 1.0D, 0.0D, 10.0D);
+            spawnMultLightning = builder.defineInRange("lightning", 1.0D, 0.0D, 10.0D);
+            spawnMultNone = builder.defineInRange("none", 1.0D, 0.0D, 10.0D);
+            builder.pop();
+            builder.pop();
+            
             spec = builder.build();
         }
 
@@ -63,5 +174,46 @@ public class Config
         public static double procPlantGrowthMax() { return procPlantGrowthMax.get(); }
         public static int procPlantHeightMin() { return procPlantHeightMin.get(); }
         public static int procPlantHeightMax() { return procPlantHeightMax.get(); }
+        public static int procPlantTier3ChancePercent() { return procPlantTier3ChancePercent.get(); }
+        public static int procPlantTier2ChancePercent() { return procPlantTier2ChancePercent.get(); }
+        public static double procPlantHostChanceElement() { return procPlantHostChanceElement.get(); }
+        public static double procPlantHostChanceNone() { return procPlantHostChanceNone.get(); }
+        public static double procPlantRarityT1() { return procPlantRarityT1.get(); }
+        public static double procPlantRarityT2() { return procPlantRarityT2.get(); }
+        public static double procPlantRarityT3() { return procPlantRarityT3.get(); }
+        public static int procPlantPatchCapT1() { return procPlantPatchCapT1.get(); }
+        public static int procPlantPatchCapT2() { return procPlantPatchCapT2.get(); }
+        public static int procPlantPatchCapT3() { return procPlantPatchCapT3.get(); }
+        public static int procPlantPatchCapNoneBonus() { return procPlantPatchCapNoneBonus.get(); }
+        public static double procPlantGrowthBoostQiAny() { return procPlantGrowthBoostQiAny.get(); }
+        public static double procPlantGrowthBoostQiMatch() { return procPlantGrowthBoostQiMatch.get(); }
+        public static int procPlantQiGrowthRadius() { return procPlantQiGrowthRadius.get(); }
+        public static int procPlantQiSpawnRadius() { return procPlantQiSpawnRadius.get(); }
+
+        // Element growth multipliers getters
+        public static double fireHotMult() { return fireHotMult.get(); }
+        public static double fireColdMult() { return fireColdMult.get(); }
+        public static double waterNearMult() { return waterNearMult.get(); }
+        public static double waterFarMult() { return waterFarMult.get(); }
+        public static double iceColdMult() { return iceColdMult.get(); }
+        public static double iceWarmMult() { return iceWarmMult.get(); }
+        public static double windHighAltMult() { return windHighAltMult.get(); }
+        public static double windLowAltMult() { return windLowAltMult.get(); }
+        public static double lightningBrightMult() { return lightningBrightMult.get(); }
+        public static double lightningDimMult() { return lightningDimMult.get(); }
+        public static double earthGoodGroundMult() { return earthGoodGroundMult.get(); }
+        public static double earthBadGroundMult() { return earthBadGroundMult.get(); }
+        public static double woodGoodLightMult() { return woodGoodLightMult.get(); }
+        public static double woodBadLightMult() { return woodBadLightMult.get(); }
+
+        // Element spawn multipliers getters
+        public static double spawnMultFire() { return spawnMultFire.get(); }
+        public static double spawnMultEarth() { return spawnMultEarth.get(); }
+        public static double spawnMultWood() { return spawnMultWood.get(); }
+        public static double spawnMultWind() { return spawnMultWind.get(); }
+        public static double spawnMultWater() { return spawnMultWater.get(); }
+        public static double spawnMultIce() { return spawnMultIce.get(); }
+        public static double spawnMultLightning() { return spawnMultLightning.get(); }
+        public static double spawnMultNone() { return spawnMultNone.get(); }
     }
 }

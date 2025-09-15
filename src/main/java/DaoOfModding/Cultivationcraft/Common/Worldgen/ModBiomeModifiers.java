@@ -10,6 +10,7 @@ import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraftforge.common.world.BiomeModifier;
 import net.minecraftforge.common.world.ForgeBiomeModifiers.AddFeaturesBiomeModifier;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
@@ -38,7 +39,20 @@ public class ModBiomeModifiers {
                 );
             });
 
+    public static final RegistryObject<BiomeModifier> PROC_PLANT_IN_NETHER =
+            BIOME_MODIFIERS.register("proc_plant_in_nether", () -> {
+                HolderSet.Named<Biome> netherBiomes =
+                        BuiltinRegistries.BIOME.getOrCreateTag(BiomeTags.IS_NETHER);
+                HolderSet<PlacedFeature> features =
+                        HolderSet.direct(ModWorldgen.PF_PROC_PLANT_PATCH.getHolder().orElseThrow());
+                return new AddFeaturesBiomeModifier(
+                        netherBiomes,
+                        features,
+                        GenerationStep.Decoration.VEGETAL_DECORATION
+                );
+            });
+
     public static void init() {
-        BIOME_MODIFIERS.register(net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext.get().getModEventBus());
+        BIOME_MODIFIERS.register(FMLJavaModLoadingContext.get().getModEventBus());
     }
 }

@@ -1,5 +1,6 @@
 {
-  "prefixes": ["Whispering", "Soaring", "Zephyrous", "Gusting", "Howling", "Breathless"],
-  "cores": ["Plume", "Current", "Draft", "Whirl", "Vapor", "Breeze"],
-  "suffixes": ["leaf", "petal", "plume", "whisp", "song", "gale"]
+  "prefixes": ["Soaring", "Gusty", "Whistling", "High", "Zephyr", "Sky"],
+  "cores": ["Reed", "Fern", "Thorn", "Bloom", "Vine", "Sedge"],
+  "suffixes": ["plume", "tuft", "frond", "leaf", "bud", "flow"]
 }
+

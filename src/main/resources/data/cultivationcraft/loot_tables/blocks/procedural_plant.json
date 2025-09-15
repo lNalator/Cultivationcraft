@@ -11,7 +11,14 @@
             {
               "function": "minecraft:copy_state",
               "block": "cultivationcraft:procedural_plant",
-              "properties": ["species"]
+              "properties": ["species", "host_qi"]
+            },
+            {
+              "function": "minecraft:copy_nbt",
+              "source": "block_entity",
+              "ops": [
+                { "source": "QiHostData", "target": "QiHostData", "op": "replace" }
+              ]
             }
           ]
         }
@@ -19,4 +26,3 @@
     }
   ]
 }
-
