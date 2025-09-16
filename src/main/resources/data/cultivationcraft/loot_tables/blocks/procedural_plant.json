@@ -11,13 +11,14 @@
             {
               "function": "minecraft:copy_state",
               "block": "cultivationcraft:procedural_plant",
-              "properties": ["species", "host_qi"]
+              "properties": ["species", "host_qi", "tier"]
             },
             {
               "function": "minecraft:copy_nbt",
               "source": "block_entity",
               "ops": [
-                { "source": "Age", "target": "PlantAge", "op": "replace" },
+                { "source": "SpiritualGrowth", "target": "SpiritualGrowth", "op": "replace" },
+                { "source": "SpiritualGrowth", "target": "PlantAge", "op": "replace" },
                 { "source": "QiHostData", "target": "QiHostData", "op": "replace" }
               ]
             }
@@ -30,4 +31,3 @@
     }
   ]
 }
-

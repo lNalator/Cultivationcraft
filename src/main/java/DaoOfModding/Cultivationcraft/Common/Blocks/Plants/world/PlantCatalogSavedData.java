@@ -194,17 +194,6 @@ public class PlantCatalogSavedData extends SavedData {
         return false;
     }
 
-    private static int rollTier(RandomSource rng) {
-        int t3 = Config.Server.procPlantTier3ChancePercent();
-        int t2 = Config.Server.procPlantTier2ChancePercent();
-        if (t3 < 0) t3 = 0; if (t3 > 100) t3 = 100;
-        if (t2 < 0) t2 = 0; if (t2 > 100) t2 = 100;
-        int r = rng.nextInt(100);
-        if (r < t3) return 3;
-        if (r < t3 + t2) return 2;
-        return 1;
-    }
-
     private static String generateName(RandomSource rng, PlantGenome g) {
         return PlantNamePools.pickName(rng, g.qiElement());
     }

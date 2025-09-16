@@ -25,19 +25,17 @@ public class ModWorldgen {
     public static final DeferredRegister<PlacedFeature> PLACED =
             DeferredRegister.create(Registry.PLACED_FEATURE_REGISTRY, Cultivationcraft.MODID);
 
-    // Configured feature: our custom feature with NoneFeatureConfiguration
     public static final RegistryObject<ConfiguredFeature<?, ?>> CF_PROC_PLANT_PATCH =
             CONFIGURED.register("procedural_plant_patch",
                     () -> new ConfiguredFeature<>(Register.PROCEDURAL_PLANT_PATCH.get(),
                             NoneFeatureConfiguration.INSTANCE));
 
-    // Placed feature: add placement rules (rarity, in-square, heightmap, biome)
     public static final RegistryObject<PlacedFeature> PF_PROC_PLANT_PATCH =
             PLACED.register("procedural_plant_patch",
                     () -> new PlacedFeature(
                             Holder.hackyErase(CF_PROC_PLANT_PATCH.getHolder().orElseThrow()),
                             List.of(
-                                RarityFilter.onAverageOnceEvery(3), // ~1/3 chunks
+                                RarityFilter.onAverageOnceEvery(8), // ~1/8 chunks
                                 InSquarePlacement.spread(),         // spread across the chunk
                                 HeightmapPlacement.onHeightmap(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES),
                                 BiomeFilter.biome()

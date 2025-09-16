@@ -257,10 +257,10 @@ public class ClientListeners
                     if (st.getBlock() instanceof ProceduralPlantBlock) {
                         var be = mc.level.getBlockEntity(pos);
                         if (be instanceof ProceduralPlantBlockEntity plant) {
-                            int age = plant.getAge();
-                            int tier = plant.dynamicTier();
+                            int growth = plant.getSpiritualGrowth();
+                            int tier = plant.getTier();
                             Font font = mc.font;
-                            String text = "Tier: T" + tier + "  Age: " + age;
+                            String text = "Tier: T" + tier + "  Qi: " + growth;
                             int w = font.width(text);
                             int x = (mc.getWindow().getGuiScaledWidth() - w) / 2;
                             int y = mc.getWindow().getGuiScaledHeight() / 2 + 12; // just below crosshair
@@ -322,3 +322,4 @@ public class ClientListeners
         }
     }
 }
+

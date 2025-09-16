@@ -7,6 +7,7 @@ import DaoOfModding.Cultivationcraft.Common.Blocks.Plants.ProceduralPlantBlock;
 import DaoOfModding.Cultivationcraft.Common.Blocks.Plants.entity.ProceduralPlantBlockEntity;
 import DaoOfModding.Cultivationcraft.Common.Blocks.Plants.utils.Seeds;
 import DaoOfModding.Cultivationcraft.Common.Blocks.Plants.world.PlantCatalogSavedData;
+import DaoOfModding.Cultivationcraft.Common.Blocks.Plants.world.ProceduralPlantElementConditions;
 import DaoOfModding.Cultivationcraft.Common.Config;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockPos.MutableBlockPos;
@@ -39,9 +40,9 @@ public class ProceduralPlantPatchFeature extends Feature<NoneFeatureConfiguratio
         if (catalog.size() <= 0) return false;
 
         int placed = 0;
-        int tries = 64; // attempts around origin to find valid spots
+        int tries = 10; // few attempts to reduce overall density
         int radiusXZ = 6;
-        int ySpread = 3;
+        int ySpread = 2;
 
         for (int i = 0; i < tries; i++) {
             int dx = rng.nextInt(radiusXZ * 2 + 1) - radiusXZ;
@@ -57,7 +58,11 @@ public class ProceduralPlantPatchFeature extends Feature<NoneFeatureConfiguratio
             int rx = Math.floorDiv(pos.getX(), regionSize);
             int rz = Math.floorDiv(pos.getZ(), regionSize);
             BlockPos regionPos = new BlockPos(rx, 0, rz);
-            int id = Seeds.forPos(server.getSeed(), regionPos, 0xC0FFEE).nextInt(Math.max(1, catalog.size()));
+            String elemKey = chooseElementKeyForPatch(server, rng);
+            int id = pickRandomIdByElementStable(catalog, elemKey, server.getSeed(), regionPos);
+            if (id < 0) {
+                id = Seeds.forPos(server.getSeed(), regionPos, 0xC0FFEE).nextInt(Math.max(1, catalog.size()));
+            }
             var entry = catalog.getById(id);
             if (entry == null) continue;
             var g = entry.genome;
@@ -70,26 +75,28 @@ public class ProceduralPlantPatchFeature extends Feature<NoneFeatureConfiguratio
 
             if (!level.isEmptyBlock(pos)) continue; // must place into air
 
-            if (!ElementRules.canSpawnAt(server, level, pos, g.qiElement().getPath())) continue;
+            if (!ProceduralPlantElementConditions.canSpawn(server, level, pos, g.qiElement())) continue;
 
             // Choose a pre-aging pattern for this patch, with optional bias near QiSources
             int patchTier = choosePatchTier(rng); // 1,2,3 represent age ranges
 
-            // Patch size policy: aim for ~10-15 plants per T1 patch, smaller for T2, single for T3
+            // Patch size policy: smaller overall for performance
             int count;
             int radius;
+            boolean isNone = g.qiElement() != null && g.qiElement().getPath().contains("none");
             if (patchTier == 3) { // T3: isolated singles
                 count = 1;
                 radius = 0;
             } else if (patchTier == 2) { // T2: small group, wider spread
-                count = 3 + rng.nextInt(4); // 3..6
-                radius = 7 + rng.nextInt(5); // 7..11
-            } else { // T1: medium cluster near anchor ~10..15
-                int target = 10 + rng.nextInt(6); // 10..15
+                count = 2 + rng.nextInt(3); // 2..4
+                radius = 5 + rng.nextInt(3); // 5..7
+            } else { // T1: compact cluster ~6..10
+                int target = 6 + rng.nextInt(5); // 6..10
                 double mult = elementSpawnMult(g.qiElement().getPath());
                 count = (int)Math.round(target * mult);
-                if (count < 8) count = 8; if (count > 18) count = 18;
-                radius = 4 + rng.nextInt(3); // 4..6
+                if (isNone) { if (count < 2) count = 2; if (count > 6) count = 6; }
+                else { if (count < 4) count = 4; if (count > 12) count = 12; }
+                radius = 3 + rng.nextInt(2); // 3..4
             }
             for (int n = 0; n < count; n++) {
                 int ox = rng.nextInt(radius * 2 + 1) - radius;
@@ -100,22 +107,27 @@ public class ProceduralPlantPatchFeature extends Feature<NoneFeatureConfiguratio
                 // Re-adjust to surface for non-earth plants; earth stays underground
                 BlockPos pp = contains(g.qiElement().getPath(), "earth") ? adjustToCaveAir(level, p) : findSurfaceAirAboveSolid(level, p);
                 if (pp == null) continue;
-                if (!ElementRules.canSpawnAt(server, level, pp, g.qiElement().getPath())) continue;
-
-                // HOST_QI: only for Tier-3 (age 100+). Lower tiers never host at spawn.
-                boolean host = (patchTier == 3);
-
-                var state = BlockRegister.PROCEDURAL_PLANT.get()
-                        .defaultBlockState()
-                        .setValue(ProceduralPlantBlock.SPECIES, id)
-                        .setValue(ProceduralPlantBlock.HOST_QI, host);
+                if (!ProceduralPlantElementConditions.canSpawn(server, level, pp, g.qiElement())) continue;
 
                 if (level.isEmptyBlock(pp)) {
+                    int initGrowth = switch (patchTier) {
+                        case 3 -> 1000 + rng.nextInt(9000);      // 1000..9999 (Tier 3)
+                        case 2 -> 100 + rng.nextInt(900);       // 100..999  (Tier 2)
+                        default -> rng.nextInt(100);            // 0..99     (Tier 1)
+                    };
+                    int tier = ProceduralPlantBlockEntity.growthToTier(initGrowth);
+                    boolean host = tier >= 3;
+
+                    BlockState state = BlockRegister.PROCEDURAL_PLANT.get()
+                            .defaultBlockState()
+                            .setValue(ProceduralPlantBlock.SPECIES, id)
+                            .setValue(ProceduralPlantBlock.TIER, tier)
+                            .setValue(ProceduralPlantBlock.HOST_QI, host);
+
                     level.setBlock(pp, state, 2);
-                    // Pre-aging: set BE dynamic age by patch type. For T3, HOST_QI is set; BE onLoad will attach source.
+                    // Pre-growth: set BE dynamic spiritual growth; Tier 3 hosts pick up Qi on load.
                     if (level.getBlockEntity(pp) instanceof ProceduralPlantBlockEntity be) {
-                        int initAge = switch (patchTier) { case 3 -> 100 + rng.nextInt(60); case 2 -> 50 + rng.nextInt(50); default -> rng.nextInt(50); };
-                        be.setAge(initAge);
+                        be.setSpiritualGrowth(initGrowth);
                     }
                     placed++;
                 }
@@ -134,10 +146,31 @@ public class ProceduralPlantPatchFeature extends Feature<NoneFeatureConfiguratio
 
     private static boolean contains(String s, String k) { return s != null && s.contains(k); }
 
+    private String chooseElementKeyForPatch(ServerLevel server, RandomSource rng) {
+        boolean inNether = server.dimension() == Level.NETHER;
+        if (rng.nextFloat() >= 0.84f) return "none";
+        String[] elems = inNether
+                ? new String[]{"fire"}
+                : new String[]{"earth", "wood", "wind", "water", "ice", "lightning"};
+        return elems[rng.nextInt(elems.length)];
+    }
+
+    private int pickRandomIdByElementStable(PlantCatalogSavedData catalog, String elementKey, long worldSeed, BlockPos regionPos) {
+        java.util.ArrayList<Integer> ids = new java.util.ArrayList<>();
+        for (var e : catalog.entries()) {
+            String path = e.genome.qiElement().getPath();
+            if (elementKey == null || elementKey.isEmpty() || path.contains(elementKey)) ids.add(e.id);
+        }
+        if (ids.isEmpty()) return -1;
+        int salt = elementKey == null ? 0 : elementKey.hashCode();
+        RandomSource srng = Seeds.forPos(worldSeed, regionPos, 0xC0FFEE ^ salt);
+        return ids.get(srng.nextInt(ids.size()));
+    }
+
     private BlockPos findSurfaceAirAboveSolid(WorldGenLevel level, BlockPos start) {
         MutableBlockPos m = new MutableBlockPos(start.getX(), start.getY(), start.getZ());
         // walk down some steps to find ground
-        for (int i = 0; i < 16 && m.getY() > level.getMinBuildHeight(); i++) {
+        for (int i = 0; i < 64 && m.getY() > level.getMinBuildHeight(); i++) {
             if (!level.isEmptyBlock(m)) {
                 // climb to first air above the solid stack
                 while (!level.isEmptyBlock(m.above())) {
@@ -146,7 +179,9 @@ public class ProceduralPlantPatchFeature extends Feature<NoneFeatureConfiguratio
                 }
                 BlockPos place = m.above();
                 BlockState below = level.getBlockState(place.below());
-                if (below.isFaceSturdy(level, place.below(), Direction.UP)) return place.immutable();
+                if (below.isFaceSturdy(level, place.below(), Direction.UP)
+                        && net.minecraft.world.level.block.Block.isFaceFull(below.getCollisionShape(level, place.below()), Direction.UP))
+                    return place.immutable();
                 return null;
             }
             m.move(Direction.DOWN);
@@ -166,7 +201,8 @@ public class ProceduralPlantPatchFeature extends Feature<NoneFeatureConfiguratio
             boolean air = level.isEmptyBlock(m);
             if (air && !level.canSeeSkyFromBelowWater(m)) {
                 BlockState below = level.getBlockState(m.below());
-                if (!below.isAir() && below.isFaceSturdy(level, m.below(), Direction.UP)) return m.immutable();
+                if (!below.isAir() && below.isFaceSturdy(level, m.below(), Direction.UP)
+                        && net.minecraft.world.level.block.Block.isFaceFull(below.getCollisionShape(level, m.below()), Direction.UP)) return m.immutable();
             }
             m.move(Direction.DOWN);
         }
@@ -177,7 +213,8 @@ public class ProceduralPlantPatchFeature extends Feature<NoneFeatureConfiguratio
         // If already a valid underground air above sturdy floor, keep
         if (level.isEmptyBlock(pos) && !level.canSeeSkyFromBelowWater(pos)) {
             var below = level.getBlockState(pos.below());
-            if (!below.isAir() && below.isFaceSturdy(level, pos.below(), Direction.UP)) return pos;
+            if (!below.isAir() && below.isFaceSturdy(level, pos.below(), Direction.UP)
+                    && net.minecraft.world.level.block.Block.isFaceFull(below.getCollisionShape(level, pos.below()), Direction.UP)) return pos;
         }
         return findUndergroundPlacementNear(level, pos);
     }
@@ -194,120 +231,9 @@ public class ProceduralPlantPatchFeature extends Feature<NoneFeatureConfiguratio
         if (path.contains("none")) return Config.Server.spawnMultNone();
         return 1.0;
     }
-
-    // Element placement rules per the new spec
-    private static final class ElementRules {
-        static boolean canSpawnAt(ServerLevel server, WorldGenLevel level, BlockPos pos, String path) {
-            if (path == null) return true; // none
-            path = path.toLowerCase();
-            if (path.contains("fire")) return fire(server, level, pos);
-            if (path.contains("earth")) return earth(level, pos);
-            if (path.contains("ice")) return ice(level, pos);
-            if (path.contains("wind")) return wind(level, pos);
-            if (path.contains("lightning")) return lightning(level, pos);
-            if (path.contains("wood")) return wood(level, pos);
-            if (path.contains("water")) return water(level, pos);
-            if (path.contains("none")) return none(level, pos);
-            return true; // none
-        }
-
-        private static boolean fire(ServerLevel server, WorldGenLevel level, BlockPos pos) {
-            if (server.dimension() != Level.NETHER) return false;
-            BlockState below = level.getBlockState(pos.below());
-            boolean ok = below.is(Blocks.NETHERRACK) || below.is(Blocks.CRIMSON_NYLIUM) || below.is(Blocks.WARPED_NYLIUM)
-                    || below.is(Blocks.BASALT) || below.is(Blocks.BLACKSTONE) || below.is(Blocks.SOUL_SAND) || below.is(Blocks.SOUL_SOIL);
-            return ok && below.isFaceSturdy(level, pos.below(), Direction.UP);
-        }
-
-        private static boolean earth(WorldGenLevel level, BlockPos pos) {
-            if (level.canSeeSkyFromBelowWater(pos)) return false; // underground-only
-            BlockState below = level.getBlockState(pos.below());
-            boolean ok = below.is(Blocks.STONE) || below.is(Blocks.GRANITE) || below.is(Blocks.DIORITE) || below.is(Blocks.ANDESITE)
-                    || below.is(Blocks.DEEPSLATE) || below.is(Blocks.GRAVEL) || below.is(Blocks.SAND)
-                    || below.is(Blocks.DIRT) || below.is(Blocks.COARSE_DIRT) || below.is(Blocks.ROOTED_DIRT) || below.is(Blocks.TUFF);
-            return ok && below.isFaceSturdy(level, pos.below(), Direction.UP);
-        }
-
-        private static boolean ice(WorldGenLevel level, BlockPos pos) {
-            BlockState below = level.getBlockState(pos.below());
-            boolean icyGround = below.is(Blocks.ICE) || below.is(Blocks.PACKED_ICE) || below.is(Blocks.BLUE_ICE)
-                    || below.is(Blocks.FROSTED_ICE) || below.is(Blocks.SNOW_BLOCK);
-            if (icyGround) return below.isFaceSturdy(level, pos.below(), Direction.UP);
-            String biome = level.getBiome(pos).unwrapKey().map(k -> k.location().getPath()).orElse("");
-            return biome.contains("frozen") || biome.contains("snow");
-        }
-
-        private static boolean wind(WorldGenLevel level, BlockPos pos) {
-            if (!isOpenArea(level, pos, 1)) return false;
-            if (pos.getY() < 100) return false; //min 100 blocks altitude
-            String biome = level.getBiome(pos).unwrapKey().map(k -> k.location().getPath()).orElse("");
-            return biome.contains("mountain") || biome.contains("windswept") || biome.contains("peaks") || biome.contains("hills");
-        }
-
-        private static boolean lightning(WorldGenLevel level, BlockPos pos) {
-            if (!isOpenArea(level, pos, 1)) return false;
-            if (pos.getY() < 150) return false; //min 150 blocks altitude
-            String biome = level.getBiome(pos).unwrapKey().map(k -> k.location().getPath()).orElse("");
-            return biome.contains("mountain") || biome.contains("windswept") || biome.contains("peaks") || biome.contains("hills");
-        }
-
-        private static boolean wood(WorldGenLevel level, BlockPos pos) {
-            String biome = level.getBiome(pos).unwrapKey().map(k -> k.location().getPath()).orElse("");
-            if (!(biome.contains("forest") || biome.contains("jungle") || biome.contains("dark_forest"))) return false;
-            return nearWoodOrPlants(level, pos, 6);
-        }
-
-        private static boolean water(WorldGenLevel level, BlockPos pos) {
-            BlockState below = level.getBlockState(pos.below());
-            boolean ground = below.is(Blocks.SAND) || below.is(Blocks.CLAY) || below.is(Blocks.DIRT) || below.is(Blocks.GRASS_BLOCK) || below.is(Blocks.MUD);
-            if (!ground || !below.isFaceSturdy(level, pos.below(), Direction.UP)) return false;
-            if (nearWater(level, pos, 6)) return true;
-            String biome = level.getBiome(pos).unwrapKey().map(k -> k.location().getPath()).orElse("");
-            return biome.contains("ocean") || biome.contains("river") || biome.contains("swamp") || biome.contains("beach");
-        }
-
-        private static boolean none(WorldGenLevel level, BlockPos pos) {
-            if (pos.getY() > 100) return false; //max 100 blocks altitude
-            BlockState below = level.getBlockState(pos.below());
-            boolean ground = below.is(Blocks.DIRT) || below.is(Blocks.GRASS_BLOCK);
-            return ground && below.isFaceSturdy(level, pos.below(), Direction.UP);
-        }
-
-        private static boolean isOpenArea(WorldGenLevel level, BlockPos pos, int clearance) {
-            // Checks that there is minimal obstruction above and can see sky
-            if (!level.canSeeSkyFromBelowWater(pos)) return false;
-            int solid = 0;
-            MutableBlockPos m = new MutableBlockPos();
-            for (int dx = -clearance; dx <= clearance; dx++)
-                for (int dz = -clearance; dz <= clearance; dz++) {
-                    m.set(pos.getX() + dx, pos.getY() + 1, pos.getZ() + dz);
-                    if (!level.isEmptyBlock(m)) solid++;
-                }
-            return solid <= 2;
-        }
-
-        private static boolean nearWater(WorldGenLevel level, BlockPos center, int radius) {
-            MutableBlockPos m = new MutableBlockPos();
-            for (int dx = -radius; dx <= radius; dx++)
-                for (int dz = -radius; dz <= radius; dz++)
-                    for (int dy = -1; dy <= 1; dy++) {
-                        m.set(center.getX() + dx, center.getY() + dy, center.getZ() + dz);
-                        var st = level.getBlockState(m);
-                        if (st.getBlock() == Blocks.WATER || st.getFluidState().isSource()) return true;
-                    }
-            return false;
-        }
-
-        private static boolean nearWoodOrPlants(WorldGenLevel level, BlockPos center, int radius) {
-            MutableBlockPos m = new MutableBlockPos();
-            for (int dx = -radius; dx <= radius; dx++)
-                for (int dz = -radius; dz <= radius; dz++)
-                    for (int dy = -1; dy <= 1; dy++) {
-                        m.set(center.getX() + dx, center.getY() + dy, center.getZ() + dz);
-                        var st = level.getBlockState(m);
-                        if (st.is(BlockTags.LOGS) || st.is(BlockTags.LEAVES) || st.is(BlockTags.SAPLINGS) || st.is(BlockTags.FLOWERS)) return true;
-                    }
-            return false;
-        }
-    }
 }
+
+
+
+
+
