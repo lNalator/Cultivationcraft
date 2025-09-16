@@ -17,15 +17,7 @@ public class Config
         private static ForgeConfigSpec.IntValue procPlantHeightMax;
         private static ForgeConfigSpec.IntValue procPlantTier3ChancePercent;
         private static ForgeConfigSpec.IntValue procPlantTier2ChancePercent;
-        private static ForgeConfigSpec.DoubleValue procPlantHostChanceElement;
-        private static ForgeConfigSpec.DoubleValue procPlantHostChanceNone;
-        private static ForgeConfigSpec.DoubleValue procPlantRarityT1;
-        private static ForgeConfigSpec.DoubleValue procPlantRarityT2;
-        private static ForgeConfigSpec.DoubleValue procPlantRarityT3;
         private static ForgeConfigSpec.IntValue procPlantPatchCapT1;
-        private static ForgeConfigSpec.IntValue procPlantPatchCapT2;
-        private static ForgeConfigSpec.IntValue procPlantPatchCapT3;
-        private static ForgeConfigSpec.IntValue procPlantPatchCapNoneBonus;
         private static ForgeConfigSpec.DoubleValue procPlantGrowthBoostQiAny;
         private static ForgeConfigSpec.DoubleValue procPlantGrowthBoostQiMatch;
         private static ForgeConfigSpec.IntValue procPlantQiGrowthRadius;
@@ -46,54 +38,49 @@ public class Config
         static
         {
             builder.push("First Person Rendering");
-            qiSourceElementalEffects = builder.comment("Enable Qi Sources to apply their elemental effects to the world around them").define("Enable Qi Source Elemental Effects", true);
+            qiSourceElementalEffects = builder.comment("Enable Qi Sources to apply their elemental effects to the world around them")
+                        .define("Enable Qi Source Elemental Effects", true);
             builder.pop();
 
             builder.push("Procedural Plants");
-            procPlantCatalogSize = builder.comment("Number of plant entries generated per world")
-                    .defineInRange("catalog_size", 50, 1, 256);
-            procPlantRegionSizeChunks = builder.comment("Region size in chunks used to map world positions to a catalog entry")
-                    .defineInRange("region_size_chunks", 8, 1, 64);
-            procPlantAgeMin = builder.comment("Minimum maxAge for plants")
-                    .defineInRange("age_min", 3, 1, 10);
-            procPlantAgeMax = builder.comment("Maximum maxAge for plants")
-                    .defineInRange("age_max", 5, 1, 15);
-            procPlantGrowthMin = builder.comment("Minimum per-tick growth chance")
-                    .defineInRange("growth_chance_min", 0.05D, 0.0D, 1.0D);
-            procPlantGrowthMax = builder.comment("Maximum per-tick growth chance")
-                    .defineInRange("growth_chance_max", 0.15D, 0.0D, 1.0D);
-            procPlantHeightMin = builder.comment("Minimum visual height in pixels")
-                    .defineInRange("height_min", 10, 1, 64);
-            procPlantHeightMax = builder.comment("Maximum visual height in pixels")
-                    .defineInRange("height_max", 22, 1, 64);
-            procPlantTier3ChancePercent = builder.comment("Percent chance of tier 3 (epic) entries in catalog")
-                    .defineInRange("tier3_percent", 5, 0, 100);
-            procPlantTier2ChancePercent = builder.comment("Percent chance of tier 2 (rare) entries in catalog; rest are tier 1")
-                    .defineInRange("tier2_percent", 25, 0, 100);
-            procPlantHostChanceElement = builder.comment("Chance [0..1] that a tier 3 elemental plant hosts a Qi Source")
-                    .defineInRange("host_chance_element", 0.20D, 0.0D, 1.0D);
-            procPlantHostChanceNone = builder.comment("Chance [0..1] that a tier 3 none-element plant hosts a Qi Source")
-                    .defineInRange("host_chance_none", 0.05D, 0.0D, 1.0D);
-            procPlantRarityT1 = builder.comment("Base placement chance per attempt for tier 1")
-                    .defineInRange("rarity_t1", 0.85D, 0.0D, 1.0D);
-            procPlantRarityT2 = builder.comment("Base placement chance per attempt for tier 2")
-                    .defineInRange("rarity_t2", 0.40D, 0.0D, 1.0D);
-            procPlantRarityT3 = builder.comment("Base placement chance per attempt for tier 3")
-                    .defineInRange("rarity_t3", 0.15D, 0.0D, 1.0D);
-            procPlantPatchCapT1 = builder.comment("Max plants placed per patch for tier 1")
-                    .defineInRange("patch_cap_t1", 3, 1, 16);
-            procPlantPatchCapT2 = builder.comment("Max plants placed per patch for tier 2")
-                    .defineInRange("patch_cap_t2", 2, 1, 16);
-            procPlantPatchCapT3 = builder.comment("Max plants placed per patch for tier 3")
-                    .defineInRange("patch_cap_t3", 1, 1, 16);
-            procPlantPatchCapNoneBonus = builder.comment("Bonus patch cap for none-element entries")
-                    .defineInRange("patch_cap_none_bonus", 2, 0, 16);
-            procPlantGrowthBoostQiAny = builder.comment("Growth multiplier when any Qi Source is nearby")
-                    .defineInRange("growth_boost_qi_any", 1.2D, 1.0D, 10.0D);
-            procPlantGrowthBoostQiMatch = builder.comment("Growth multiplier when matching-element Qi Source is nearby")
-                    .defineInRange("growth_boost_qi_match", 1.8D, 1.0D, 10.0D);
-            procPlantQiGrowthRadius = builder.comment("Radius (blocks) to search for Qi Sources to boost growth")
-                    .defineInRange("qi_growth_radius", 16, 1, 128);
+            builder.push("catalog");
+                procPlantCatalogSize = builder.comment("Number of plant entries generated per world")
+                        .defineInRange("catalog_size", 50, 1, 256);
+                procPlantRegionSizeChunks = builder.comment("Region size in chunks used to map world positions to a catalog entry")
+                        .defineInRange("region_size_chunks", 8, 1, 64);
+            builder.pop();
+            builder.push("genome");
+                procPlantAgeMin = builder.comment("Minimum maxAge for plants")
+                        .defineInRange("age_min", 3, 1, 10);
+                procPlantAgeMax = builder.comment("Maximum maxAge for plants")
+                        .defineInRange("age_max", 5, 1, 15);
+                procPlantGrowthMin = builder.comment("Minimum per-tick growth chance")
+                        .defineInRange("growth_chance_min", 0.05D, 0.0D, 1.0D);
+                procPlantGrowthMax = builder.comment("Maximum per-tick growth chance")
+                        .defineInRange("growth_chance_max", 0.15D, 0.0D, 1.0D);
+                procPlantHeightMin = builder.comment("Minimum visual height in pixels")
+                        .defineInRange("height_min", 10, 1, 64);
+                procPlantHeightMax = builder.comment("Maximum visual height in pixels")
+                        .defineInRange("height_max", 22, 1, 64);
+            builder.pop();
+            builder.push("catalog_tiers");
+                procPlantTier3ChancePercent = builder.comment("Percent chance of tier 3 (epic) entries in catalog")
+                        .defineInRange("tier3_percent", 5, 0, 100);
+                procPlantTier2ChancePercent = builder.comment("Percent chance of tier 2 (rare) entries in catalog; rest are tier 1")
+                        .defineInRange("tier2_percent", 25, 0, 100);
+            builder.pop();
+            builder.push("patches");
+                procPlantPatchCapT1 = builder.comment("Max plants placed per patch for tier 1")
+                        .defineInRange("patch_cap_t1", 3, 1, 16);
+            builder.pop();
+            builder.push("growth");
+                procPlantGrowthBoostQiAny = builder.comment("Growth multiplier when any Qi Source is nearby")
+                        .defineInRange("growth_boost_qi_any", 1.2D, 1.0D, 10.0D);
+                procPlantGrowthBoostQiMatch = builder.comment("Growth multiplier when matching-element Qi Source is nearby")
+                        .defineInRange("growth_boost_qi_match", 1.8D, 1.0D, 10.0D);
+                procPlantQiGrowthRadius = builder.comment("Radius (blocks) to search for Qi Sources to boost growth")
+                        .defineInRange("qi_growth_radius", 16, 1, 128);
+            builder.pop();
             builder.push("Element Spawn Multipliers");
             spawnMultFire = builder.defineInRange("fire", 1.0D, 0.0D, 10.0D);
             spawnMultEarth = builder.defineInRange("earth", 1.0D, 0.0D, 10.0D);
@@ -102,7 +89,7 @@ public class Config
             spawnMultWater = builder.defineInRange("water", 1.0D, 0.0D, 10.0D);
             spawnMultIce = builder.defineInRange("ice", 1.0D, 0.0D, 10.0D);
             spawnMultLightning = builder.defineInRange("lightning", 1.0D, 0.0D, 10.0D);
-            spawnMultNone = builder.defineInRange("none", 1.0D, 0.0D, 10.0D);
+            spawnMultNone = builder.defineInRange("none", 0.50D, 0.0D, 10.0D);
             builder.pop();
             builder.pop();
             
@@ -127,15 +114,7 @@ public class Config
         public static int procPlantHeightMax() { return procPlantHeightMax.get(); }
         public static int procPlantTier3ChancePercent() { return procPlantTier3ChancePercent.get(); }
         public static int procPlantTier2ChancePercent() { return procPlantTier2ChancePercent.get(); }
-        public static double procPlantHostChanceElement() { return procPlantHostChanceElement.get(); }
-        public static double procPlantHostChanceNone() { return procPlantHostChanceNone.get(); }
-        public static double procPlantRarityT1() { return procPlantRarityT1.get(); }
-        public static double procPlantRarityT2() { return procPlantRarityT2.get(); }
-        public static double procPlantRarityT3() { return procPlantRarityT3.get(); }
         public static int procPlantPatchCapT1() { return procPlantPatchCapT1.get(); }
-        public static int procPlantPatchCapT2() { return procPlantPatchCapT2.get(); }
-        public static int procPlantPatchCapT3() { return procPlantPatchCapT3.get(); }
-        public static int procPlantPatchCapNoneBonus() { return procPlantPatchCapNoneBonus.get(); }
         public static double procPlantGrowthBoostQiAny() { return procPlantGrowthBoostQiAny.get(); }
         public static double procPlantGrowthBoostQiMatch() { return procPlantGrowthBoostQiMatch.get(); }
         public static int procPlantQiGrowthRadius() { return procPlantQiGrowthRadius.get(); }

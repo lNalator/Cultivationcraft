@@ -75,20 +75,21 @@ public class ProceduralPlantPatchFeature extends Feature<NoneFeatureConfiguratio
             // Choose a pre-aging pattern for this patch, with optional bias near QiSources
             int patchTier = choosePatchTier(rng); // 1,2,3 represent age ranges
 
-            // Base patch size tuned by element multiplier; then reshaped by patch tier type
-            int baseCap = Config.Server.procPlantPatchCapT1();
-            int patchCap = Math.max(1, (int)Math.round(baseCap * elementSpawnMult(g.qiElement().getPath())));
+            // Patch size policy: aim for ~10-15 plants per T1 patch, smaller for T2, single for T3
             int count;
             int radius;
             if (patchTier == 3) { // T3: isolated singles
                 count = 1;
                 radius = 0;
             } else if (patchTier == 2) { // T2: small group, wider spread
-                count = 2 + rng.nextInt(3); // 2..4
-                radius = 6 + rng.nextInt(5); // 6..10
-            } else { // T1: large clumps near anchor
-                count = 1 + rng.nextInt(Math.max(1, patchCap));
-                radius = 2 + rng.nextInt(2); // 2..3
+                count = 3 + rng.nextInt(4); // 3..6
+                radius = 7 + rng.nextInt(5); // 7..11
+            } else { // T1: medium cluster near anchor ~10..15
+                int target = 10 + rng.nextInt(6); // 10..15
+                double mult = elementSpawnMult(g.qiElement().getPath());
+                count = (int)Math.round(target * mult);
+                if (count < 8) count = 8; if (count > 18) count = 18;
+                radius = 4 + rng.nextInt(3); // 4..6
             }
             for (int n = 0; n < count; n++) {
                 int ox = rng.nextInt(radius * 2 + 1) - radius;
@@ -125,10 +126,10 @@ public class ProceduralPlantPatchFeature extends Feature<NoneFeatureConfiguratio
     }
 
     private int choosePatchTier(RandomSource rng) {
-        int r = rng.nextInt(100);
-        if (r < 1) return 3;    // 1% T3 (epic)
-        if (r < 14) return 2;   // 14% T2 (rare)
-        return 1;               // 85% T1 (common)
+        double r = rng.nextDouble();
+        if (r < 0.005) return 3;    // 0.5% T3 (epic)
+        if (r < 0.055) return 2;   // 5.5% T2 (rare)
+        return 1;               // 94% T1 (common)
     }
 
     private static boolean contains(String s, String k) { return s != null && s.contains(k); }
@@ -238,16 +239,14 @@ public class ProceduralPlantPatchFeature extends Feature<NoneFeatureConfiguratio
 
         private static boolean wind(WorldGenLevel level, BlockPos pos) {
             if (!isOpenArea(level, pos, 1)) return false;
-            int sea = level.getLevel().getSeaLevel();
-            if (pos.getY() < sea + 75) return false;
+            if (pos.getY() < 100) return false; //min 100 blocks altitude
             String biome = level.getBiome(pos).unwrapKey().map(k -> k.location().getPath()).orElse("");
             return biome.contains("mountain") || biome.contains("windswept") || biome.contains("peaks") || biome.contains("hills");
         }
 
         private static boolean lightning(WorldGenLevel level, BlockPos pos) {
             if (!isOpenArea(level, pos, 1)) return false;
-            int sea = level.getLevel().getSeaLevel();
-            if (pos.getY() < sea + 100) return false;
+            if (pos.getY() < 150) return false; //min 150 blocks altitude
             String biome = level.getBiome(pos).unwrapKey().map(k -> k.location().getPath()).orElse("");
             return biome.contains("mountain") || biome.contains("windswept") || biome.contains("peaks") || biome.contains("hills");
         }
@@ -255,19 +254,20 @@ public class ProceduralPlantPatchFeature extends Feature<NoneFeatureConfiguratio
         private static boolean wood(WorldGenLevel level, BlockPos pos) {
             String biome = level.getBiome(pos).unwrapKey().map(k -> k.location().getPath()).orElse("");
             if (!(biome.contains("forest") || biome.contains("jungle") || biome.contains("dark_forest"))) return false;
-            return nearWoodOrPlants(level, pos, 4);
+            return nearWoodOrPlants(level, pos, 6);
         }
 
         private static boolean water(WorldGenLevel level, BlockPos pos) {
             BlockState below = level.getBlockState(pos.below());
             boolean ground = below.is(Blocks.SAND) || below.is(Blocks.CLAY) || below.is(Blocks.DIRT) || below.is(Blocks.GRASS_BLOCK) || below.is(Blocks.MUD);
             if (!ground || !below.isFaceSturdy(level, pos.below(), Direction.UP)) return false;
-            if (nearWater(level, pos, 4)) return true;
+            if (nearWater(level, pos, 6)) return true;
             String biome = level.getBiome(pos).unwrapKey().map(k -> k.location().getPath()).orElse("");
             return biome.contains("ocean") || biome.contains("river") || biome.contains("swamp") || biome.contains("beach");
         }
 
         private static boolean none(WorldGenLevel level, BlockPos pos) {
+            if (pos.getY() > 100) return false; //max 100 blocks altitude
             BlockState below = level.getBlockState(pos.below());
             boolean ground = below.is(Blocks.DIRT) || below.is(Blocks.GRASS_BLOCK);
             return ground && below.isFaceSturdy(level, pos.below(), Direction.UP);

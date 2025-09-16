@@ -253,16 +253,4 @@ public class ProceduralPlantBlock extends BushBlock implements BonemealableBlock
         }
         return mult;
     }
-
-    private boolean nearWater(Level level, BlockPos center, int radius) {
-        BlockPos.MutableBlockPos m = new BlockPos.MutableBlockPos();
-        for (int dx = -radius; dx <= radius; dx++)
-            for (int dz = -radius; dz <= radius; dz++)
-                for (int dy = -1; dy <= 1; dy++) {
-                    m.set(center.getX() + dx, center.getY() + dy, center.getZ() + dz);
-                    var st = level.getBlockState(m);
-                    if (st.getBlock() == Blocks.WATER || st.getFluidState().isSource()) return true;
-                }
-        return false;
-    }
 }

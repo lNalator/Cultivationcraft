@@ -21,6 +21,9 @@ import DaoOfModding.Cultivationcraft.Common.Qi.Stats.StatIDs;
 import DaoOfModding.Cultivationcraft.Common.Qi.Techniques.PassiveTechniques.PassiveTechnique;
 import DaoOfModding.Cultivationcraft.Common.Qi.Techniques.Technique;
 import DaoOfModding.Cultivationcraft.Common.Reflection;
+import DaoOfModding.Cultivationcraft.Common.Blocks.Plants.ProceduralPlantBlock;
+import DaoOfModding.Cultivationcraft.Common.Blocks.Plants.entity.ProceduralPlantBlockEntity;
+import DaoOfModding.Cultivationcraft.Common.Blocks.Plants.world.ClientPlantCatalog;
 import DaoOfModding.Cultivationcraft.Cultivationcraft;
 import DaoOfModding.Cultivationcraft.StaminaHandler;
 import DaoOfModding.mlmanimator.Client.MultiLimbedRenderer;
@@ -28,10 +31,13 @@ import DaoOfModding.mlmanimator.Client.Poses.PlayerPoseHandler;
 import DaoOfModding.mlmanimator.Client.Poses.PoseHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.BlockHitResult;
+import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
@@ -248,9 +254,9 @@ public class ClientListeners
                 if (mc.hitResult instanceof BlockHitResult bhr && mc.level != null) {
                     BlockPos pos = bhr.getBlockPos();
                     var st = mc.level.getBlockState(pos);
-                    if (st.getBlock() instanceof DaoOfModding.Cultivationcraft.Common.Blocks.Plants.ProceduralPlantBlock) {
+                    if (st.getBlock() instanceof ProceduralPlantBlock) {
                         var be = mc.level.getBlockEntity(pos);
-                        if (be instanceof DaoOfModding.Cultivationcraft.Common.Blocks.Plants.entity.ProceduralPlantBlockEntity plant) {
+                        if (be instanceof ProceduralPlantBlockEntity plant) {
                             int age = plant.getAge();
                             int tier = plant.dynamicTier();
                             Font font = mc.font;
@@ -258,6 +264,21 @@ public class ClientListeners
                             int w = font.width(text);
                             int x = (mc.getWindow().getGuiScaledWidth() - w) / 2;
                             int y = mc.getWindow().getGuiScaledHeight() / 2 + 12; // just below crosshair
+                            
+                            // Render element icon to the left of the text if available
+                            try {
+                                int species = st.getValue(ProceduralPlantBlock.SPECIES);
+                                var entry = ClientPlantCatalog.get(species);
+                                if (entry != null && entry.element != null) {
+                                    ResourceLocation el = new ResourceLocation(entry.element);
+                                    ResourceLocation icon = new ResourceLocation("cultivationcraft", "textures/gui/plants/element_icons/" + el.getPath() + ".png");
+                                    RenderSystem.setShaderTexture(0, icon);
+                                    int iw = 12, ih = 12;
+                                    int ix = x - iw - 4;
+                                    int iy = y - 2;
+                                    GuiComponent.blit(event.getPoseStack(), ix, iy, 0, 0, iw, ih, iw, ih);
+                                }
+                            } catch (Exception ignored) {}
                             font.draw(event.getPoseStack(), text, x, y, 0xFFFFFF);
                         }
                     }

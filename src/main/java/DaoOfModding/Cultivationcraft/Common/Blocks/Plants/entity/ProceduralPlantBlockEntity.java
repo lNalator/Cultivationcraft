@@ -34,7 +34,7 @@ public class ProceduralPlantBlockEntity extends BlockEntity {
 
     public int getAge() { return age; }
     public void incrementAge(int amount) { this.age += amount; if (this.age < 0) this.age = 0; setChanged(); }
-    public int dynamicTier() { if (age >= 100) return 3; if (age >= 50) return 2; return 1; }
+    public int dynamicTier() { if (age >= 1000) return 3; if (age >= 100) return 2; return 1; }
     public void setAge(int newAge) { this.age = Math.max(0, newAge); setChanged(); }
 
     public void attachQiSourceIfMissing(ServerLevel srv, net.minecraft.resources.ResourceLocation element) {
