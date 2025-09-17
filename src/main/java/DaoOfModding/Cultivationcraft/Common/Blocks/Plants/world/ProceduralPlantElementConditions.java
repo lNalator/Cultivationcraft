@@ -23,7 +23,7 @@ public final class ProceduralPlantElementConditions {
 
     public static boolean canSpawn(ServerLevel server, LevelAccessor level, BlockPos pos, ResourceLocation element) {
         String key = elementKey(element);
-        if (key.isEmpty()) {
+        if (key.contains("none")) {
             return noneSpawn(level, pos);
         }
         if (key.contains("fire")) {
@@ -55,7 +55,7 @@ public final class ProceduralPlantElementConditions {
             return 1.0f;
         }
         String key = elementKey(genome.qiElement());
-        if (key.isEmpty()) {
+        if (key.contains("none")) {
             return noneGrowth(level, pos);
         }
         if (key.contains("fire")) {
@@ -111,11 +111,11 @@ public final class ProceduralPlantElementConditions {
     }
 
     private static boolean windSpawn(LevelAccessor level, BlockPos pos) {
-        return isOpenArea(level, pos, 1) && pos.getY() > 100;
+        return isOpenArea(level, pos, 1) && pos.getY() > 85;
     }
 
     private static boolean lightningSpawn(LevelAccessor level, BlockPos pos) {
-        return isOpenArea(level, pos, 1) && pos.getY() > 150;
+        return isOpenArea(level, pos, 1) && pos.getY() > 130;
     }
 
     private static boolean woodSpawn(LevelAccessor level, BlockPos pos) {
@@ -136,7 +136,7 @@ public final class ProceduralPlantElementConditions {
     }
 
     private static boolean noneSpawn(LevelAccessor level, BlockPos pos) {
-        if (pos.getY() > 100) {
+        if (pos.getY() > 85) {
             return false;
         }
         BlockState below = level.getBlockState(pos.below());
@@ -181,10 +181,10 @@ public final class ProceduralPlantElementConditions {
 
     private static float windGrowth(Level level, BlockPos pos) {
         boolean open = isOpenArea(level, pos, 1);
-        if (open && pos.getY() > 140) {
+        if (open && pos.getY() > 125) {
             return 1.4f;
         }
-        if (open && pos.getY() > 90) {
+        if (open && pos.getY() > 80) {
             return 1.0f;
         }
         return open ? 0.7f : 0.4f;
@@ -224,7 +224,7 @@ public final class ProceduralPlantElementConditions {
     }
 
     private static float noneGrowth(Level level, BlockPos pos) {
-        return pos.getY() <= 100 ? 1.0f : 0.6f;
+        return pos.getY() <= 85 ? 1.0f : 0.6f;
     }
 
     private static boolean isFireGround(BlockState state) {

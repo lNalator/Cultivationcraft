@@ -33,6 +33,7 @@ public class ProceduralPlantPatchFeature extends Feature<NoneFeatureConfiguratio
     public boolean place(FeaturePlaceContext<NoneFeatureConfiguration> ctx) {
         WorldGenLevel level = ctx.level();
         ServerLevel server = level.getLevel();
+        boolean isNether = server.dimension() == Level.NETHER;
         RandomSource rng = ctx.random();
         BlockPos origin = ctx.origin();
 
@@ -52,6 +53,9 @@ public class ProceduralPlantPatchFeature extends Feature<NoneFeatureConfiguratio
             BlockPos base = origin.offset(dx, dy, dz);
 
             BlockPos pos = findSurfaceAirAboveSolid(level, base);
+            if (pos == null && isNether) {
+                pos = findUndergroundPlacementNear(level, base);
+            }
             if (pos == null) continue;
 
             int regionSize = Config.Server.procPlantRegionSizeChunks() * 16;
@@ -66,9 +70,10 @@ public class ProceduralPlantPatchFeature extends Feature<NoneFeatureConfiguratio
             var entry = catalog.getById(id);
             if (entry == null) continue;
             var g = entry.genome;
+            boolean isEarth = contains(g.qiElement().getPath(), "earth");
 
             // If EARTH plant, bias search to find an underground cavity with solid floor
-            if (contains(g.qiElement().getPath(), "earth")) {
+            if (isEarth) {
                 BlockPos cave = findUndergroundPlacementNear(level, pos);
                 if (cave != null) pos = cave; else continue;
             }
@@ -105,7 +110,10 @@ public class ProceduralPlantPatchFeature extends Feature<NoneFeatureConfiguratio
                 BlockPos p = pos.offset(ox, oy, oz);
 
                 // Re-adjust to surface for non-earth plants; earth stays underground
-                BlockPos pp = contains(g.qiElement().getPath(), "earth") ? adjustToCaveAir(level, p) : findSurfaceAirAboveSolid(level, p);
+                BlockPos pp = isEarth ? adjustToCaveAir(level, p) : findSurfaceAirAboveSolid(level, p);
+                if (!isEarth && pp == null && isNether) {
+                    pp = findUndergroundPlacementNear(level, p);
+                }
                 if (pp == null) continue;
                 if (!ProceduralPlantElementConditions.canSpawn(server, level, pp, g.qiElement())) continue;
 
