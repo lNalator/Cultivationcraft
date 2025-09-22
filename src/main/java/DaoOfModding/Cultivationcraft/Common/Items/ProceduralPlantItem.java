@@ -31,7 +31,7 @@ public class ProceduralPlantItem extends BlockItem {
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
         super.appendHoverText(stack, level, tooltip, flag);
 
-        int species = extractSpecies(stack);
+        int species = readSpecies(stack);
 
         String name = null;
         if (level instanceof ServerLevel server) name = PlantGenomes.getNameById(server, species);
@@ -77,7 +77,7 @@ public class ProceduralPlantItem extends BlockItem {
 
     @Override
     public Optional<TooltipComponent> getTooltipImage(ItemStack stack) {
-        int species = extractSpecies(stack);
+        int species = readSpecies(stack);
         boolean host = hasHostFlag(stack);
         int dynTier = 0;
         int growth = extractGrowth(stack);
@@ -87,7 +87,7 @@ public class ProceduralPlantItem extends BlockItem {
         return Optional.of(new DaoOfModding.Cultivationcraft.Client.Tooltip.PlantBadgeTooltipData(species, host, dynTier));
     }
 
-    private int extractSpecies(ItemStack stack) {
+    public static int readSpecies(ItemStack stack) {
         int species = 0;
         if (stack.hasTag() && stack.getTag().contains("BlockStateTag")) {
             var bst = stack.getTag().getCompound("BlockStateTag");

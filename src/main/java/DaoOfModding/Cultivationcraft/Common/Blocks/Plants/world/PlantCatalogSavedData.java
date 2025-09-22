@@ -21,6 +21,8 @@ public class PlantCatalogSavedData extends SavedData {
 
     public static final String DATA_NAME = "cultivationcraft_plant_catalog";
 
+    private static final float FRUIT_PRESENT_CHANCE = 0.6f;
+
     public static class Entry {
         public final int id;
         public final PlantGenome genome;
@@ -56,6 +58,9 @@ public class PlantCatalogSavedData extends SavedData {
             ct.putInt("id", e.id);
             ct.putInt("speciesId", e.genome.speciesId());
             ct.putInt("color", e.genome.colorRGB());
+            ct.putInt("stemVariant", e.genome.stemVariant());
+            ct.putInt("foliageVariant", e.genome.foliageVariant());
+            ct.putInt("fruitVariant", e.genome.fruitVariant());
             ct.putInt("maxAge", e.genome.maxAge());
             ct.putFloat("growthChance", e.genome.growthChance());
             ct.putInt("height", e.genome.heightPixels());
@@ -76,9 +81,18 @@ public class PlantCatalogSavedData extends SavedData {
         for (int i = 0; i < list.size(); i++) {
             CompoundTag ct = list.getCompound(i);
             int id = ct.getInt("id");
+            int stemVariant = ct.contains("stemVariant", Tag.TAG_INT) ? ct.getInt("stemVariant") : 0;
+            int foliageVariant = ct.contains("foliageVariant", Tag.TAG_INT) ? ct.getInt("foliageVariant") : 0;
+            int fruitVariant = ct.contains("fruitVariant", Tag.TAG_INT) ? ct.getInt("fruitVariant") : PlantVisuals.NO_FRUIT;
+            if (!PlantVisuals.isValidStem(stemVariant)) stemVariant = 0;
+            if (!PlantVisuals.isValidFoliage(foliageVariant)) foliageVariant = 0;
+            if (!PlantVisuals.isValidFruit(fruitVariant)) fruitVariant = PlantVisuals.NO_FRUIT;
             PlantGenome g = new PlantGenome(
                 ct.getInt("speciesId"),
                 ct.getInt("color"),
+                stemVariant,
+                foliageVariant,
+                fruitVariant,
                 ct.getInt("maxAge"),
                 ct.getFloat("growthChance"),
                 ct.getInt("height"),
@@ -178,7 +192,15 @@ public class PlantCatalogSavedData extends SavedData {
         // Derive spawn preferences from element
         boolean cold = isColdFavored(element);
 
-        PlantGenome genome = new PlantGenome(id, color, maxAge, growthChance, height, prefersShade, cold, element, tier);
+        int stemVariant = rng.nextInt(Math.max(1, PlantVisuals.stemVariantCount()));
+        int foliageVariant = rng.nextInt(Math.max(1, PlantVisuals.foliageVariantCount()));
+        int fruitVariant = PlantVisuals.NO_FRUIT;
+        int fruitCount = PlantVisuals.fruitVariantCount();
+        if (fruitCount > 0 && rng.nextFloat() < FRUIT_PRESENT_CHANCE) {
+            fruitVariant = rng.nextInt(fruitCount);
+        }
+
+        PlantGenome genome = new PlantGenome(id, color, stemVariant, foliageVariant, fruitVariant, maxAge, growthChance, height, prefersShade, cold, element, tier);
         String name = generateName(rng, genome);
         data.entries.add(new Entry(id, genome, name));
         return id + 1;

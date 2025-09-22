@@ -17,8 +17,12 @@ public class PlantCatalogSyncPacket extends Packet {
         public final int color;
         public final String element; // ResourceLocation string
         public final int tier;
-        public Entry(int id, String name, int color, String element, int tier) {
+        public final int stemVariant;
+        public final int foliageVariant;
+        public final int fruitVariant;
+        public Entry(int id, String name, int color, String element, int tier, int stemVariant, int foliageVariant, int fruitVariant) {
             this.id = id; this.name = name; this.color = color; this.element = element; this.tier = tier;
+            this.stemVariant = stemVariant; this.foliageVariant = foliageVariant; this.fruitVariant = fruitVariant;
         }
     }
 
@@ -36,6 +40,9 @@ public class PlantCatalogSyncPacket extends Packet {
             buf.writeVarInt(e.color);
             buf.writeUtf(e.element);
             buf.writeVarInt(e.tier);
+            buf.writeVarInt(e.stemVariant);
+            buf.writeVarInt(e.foliageVariant);
+            buf.writeVarInt(e.fruitVariant);
         }
     }
 
@@ -49,7 +56,10 @@ public class PlantCatalogSyncPacket extends Packet {
                 int color = buf.readVarInt();
                 String element = buf.readUtf(32767);
                 int tier = buf.readVarInt();
-                list.add(new Entry(id, name, color, element, tier));
+                int stemVariant = buf.readVarInt();
+                int foliageVariant = buf.readVarInt();
+                int fruitVariant = buf.readVarInt();
+                list.add(new Entry(id, name, color, element, tier, stemVariant, foliageVariant, fruitVariant));
             }
             return new PlantCatalogSyncPacket(list);
         } catch (Exception e) {
@@ -63,7 +73,7 @@ public class PlantCatalogSyncPacket extends Packet {
         ctx.enqueueWork(() -> {
             ClientPlantCatalog.clear();
             for (Entry e : entries) {
-                ClientPlantCatalog.put(e.id, e.name, e.color, e.element, e.tier);
+                ClientPlantCatalog.put(e.id, e.name, e.color, e.element, e.tier, e.stemVariant, e.foliageVariant, e.fruitVariant);
             }
         });
         ctx.setPacketHandled(true);

@@ -5,6 +5,9 @@ import net.minecraft.resources.ResourceLocation;
 public record PlantGenome(
     int speciesId,        // e.g. 0..N-1
     int colorRGB,         // 0xRRGGBB; client tint
+    int stemVariant,      // index into stem texture catalog
+    int foliageVariant,   // index into foliage texture catalog
+    int fruitVariant,     // index into fruit texture catalog; -1 = none
     int maxAge,           // growth stages (e.g., 3 or 7)
     float growthChance,   // per random tick when conditions met
     int heightPixels,     // for hitbox/shape choice if you like

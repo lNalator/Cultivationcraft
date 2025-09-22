@@ -60,7 +60,7 @@ public class PacketHandler
     protected static final byte CULTIVATOR_STATS = 99;
     protected static final byte FROZEN_BLOCK_RENDER = 100;
     protected static final byte PLANT_CATALOG_SYNC = 101;
-    protected static final String PROTOCOL_VERSION = "1";
+    protected static final String PROTOCOL_VERSION = "2";
 
     public static final SimpleChannel channel = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(Cultivationcraft.MODID, "main"),
@@ -226,7 +226,8 @@ public class PacketHandler
         ArrayList<PlantCatalogSyncPacket.Entry> list = new ArrayList<>(entries.size());
         for (var e : entries) {
             list.add(new PlantCatalogSyncPacket.Entry(
-                e.id, e.displayName, e.genome.colorRGB(), e.genome.qiElement().toString(), e.genome.tier()));
+                e.id, e.displayName, e.genome.colorRGB(), e.genome.qiElement().toString(), e.genome.tier(),
+                e.genome.stemVariant(), e.genome.foliageVariant(), e.genome.fruitVariant()));
         }
         PlantCatalogSyncPacket pkt = new PlantCatalogSyncPacket(list);
         channel.send(PacketDistributor.PLAYER.with(() -> player), pkt);
