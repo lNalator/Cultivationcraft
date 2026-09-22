@@ -5,7 +5,6 @@ import DaoOfModding.Cultivationcraft.Common.Blocks.Plants.world.ClientPlantCatal
 import DaoOfModding.Cultivationcraft.Common.Blocks.Plants.world.PlantGenomes;
 import DaoOfModding.Cultivationcraft.Common.Qi.Elements.Elements;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
@@ -28,31 +27,25 @@ public class ProceduralPlantItem extends BlockItem {
     }
 
     @Override
+    public Component getName(ItemStack stack) {
+        Component name = PlantGenomes.getDisplayName(null, readSpecies(stack));
+        return name != null ? name : super.getName(stack);
+    }
+
+    @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
         super.appendHoverText(stack, level, tooltip, flag);
 
         int species = readSpecies(stack);
 
-        String name = null;
-        if (level instanceof ServerLevel server) name = PlantGenomes.getNameById(server, species);
-        else {
-            var e = ClientPlantCatalog.get(species);
-            if (e != null) name = e.name;
-        }
-
-        int nameColor = 0xFFFFFF;
         String elementStr = null;
         if (level instanceof ServerLevel server) {
             var g = PlantGenomes.getById(server, species);
-            if (g != null) { nameColor = g.colorRGB(); elementStr = g.qiElement().toString(); }
+            if (g != null) elementStr = g.qiElement().toString();
         } else {
             var e = ClientPlantCatalog.get(species);
-            if (e != null) { nameColor = e.color; elementStr = e.element; }
+            if (e != null) elementStr = e.element;
         }
-
-        if (name == null || name.isEmpty()) name = "Species";
-        Style style = Style.EMPTY.withColor(nameColor);
-        tooltip.add(Component.literal(name).setStyle(style));
 
         if (elementStr != null) {
             var rl = new ResourceLocation(elementStr);

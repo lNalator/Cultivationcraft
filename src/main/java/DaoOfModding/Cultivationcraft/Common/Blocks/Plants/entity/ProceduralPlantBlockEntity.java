@@ -9,15 +9,19 @@ import DaoOfModding.Cultivationcraft.Common.Qi.QiSourceConfig;
 import DaoOfModding.Cultivationcraft.Network.PacketHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.network.Connection;
 import net.minecraft.util.Mth;
+import net.minecraft.world.Nameable;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class ProceduralPlantBlockEntity extends BlockEntity {
+import javax.annotation.Nullable;
+
+public class ProceduralPlantBlockEntity extends BlockEntity implements Nameable {
     public static final int MAX_SPIRITUAL_GROWTH = 9999;
     private static final int TIER_TWO_GROWTH = 100;
     private static final int TIER_THREE_GROWTH = 1000;
@@ -27,6 +31,19 @@ public class ProceduralPlantBlockEntity extends BlockEntity {
 
     public ProceduralPlantBlockEntity(BlockPos pos, BlockState state) {
         super(BlockRegister.PROCEDURAL_PLANT_ENTITY.get(), pos, state);
+    }
+
+    @Override
+    public Component getName() {
+        Component name = getCustomName();
+        return name != null ? name : getBlockState().getBlock().getName();
+    }
+
+    // Expose this variant's generated name to block tooltips such as Jade.
+    @Nullable
+    @Override
+    public Component getCustomName() {
+        return PlantGenomes.getDisplayName(level, getBlockState().getValue(ProceduralPlantBlock.SPECIES));
     }
 
     private void markUpdated() {
