@@ -78,17 +78,18 @@ minecraft {
         // By default, the server will crash when no gametests are provided.
         // The gametest system is also enabled by default for other run configs under the /test command.
         gameTestServer {
-            workingDirectory project.file('run')
+            workingDirectory project.file('build/gametest')
 
             property 'forge.logging.markers', 'REGISTRIES'
 
             property 'forge.logging.console.level', 'debug'
 
-            property 'forge.enabledGameTestNamespaces', 'examplemod'
+            property 'forge.enabledGameTestNamespaces', 'cultivationcraft'
 
             mods {
-                examplemod {
+                cultivationcraft {
                     source sourceSets.main
+                    source sourceSets.test
                 }
             }
         }

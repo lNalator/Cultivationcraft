@@ -1,4 +1,11 @@
 {
+  "cultivationcraft.gui.alchemy.results": "Results",
+  "cultivationcraft.gui.alchemy.elemental_qi": "Elemental Qi",
+  "cultivationcraft.gui.alchemy.qi_total": "%s: %s Qi",
+  "cultivationcraft.gui.alchemy.results_reserved": "Reserved for alchemy results",
+  "cultivationcraft.gui.alchemy.controls": "Wheel: zoom · Drag empty space: pan · Shift-wheel: scroll · Home: reset",
+  "block.cultivationcraft.alchemy_cauldron": "Alchemy Cauldron",
+  "cultivationcraft.gui.alchemy.ingredients": "Ingredients",
   "block.cultivationcraft.procedural_plant": "Spiritual Plant",
   "cultivationcraft.cultivation.none": "None",
   "cultivationcraft.cultivation.foundation": "Foundation Establishment",

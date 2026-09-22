@@ -9,6 +9,7 @@ import DaoOfModding.Cultivationcraft.Client.Particles.WindParticle.WindParticleT
 import DaoOfModding.Cultivationcraft.Client.Renderers.FlyingSwordRenderer;
 import DaoOfModding.Cultivationcraft.Client.Renderers.QiProjectileRenderer;
 import DaoOfModding.Cultivationcraft.Common.Containers.FlyingSwordContainer;
+import DaoOfModding.Cultivationcraft.Common.Containers.AlchemyCauldronMenu;
 import DaoOfModding.Cultivationcraft.Common.Qi.QiProjectile;
 import DaoOfModding.Cultivationcraft.Common.Worldgen.ProceduralPlantPatchFeature;
 import DaoOfModding.Cultivationcraft.Cultivationcraft;
@@ -64,6 +65,8 @@ public class Register {
                     .build("qiprojectile"));
 
     public static final RegistryObject<MenuType<FlyingSwordContainer>> ContainerTypeFlyingSword = CONTAINERS.register("flyingsword", () -> IForgeMenuType.create(FlyingSwordContainer::createContainerClientSide));
+    public static final RegistryObject<MenuType<AlchemyCauldronMenu>> ALCHEMY_CAULDRON_MENU = CONTAINERS.register(
+            "alchemy_cauldron", () -> IForgeMenuType.create(AlchemyCauldronMenu::createClient));
 
     public static final RegistryObject<SimpleParticleType> qiParticleType = PARTICLES.register("qiparticle", () -> new SimpleParticleType(true));
     public static final RegistryObject<BloodParticleType> bloodParticleType = PARTICLES.register("bloodparticle", () -> new BloodParticleType());

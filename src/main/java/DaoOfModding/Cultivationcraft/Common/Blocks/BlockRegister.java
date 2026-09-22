@@ -2,12 +2,15 @@ package DaoOfModding.Cultivationcraft.Common.Blocks;
 
 import DaoOfModding.Cultivationcraft.Common.Blocks.Plants.ProceduralPlantBlock;
 import DaoOfModding.Cultivationcraft.Common.Blocks.custom.FrozenBlock;
+import DaoOfModding.Cultivationcraft.Common.Blocks.custom.AlchemyCauldronBlock;
+import DaoOfModding.Cultivationcraft.Common.Blocks.entity.AlchemyCauldronBlockEntity;
 import DaoOfModding.Cultivationcraft.Common.Blocks.entity.FrozenBlockEntity;
 import DaoOfModding.Cultivationcraft.Common.Blocks.Plants.entity.ProceduralPlantBlockEntity;
 import DaoOfModding.Cultivationcraft.Common.Items.ItemRegister;
 import DaoOfModding.Cultivationcraft.Cultivationcraft;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -46,6 +49,14 @@ public class BlockRegister {
                     PROCEDURAL_PLANT.get()
             ).build(null)
     );
+
+    public static final RegistryObject<AlchemyCauldronBlock> ALCHEMY_CAULDRON =
+            BLOCKS.register("alchemy_cauldron", AlchemyCauldronBlock::new);
+    public static final RegistryObject<Item> ALCHEMY_CAULDRON_ITEM = ItemRegister.ITEMS.register("alchemy_cauldron",
+            () -> new BlockItem(ALCHEMY_CAULDRON.get(), new Item.Properties().tab(CreativeModeTab.TAB_DECORATIONS)));
+    public static final RegistryObject<BlockEntityType<AlchemyCauldronBlockEntity>> ALCHEMY_CAULDRON_ENTITY =
+            BLOCK_ENTITIES.register("alchemy_cauldron", () -> BlockEntityType.Builder.of(
+                    AlchemyCauldronBlockEntity::new, ALCHEMY_CAULDRON.get()).build(null));
 
     public static void init(IEventBus bus) {
         BLOCKS.register(bus);
