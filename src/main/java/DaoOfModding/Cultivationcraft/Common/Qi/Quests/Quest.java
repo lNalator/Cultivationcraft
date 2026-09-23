@@ -5,6 +5,8 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
+import java.util.Objects;
+
 public class Quest
 {
     public static final ResourceLocation QI_SOURCE_MEDITATION = new ResourceLocation(Cultivationcraft.MODID, "cultivationcraft.quest.qisource");
@@ -49,7 +51,9 @@ public class Quest
 
     public double progress(ResourceLocation progressMode, double amount, String extraRequirement)
     {
-        if (mode.compareTo(progressMode) == 0 && ((extra == null && extraRequirement == null) || (extraRequirement != null && extra.compareTo(extraRequirement) == 0)))
+        // Damage events report generic and elemental progress separately. Match the
+        // optional requirement exactly so generic quests only count the hit once.
+        if (mode.equals(progressMode) && Objects.equals(extra, extraRequirement))
             return amount;
 
         return 0;
@@ -72,7 +76,7 @@ public class Quest
         nbt.putString("mode", mode.toString());
         nbt.putDouble("complete", complete);
 
-        if (nbt.contains("extra"))
+        if (extra != null)
             nbt.putString("extra", extra);
 
         return nbt;

@@ -1,4 +1,8 @@
 {
+  "cultivationcraft.tstat.divinesense_radius": "Detection Radius (blocks)",
+  "cultivationcraft.tstat.divinesense_max_highlights": "Max Highlights",
+  "cultivationcraft.gui.available_qi": "Available Qi",
+  "cultivationcraft.gui.available_stamina": "Available Stamina",
   "cultivationcraft.gui.alchemy.charge": "Stored Qi",
   "cultivationcraft.technique.qitransfer": "Qi Transfer",
   "cultivationcraft.technique.qitransfer.description": "Hold while aiming at a spiritual plant or alchemy cauldron to send one Qi per pulse.",

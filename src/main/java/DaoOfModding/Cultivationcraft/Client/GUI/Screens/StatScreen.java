@@ -10,6 +10,9 @@ import DaoOfModding.Cultivationcraft.Common.Capabilities.BodyModifications.IBody
 import DaoOfModding.Cultivationcraft.Common.Qi.BodyParts.BodyPart;
 import DaoOfModding.Cultivationcraft.Common.Qi.BodyParts.BodyPartNames;
 import DaoOfModding.Cultivationcraft.Common.Qi.Stats.BodyPartStatControl;
+import DaoOfModding.Cultivationcraft.Common.Capabilities.CultivatorStats.CultivatorStats;
+import DaoOfModding.Cultivationcraft.Common.Qi.CultivationTypes;
+import DaoOfModding.Cultivationcraft.Common.Qi.BodyParts.FoodStats.QiFoodStats;
 import DaoOfModding.Cultivationcraft.Cultivationcraft;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.network.chat.Component;
@@ -18,6 +21,9 @@ import net.minecraft.resources.ResourceLocation;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Map;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
 
 public class StatScreen extends GenericTabScreen
 {
@@ -26,7 +32,9 @@ public class StatScreen extends GenericTabScreen
     protected int statTextX = 70;
     protected int statTextY = 35;
     protected int statTextWidth = 170;
-    protected int statTextHeight = 121;
+    protected int statTextHeight = 93;
+
+    private final DecimalFormat availableFormat = new DecimalFormat("0.##", DecimalFormatSymbols.getInstance(Locale.ROOT));
 
     protected TextField stats = new TextField();
 
@@ -81,6 +89,31 @@ public class StatScreen extends GenericTabScreen
         stats.setSize(statTextWidth, statTextHeight);
         stats.setText(statString);
         stats.render(this, font, PoseStack, mouseX, mouseY);
+
+        var player = genericClientFunctions.getPlayer();
+        if (player != null) {
+            double available = player.getFoodData() instanceof QiFoodStats food
+                    ? food.getTrueFoodLevel() : player.getFoodData().getFoodLevel();
+            available = Math.max(0, available);
+            // External cultivation currently pays both Qi and stamina costs from this pool.
+            double qi = CultivatorStats.getCultivatorStats(player).getCultivationType() == CultivationTypes.QI_CONDENSER
+                    ? available : 0;
+            drawAvailable(PoseStack, "cultivationcraft.gui.available_qi", qi, edgeSpacingX, edgeSpacingY + 137);
+            drawAvailable(PoseStack, "cultivationcraft.gui.available_stamina", available, edgeSpacingX, edgeSpacingY + 151);
+        }
+    }
+
+    private void drawAvailable(PoseStack pose, String label, double amount, int left, int y) {
+        Component text = Component.translatable(label);
+        font.drawShadow(pose, text, left + statTextX, y, 0xDDDDDD);
+        String value = availableFormat.format(amount);
+        int room = statTextWidth - font.width(text) - 8;
+        float scale = Math.min(1f, Math.max(1, room) / (float) Math.max(1, font.width(value)));
+        pose.pushPose();
+        pose.translate(left + statTextX + statTextWidth, y, 0);
+        pose.scale(scale, scale, 1);
+        font.drawShadow(pose, value, -font.width(value), 0, 0xFFFFFF);
+        pose.popPose();
     }
 
     protected void drawBody(PoseStack PoseStack)
