@@ -23,14 +23,36 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class AlchemyCauldronBlockEntity extends BaseContainerBlockEntity {
     public static final int SLOT_COUNT = 9;
-    private final NonNullList<ItemStack> items = NonNullList.withSize(SLOT_COUNT, ItemStack.EMPTY);
+    public static final int INVENTORY_SIZE = SLOT_COUNT + 3;
+    private final NonNullList<ItemStack> items = NonNullList.withSize(INVENTORY_SIZE, ItemStack.EMPTY);
     private int storedQi;
     private long receivingUntil;
     private long nextQiDecayTick = -1;
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, AlchemyCauldronBlockEntity cauldron) {
         cauldron.depleteIdleQi();
+        if (cauldron.isReceivingQi() && level.getGameTime() % 20 == 0) cauldron.refineBatch();
     }
+
+    private void refineBatch() {
+        if (!(level instanceof ServerLevel server)) return;
+        int output = -1;
+        for (int i = SLOT_COUNT; i < INVENTORY_SIZE; i++) {
+            if (items.get(i).isEmpty()) { output = i; break; }
+        }
+        if (output < 0) return;
+        var batch = DaoOfModding.Cultivationcraft.Common.Alchemy.AlchemyBatch.inspect(this, server);
+        if (batch == null || storedQi < batch.definition().qi()) return;
+        ItemStack result = batch.refine(server, 1);
+        // Validate capacity before rolling or consuming anything. Commit on the server thread.
+        for (int i = 0; i < SLOT_COUNT; i++) items.set(i, ItemStack.EMPTY);
+        items.set(output, result);
+        storedQi -= batch.definition().qi();
+        setChanged();
+    }
+
+    @Override
+    public boolean canPlaceItem(int slot, ItemStack stack) { return slot < SLOT_COUNT; }
 
     private int qiDecayInterval() {
         return Math.max(1, ((AlchemyCauldronBlock) getBlockState().getBlock()).getQiDecayIntervalTicks(getBlockState()));
@@ -88,7 +110,7 @@ public class AlchemyCauldronBlockEntity extends BaseContainerBlockEntity {
 
     @Override
     public int getContainerSize() {
-        return SLOT_COUNT;
+        return INVENTORY_SIZE;
     }
 
     @Override

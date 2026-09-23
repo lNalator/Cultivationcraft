@@ -1,0 +1,15 @@
+{
+  "effect": "CULTIVATION",
+  "refinement_qi": 50,
+  "elements": {},
+  "minimum_score": 30,
+  "amount": 50,
+  "duration_seconds": 0,
+  "cooldown_seconds": 300,
+  "color": "D2B66D",
+  "names": [
+    "Foundation Nourishing Pill",
+    "Foundation Seed Pill",
+    "Foundation Tending Pill"
+  ]
+}

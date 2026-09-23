@@ -43,6 +43,8 @@ public class CultivationModifyScreen extends TechniqueModifyScreen
         }
 
         drawStats(cultivation, PoseStack, new ArrayList<>(), 0);
+        ResourceReadout.draw(PoseStack, font, Minecraft.getInstance().player,
+                (width - xSize) / 2 + 20, (height - ySize) / 2 + 137, xSize - 40);
 
         stats = new ArrayList<>();
         for (ResourceLocation stat : cultivation.getPassive().getTechniqueStats())
@@ -62,7 +64,7 @@ public class CultivationModifyScreen extends TechniqueModifyScreen
             ResourceLocation statLocation = stats.get(stat);
             done.add(statLocation);
 
-            double statValue = cultivating.getPassive().getTechniqueStat(statLocation, Minecraft.getInstance().player);
+            double statValue = cultivating.getCultivationStat(Minecraft.getInstance().player, statLocation);
 
             drawStat(PoseStack, stat + location, stats.get(stat), statValue);
         }

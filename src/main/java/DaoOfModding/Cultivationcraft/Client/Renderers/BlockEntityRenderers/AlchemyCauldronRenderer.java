@@ -22,11 +22,11 @@ public class AlchemyCauldronRenderer implements BlockEntityRenderer<AlchemyCauld
                        MultiBufferSource buffers, int light, int overlay) {
         double time = cauldron.getLevel() == null ? 0 : cauldron.getLevel().getGameTime() + (double) partialTick;
         int occupied = 0;
-        for (int slot = 0; slot < cauldron.getContainerSize(); slot++) {
+        for (int slot = 0; slot < AlchemyCauldronBlockEntity.SLOT_COUNT; slot++) {
             if (!cauldron.getItem(slot).isEmpty()) occupied++;
         }
         int orbitIndex = 0;
-        for (int slot = 0; slot < cauldron.getContainerSize(); slot++) {
+        for (int slot = 0; slot < AlchemyCauldronBlockEntity.SLOT_COUNT; slot++) {
             ItemStack stack = cauldron.getItem(slot);
             if (stack.isEmpty()) continue;
             pose.pushPose();

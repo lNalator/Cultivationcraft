@@ -1,0 +1,15 @@
+{
+  "effect": "ABSORPTION",
+  "refinement_qi": 50,
+  "elements": {},
+  "minimum_score": 40,
+  "amount": 1,
+  "duration_seconds": 180,
+  "cooldown_seconds": 300,
+  "color": "B6ACD4",
+  "names": [
+    "Foundation Absorption Pill",
+    "Foundation Dew Pill",
+    "Foundation Breathing Pill"
+  ]
+}

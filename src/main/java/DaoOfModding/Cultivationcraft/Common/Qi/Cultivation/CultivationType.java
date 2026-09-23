@@ -352,6 +352,8 @@ public class CultivationType {
 
         if (getPassive().hasTechniqueStat(stat))
             amount += getPassive().getTechniqueStat(stat, player);
+        if (stat.equals(DefaultCultivationStatIDs.qiAbsorbSpeed))
+            amount += DaoOfModding.Cultivationcraft.Common.Alchemy.PillEffects.absorptionBonus(player);
 
         return amount;
     }
@@ -414,26 +416,22 @@ public class CultivationType {
         if (Qi < 0)
             return 0;
 
-        int currentLevel = (int)qiLevel;
+        double currentLevel = qiLevel;
 
-        if (statsCanLevel())
-            currentLevel = getTechLevelProgressWithoutPrevious(getPassive().getClass().toString());
+        if (statsCanLevel()) {
+            var levels = statLevels.get(getPassive().getClass().toString());
+            currentLevel = levels == null ? 0 : levels.values().stream().mapToDouble(Double::doubleValue).sum();
+        }
 
         // Don't cultivate if already at the max
         if (currentLevel >= techLevel)
             return Qi;
 
-        float remains = (currentLevel + Qi) - techLevel;
-
-        // If cultivating will go over the max, cultivate to the max instead
-        if (remains > 0) {
-            increaseCultivationLevel(player, remains);
-            return Qi - remains;
-        }
-
-        // Cultivate all the supplied Qi
-        increaseCultivationLevel(player, Qi);
-        return 0;
+        // Calculate accepted Qi directly: subtracting two huge floats loses the
+        // stage's remaining capacity when creative commands supply Integer.MAX_VALUE.
+        float accepted = (float) Math.min(Qi, techLevel - currentLevel);
+        increaseCultivationLevel(player, accepted);
+        return Qi - accepted;
     }
 
     public void increaseCultivationLevel(Player player, float amount)

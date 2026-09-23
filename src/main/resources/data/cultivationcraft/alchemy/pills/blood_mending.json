@@ -1,0 +1,18 @@
+{
+  "effect": "HEAL",
+  "refinement_qi": 50,
+  "elements": {
+    "wood": 20,
+    "earth": 10
+  },
+  "minimum_score": 0,
+  "amount": 0.25,
+  "duration_seconds": 0,
+  "cooldown_seconds": 45,
+  "color": "C65353",
+  "names": [
+    "Blood Mending Pill",
+    "Red Herb Pill",
+    "Minor Mending Pill"
+  ]
+}

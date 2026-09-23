@@ -31,7 +31,7 @@ public final class AlchemyQi {
 
     public static int[] totals(Container container, ServerLevel level) {
         int[] totals = new int[ELEMENTS.size()];
-        for (int slot = 0; slot < container.getContainerSize(); slot++) {
+        for (int slot = 0; slot < Math.min(9, container.getContainerSize()); slot++) {
             ItemStack stack = container.getItem(slot);
             int qi = contribution(stack);
             if (qi == 0) continue;

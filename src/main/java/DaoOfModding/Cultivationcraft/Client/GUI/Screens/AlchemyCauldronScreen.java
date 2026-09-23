@@ -88,7 +88,7 @@ public class AlchemyCauldronScreen extends AbstractContainerScreen<AlchemyCauldr
             // Vanilla draws the station slots and drag previews. Draw the carried stack only
             // in the normal-scale inventory pass, so it can cross between both sections.
             super.render(pose, -10000, -10000, partialTick);
-            for (int i = 0; i < 9; i++) {
+            for (int i = 0; i < AlchemyCauldronMenu.STATION_SLOTS; i++) {
                 Slot slot = menu.slots.get(i);
                 if (isHovering(slot.x, slot.y, 16, 16, mouseX, mouseY)) {
                     renderSlotHighlight(pose, leftPos + slot.x, topPos + slot.y, getBlitOffset());
@@ -119,6 +119,8 @@ public class AlchemyCauldronScreen extends AbstractContainerScreen<AlchemyCauldr
             }
         }
         renderTooltip(pose, mouseX, mouseY);
+        if (hoveredSlot != null && hoveredSlot.index == menu.getPreviewSlot() && menu.getCarried().isEmpty())
+            renderTooltip(pose, Component.literal("???"), mouseX, mouseY);
         if (hoveredSlot == null && menu.getCarried().isEmpty()) {
             if (inPanel(mouseX, mouseY)) drawPanelTooltip(pose, mouseX, mouseY);
             else if (inStation(mouseX, mouseY))
@@ -158,7 +160,12 @@ public class AlchemyCauldronScreen extends AbstractContainerScreen<AlchemyCauldr
             if (slot.isActive()) drawSlot(pose, leftPos + slot.x, topPos + slot.y);
         }
         if (!renderingPanel) return;
-        for (int i = 0; i < 3; i++) drawSlot(pose, leftPos + 164 + i * 40, topPos + 30);
+        int preview = menu.getPreviewSlot();
+        if (preview >= 0) {
+            Slot slot = menu.slots.get(preview);
+            itemRenderer.renderAndDecorateItem(new net.minecraft.world.item.ItemStack(
+                    DaoOfModding.Cultivationcraft.Common.Items.ItemRegister.ALCHEMY_PILL.get()), leftPos + slot.x, topPos + slot.y);
+        }
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1, 1, 1, 1);
         RenderSystem.setShaderTexture(0, FURNACE);
@@ -213,9 +220,6 @@ public class AlchemyCauldronScreen extends AbstractContainerScreen<AlchemyCauldr
                 return;
             }
         }
-        if (x >= 163 && x < 261 && y >= 29 && y < 47) {
-            renderTooltip(pose, Component.translatable("cultivationcraft.gui.alchemy.results_reserved"), mouseX, mouseY);
-        }
     }
 
     @Override
@@ -226,7 +230,8 @@ public class AlchemyCauldronScreen extends AbstractContainerScreen<AlchemyCauldr
         int row = y - AlchemyCauldronMenu.INGREDIENT_Y;
         boolean ingredient = column >= 0 && column <= 36 && column % 18 == 0
                 && row >= 0 && row <= 36 && row % 18 == 0;
-        if (ingredient) return inPanel(mouseX, mouseY)
+        boolean output = y == 30 && x >= 164 && x <= 244 && (x - 164) % 40 == 0;
+        if (ingredient || output) return inPanel(mouseX, mouseY)
                 && super.isHovering(x, y, w, h, virtualX(mouseX), virtualY(mouseY));
         return super.isHovering(x, y, w, h, mouseX, mouseY);
     }

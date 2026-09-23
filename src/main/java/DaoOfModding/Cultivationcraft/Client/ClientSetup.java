@@ -17,6 +17,11 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 @Mod.EventBusSubscriber(value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ClientSetup {
     @SubscribeEvent
+    public static void registerPillColors(net.minecraftforge.client.event.RegisterColorHandlersEvent.Item event) {
+        event.register(AlchemyPillPresentation::color, DaoOfModding.Cultivationcraft.Common.Items.ItemRegister.ALCHEMY_PILL.get());
+    }
+
+    @SubscribeEvent
     public static void registerBlockEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerBlockEntityRenderer(BlockRegister.ALCHEMY_CAULDRON_ENTITY.get(), AlchemyCauldronRenderer::new);
     }

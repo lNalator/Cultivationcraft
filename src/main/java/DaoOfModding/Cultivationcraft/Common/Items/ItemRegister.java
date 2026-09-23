@@ -18,6 +18,9 @@ public class ItemRegister {
             ITEMS.register("procedural_plant", () -> new ProceduralPlantItem(BlockRegister.PROCEDURAL_PLANT.get(), new Item.Properties()));
 
 
+    public static final RegistryObject<Item> ALCHEMY_PILL = ITEMS.register("alchemy_pill", () -> new AlchemyPillItem(new Item.Properties()));
+    public static final RegistryObject<Item> ALCHEMY_REMNANTS = ITEMS.register("alchemy_remnants", () -> new Item(new Item.Properties()));
+
     public static void init(IEventBus bus) {
         ITEMS.register(bus);
     }

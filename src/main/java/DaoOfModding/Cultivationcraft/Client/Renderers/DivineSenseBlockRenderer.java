@@ -92,7 +92,10 @@ public final class DivineSenseBlockRenderer {
         // Refresh immediately on a breakthrough, realm reset, teleport, or world change.
         if (scannedLevel != mc.level || !current.equals(scanProfile)
                 || (scanOrigin != null && origin.distanceToSqr(scanOrigin) > 64)) {
-            clearScan();
+            if (scannedLevel != mc.level) clearScan();
+            pendingSections.clear();
+            candidates.clear();
+            scanTicks = 0;
             scannedLevel = mc.level;
             scanProfile = current;
         }
@@ -160,11 +163,12 @@ public final class DivineSenseBlockRenderer {
                 }
             }
         }
-        // Publish partial results too, so a larger realm does not delay initial vision.
-        nearby.clear();
-        candidates.stream().sorted(Comparator.comparingDouble(Target::distanceSquared))
-                .forEach(target -> nearby.add(target.pos()));
+        // Keep the last complete snapshot while scanning; partial replacements blink
+        // distant targets off at the start of every refresh.
         if (sectionIndex >= pendingSections.size()) {
+            nearby.clear();
+            candidates.stream().sorted(Comparator.comparingDouble(Target::distanceSquared))
+                    .forEach(target -> nearby.add(target.pos()));
             pendingSections.clear();
             scanTicks = SCAN_INTERVAL - 1;
         }

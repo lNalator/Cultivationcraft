@@ -23,6 +23,7 @@ public class AlchemyCauldronMenu extends AbstractContainerMenu {
     public static final int INVENTORY_Y = 18;
     public static final int HOTBAR_Y = 76;
     private static final int SLOT_COUNT = AlchemyCauldronBlockEntity.SLOT_COUNT;
+    public static final int STATION_SLOTS = AlchemyCauldronBlockEntity.INVENTORY_SIZE;
     private final Container container;
     // Client rendering only: 0 = all slots, 1 = station, 2 = player inventory.
     private int visibleSection;
@@ -34,7 +35,16 @@ public class AlchemyCauldronMenu extends AbstractContainerMenu {
         return new Slot(owner, index, x, y) {
             @Override
             public boolean isActive() { return visibleSection == 0 || visibleSection == section; }
+            @Override
+            public boolean mayPlace(ItemStack stack) { return section != 1 || index < SLOT_COUNT; }
         };
+    }
+
+    public int getPreviewSlot() {
+        boolean ingredients = false;
+        for (int i = 0; i < SLOT_COUNT; i++) ingredients |= !container.getItem(i).isEmpty();
+        if (ingredients) for (int i = SLOT_COUNT; i < STATION_SLOTS; i++) if (container.getItem(i).isEmpty()) return i;
+        return -1;
     }
 
     public int getStoredQi() {
@@ -48,13 +58,13 @@ public class AlchemyCauldronMenu extends AbstractContainerMenu {
     private final ContainerData qiData = new SimpleContainerData(AlchemyQi.ELEMENTS.size() * 2);
 
     public static AlchemyCauldronMenu createClient(int id, Inventory inventory, FriendlyByteBuf data) {
-        return new AlchemyCauldronMenu(id, inventory, new SimpleContainer(SLOT_COUNT),
+        return new AlchemyCauldronMenu(id, inventory, new SimpleContainer(STATION_SLOTS),
                 ContainerLevelAccess.create(inventory.player.level, data.readBlockPos()));
     }
 
     public AlchemyCauldronMenu(int id, Inventory inventory, Container container, ContainerLevelAccess access) {
         super(Register.ALCHEMY_CAULDRON_MENU.get(), id);
-        checkContainerSize(container, SLOT_COUNT);
+        checkContainerSize(container, STATION_SLOTS);
         this.container = container;
         this.access = access;
         this.serverLevel = inventory.player.level instanceof ServerLevel server ? server : null;
@@ -66,6 +76,7 @@ public class AlchemyCauldronMenu extends AbstractContainerMenu {
                 addSlot(sectionSlot(container, row * 3 + column, INGREDIENT_X + column * 18, INGREDIENT_Y + row * 18, 1));
             }
         }
+        for (int i = 0; i < 3; i++) addSlot(sectionSlot(container, SLOT_COUNT + i, 164 + i * 40, 30, 1));
         for (int row = 0; row < 3; row++) {
             for (int column = 0; column < 9; column++) {
                 addSlot(sectionSlot(inventory, 9 + row * 9 + column, INVENTORY_X + column * 18, INVENTORY_Y + row * 18, 2));
@@ -111,8 +122,8 @@ public class AlchemyCauldronMenu extends AbstractContainerMenu {
         if (!slot.hasItem()) return ItemStack.EMPTY;
         ItemStack stack = slot.getItem();
         ItemStack original = stack.copy();
-        if (index < SLOT_COUNT) {
-            if (!moveItemStackTo(stack, SLOT_COUNT, slots.size(), true)) return ItemStack.EMPTY;
+        if (index < STATION_SLOTS) {
+            if (!moveItemStackTo(stack, STATION_SLOTS, slots.size(), true)) return ItemStack.EMPTY;
         } else if (!moveItemStackTo(stack, 0, SLOT_COUNT, false)) {
             return ItemStack.EMPTY;
         }

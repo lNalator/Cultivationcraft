@@ -20,7 +20,7 @@ public class FlyingSwordContainerItemHandler extends ItemStackHandler
 
         if (stack.isEmpty()) return false;
 
-        if (!(stack.getItem() instanceof SwordItem)) return false;
+        if (!(stack.getItem() instanceof SwordItem) && !(stack.getItem() instanceof DaoOfModding.Cultivationcraft.Common.Items.AlchemyPillItem)) return false;
 
         return true;
     }

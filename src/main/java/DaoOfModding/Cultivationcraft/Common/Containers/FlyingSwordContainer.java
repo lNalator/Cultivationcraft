@@ -40,6 +40,24 @@ public class FlyingSwordContainer extends BasicContainer
         addSlot(new SlotItemHandler(handler, 0, FLYING_SWORD_ITEM_XPOS, FLYING_SWORD_ITEM_YPOS));
     }
 
+    public boolean isRefiningPill() {
+        return itemStackHandler.getStackInSlot(0).getItem() instanceof DaoOfModding.Cultivationcraft.Common.Items.AlchemyPillItem;
+    }
+
+    @Override
+    public ItemStack quickMoveStack(Player player, int index) {
+        var slot = slots.get(index);
+        if (!slot.hasItem()) return ItemStack.EMPTY;
+        ItemStack stack = slot.getItem(), original = stack.copy();
+        if (index < FIRST_FREE_SLOT_INDEX) {
+            if (!moveItemStackTo(stack, FIRST_FREE_SLOT_INDEX, slots.size(), false)) return ItemStack.EMPTY;
+        } else if (!moveItemStackTo(stack, 0, FIRST_FREE_SLOT_INDEX, true)) return ItemStack.EMPTY;
+        if (stack.isEmpty()) slot.set(ItemStack.EMPTY);
+        else slot.setChanged();
+        slot.onTake(player, stack);
+        return original;
+    }
+
     public float getBindTime()
     {
         return getNbt("BindRemaining");
@@ -55,7 +73,7 @@ public class FlyingSwordContainer extends BasicContainer
         if (itemStackHandler.getStackInSlot(0) == ItemStack.EMPTY)
             return 0;
 
-        if (!itemStackHandler.getStackInSlot(0).getTag().contains(tag))
+        if (!itemStackHandler.getStackInSlot(0).hasTag() || !itemStackHandler.getStackInSlot(0).getTag().contains(tag))
             return 0;
 
         return itemStackHandler.getStackInSlot(0).getTag().getFloat(tag);

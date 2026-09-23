@@ -76,7 +76,7 @@ public class FlyingSwordContainerScreen extends AbstractContainerScreen<FlyingSw
         final float PROGRESS_LABEL_XPOS = 42;
         final float PROGRESS_LABEL_YPOS = 64;
 
-        String testString = Component.translatable("cultivationcraft.gui.bind").getString();
+        String testString = Component.translatable(menu.isRefiningPill() ? "cultivationcraft.gui.refine_pill" : "cultivationcraft.gui.bind").getString();
 
         float BAG_LABEL_XPOS = (imageHeight / 2.0F) - font.width(testString) / 2.0F;
         font.draw(PoseStack, testString, BAG_LABEL_XPOS, BAG_LABEL_YPOS, Color.darkGray.getRGB());

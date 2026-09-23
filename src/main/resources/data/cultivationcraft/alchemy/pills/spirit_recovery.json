@@ -1,0 +1,18 @@
+{
+  "effect": "QI",
+  "refinement_qi": 50,
+  "elements": {
+    "water": 20,
+    "fire": 10
+  },
+  "minimum_score": 0,
+  "amount": 0.1,
+  "duration_seconds": 0,
+  "cooldown_seconds": 60,
+  "color": "548CD4",
+  "names": [
+    "Spirit Recovery Pill",
+    "Simple Qi Pill",
+    "Clear Spirit Pill"
+  ]
+}

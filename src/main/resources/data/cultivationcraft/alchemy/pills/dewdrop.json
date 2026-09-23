@@ -1,0 +1,18 @@
+{
+  "effect": "QI_OVER_TIME",
+  "refinement_qi": 50,
+  "elements": {
+    "water": 30,
+    "wind": 10
+  },
+  "minimum_score": 0,
+  "amount": 0.15,
+  "duration_seconds": 10,
+  "cooldown_seconds": 60,
+  "color": "88C5CC",
+  "names": [
+    "Dewdrop Pill",
+    "Morning Dew Pill",
+    "Small Spring Pill"
+  ]
+}

@@ -23,6 +23,10 @@ public class FlyingSwordBindProgresser {
 
                 // If the item in the binding slot exists
                 if (!testItem.isEmpty()) {
+                    if (testItem.getItem() instanceof DaoOfModding.Cultivationcraft.Common.Items.AlchemyPillItem) {
+                        DaoOfModding.Cultivationcraft.Common.Alchemy.PillEffects.refineInBind(player, testItem, time);
+                        continue;
+                    }
                     // If the item int the binding slot is able to be bound, try to bind it
                     if (FlyingSwordController.startFlyingSwordBind(testItem, player.getUUID())) {
                         increaseBindTime(testItem, time);
