@@ -91,6 +91,23 @@ public class ProceduralPlantBlockEntity extends BlockEntity implements Nameable 
         return growthToTier(spiritualGrowth);
     }
 
+    // Qi Transfer grows the plant itself; its separate Qi-source reserve is untouched.
+    public int receiveQi(int amount) {
+        if (!(level instanceof ServerLevel server) || amount <= 0) return 0;
+        int accepted = Math.min(amount, MAX_SPIRITUAL_GROWTH - spiritualGrowth);
+        if (accepted == 0) return 0;
+        setSpiritualGrowth(spiritualGrowth + accepted);
+        BlockState state = getBlockState();
+        BlockState updated = state.setValue(ProceduralPlantBlock.TIER, getTier())
+                .setValue(ProceduralPlantBlock.HOST_QI, getTier() >= 3);
+        if (!updated.equals(state)) server.setBlock(worldPosition, updated, Block.UPDATE_CLIENTS);
+        if (getTier() >= 3) {
+            var genome = PlantGenomes.getById(server, updated.getValue(ProceduralPlantBlock.SPECIES));
+            if (genome != null) attachQiSourceIfMissing(server, genome.qiElement());
+        }
+        return accepted;
+    }
+
     public static int growthToTier(int growth) {
         if (growth >= TIER_THREE_GROWTH) {
             return 3;

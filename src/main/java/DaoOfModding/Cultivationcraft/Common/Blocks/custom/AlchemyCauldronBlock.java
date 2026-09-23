@@ -1,6 +1,7 @@
 package DaoOfModding.Cultivationcraft.Common.Blocks.custom;
 
 import DaoOfModding.Cultivationcraft.Common.Blocks.entity.AlchemyCauldronBlockEntity;
+import DaoOfModding.Cultivationcraft.Common.Blocks.BlockRegister;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Containers;
@@ -13,6 +14,8 @@ import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
@@ -38,6 +41,18 @@ public class AlchemyCauldronBlock extends BaseEntityBlock {
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new AlchemyCauldronBlockEntity(pos, state);
+    }
+
+    // Future higher-tier cauldrons can increase this interval to retain Qi longer.
+    public int getQiDecayIntervalTicks(BlockState state) {
+        return 100;
+    }
+
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state,
+                                                                BlockEntityType<T> type) {
+        return level.isClientSide ? null : createTickerHelper(type, BlockRegister.ALCHEMY_CAULDRON_ENTITY.get(),
+                AlchemyCauldronBlockEntity::serverTick);
     }
 
     @Override

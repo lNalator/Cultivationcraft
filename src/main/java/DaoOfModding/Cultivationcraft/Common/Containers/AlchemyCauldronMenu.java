@@ -19,11 +19,29 @@ import net.minecraft.world.item.ItemStack;
 public class AlchemyCauldronMenu extends AbstractContainerMenu {
     public static final int INGREDIENT_X = 32;
     public static final int INGREDIENT_Y = 30;
-    public static final int INVENTORY_X = 80;
-    public static final int INVENTORY_Y = 174;
-    public static final int HOTBAR_Y = 232;
+    public static final int INVENTORY_X = 8;
+    public static final int INVENTORY_Y = 18;
+    public static final int HOTBAR_Y = 76;
     private static final int SLOT_COUNT = AlchemyCauldronBlockEntity.SLOT_COUNT;
     private final Container container;
+    // Client rendering only: 0 = all slots, 1 = station, 2 = player inventory.
+    private int visibleSection;
+    private final ContainerData chargeData = new SimpleContainerData(3);
+
+    public void setVisibleSection(int section) { visibleSection = section; }
+
+    private Slot sectionSlot(Container owner, int index, int x, int y, int section) {
+        return new Slot(owner, index, x, y) {
+            @Override
+            public boolean isActive() { return visibleSection == 0 || visibleSection == section; }
+        };
+    }
+
+    public int getStoredQi() {
+        return (chargeData.get(0) & 0xFFFF) | ((chargeData.get(1) & 0xFFFF) << 16);
+    }
+
+    public boolean isReceivingQi() { return chargeData.get(2) != 0; }
     private final ContainerLevelAccess access;
     private final ServerLevel serverLevel;
     // Menu data packets transmit signed shorts. Split each total into two halves.
@@ -41,19 +59,20 @@ public class AlchemyCauldronMenu extends AbstractContainerMenu {
         this.access = access;
         this.serverLevel = inventory.player.level instanceof ServerLevel server ? server : null;
         addDataSlots(qiData);
+        addDataSlots(chargeData);
         updateQi();
         for (int row = 0; row < 3; row++) {
             for (int column = 0; column < 3; column++) {
-                addSlot(new Slot(container, row * 3 + column, INGREDIENT_X + column * 18, INGREDIENT_Y + row * 18));
+                addSlot(sectionSlot(container, row * 3 + column, INGREDIENT_X + column * 18, INGREDIENT_Y + row * 18, 1));
             }
         }
         for (int row = 0; row < 3; row++) {
             for (int column = 0; column < 9; column++) {
-                addSlot(new Slot(inventory, 9 + row * 9 + column, INVENTORY_X + column * 18, INVENTORY_Y + row * 18));
+                addSlot(sectionSlot(inventory, 9 + row * 9 + column, INVENTORY_X + column * 18, INVENTORY_Y + row * 18, 2));
             }
         }
         for (int column = 0; column < 9; column++) {
-            addSlot(new Slot(inventory, column, INVENTORY_X + column * 18, HOTBAR_Y));
+            addSlot(sectionSlot(inventory, column, INVENTORY_X + column * 18, HOTBAR_Y, 2));
         }
     }
 
@@ -64,6 +83,11 @@ public class AlchemyCauldronMenu extends AbstractContainerMenu {
 
     private void updateQi() {
         if (serverLevel == null) return;
+        if (container instanceof AlchemyCauldronBlockEntity cauldron) {
+            chargeData.set(0, cauldron.getStoredQi() & 0xFFFF);
+            chargeData.set(1, cauldron.getStoredQi() >>> 16);
+            chargeData.set(2, cauldron.isReceivingQi() ? 1 : 0);
+        }
         int[] totals = AlchemyQi.totals(container, serverLevel);
         for (int i = 0; i < totals.length; i++) {
             qiData.set(i * 2, totals[i] & 0xFFFF);

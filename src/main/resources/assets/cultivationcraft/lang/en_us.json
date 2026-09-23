@@ -1,4 +1,9 @@
 {
+  "cultivationcraft.gui.alchemy.charge": "Stored Qi",
+  "cultivationcraft.technique.qitransfer": "Qi Transfer",
+  "cultivationcraft.technique.qitransfer.description": "Hold while aiming at a spiritual plant or alchemy cauldron to send one Qi per pulse.",
+  "cultivationcraft.technique.qitransfer.insufficient": "Not enough Qi / stamina to transfer.",
+  "cultivationcraft.tstat.qitransferrate": "Qi transfer tickrate (pulses/s)",
   "cultivationcraft.gui.alchemy.results": "Results",
   "cultivationcraft.gui.alchemy.elemental_qi": "Elemental Qi",
   "cultivationcraft.gui.alchemy.qi_total": "%s: %s Qi",

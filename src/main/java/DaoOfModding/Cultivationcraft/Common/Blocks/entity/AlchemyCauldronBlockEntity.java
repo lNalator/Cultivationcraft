@@ -1,6 +1,7 @@
 package DaoOfModding.Cultivationcraft.Common.Blocks.entity;
 
 import DaoOfModding.Cultivationcraft.Common.Blocks.BlockRegister;
+import DaoOfModding.Cultivationcraft.Common.Blocks.custom.AlchemyCauldronBlock;
 import DaoOfModding.Cultivationcraft.Common.Containers.AlchemyCauldronMenu;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
@@ -10,6 +11,7 @@ import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -22,6 +24,53 @@ import net.minecraft.world.level.block.state.BlockState;
 public class AlchemyCauldronBlockEntity extends BaseContainerBlockEntity {
     public static final int SLOT_COUNT = 9;
     private final NonNullList<ItemStack> items = NonNullList.withSize(SLOT_COUNT, ItemStack.EMPTY);
+    private int storedQi;
+    private long receivingUntil;
+    private long nextQiDecayTick = -1;
+
+    public static void serverTick(Level level, BlockPos pos, BlockState state, AlchemyCauldronBlockEntity cauldron) {
+        cauldron.depleteIdleQi();
+    }
+
+    private int qiDecayInterval() {
+        return Math.max(1, ((AlchemyCauldronBlock) getBlockState().getBlock()).getQiDecayIntervalTicks(getBlockState()));
+    }
+
+    private void depleteIdleQi() {
+        if (!(level instanceof ServerLevel) || storedQi == 0) return;
+        long now = level.getGameTime();
+        int interval = qiDecayInterval();
+        if (nextQiDecayTick < 0) {
+            // Existing saves receive a full grace period when first loaded.
+            nextQiDecayTick = now + interval;
+            setChanged();
+        } else if (now >= nextQiDecayTick) {
+            // Use world time so unloading a chunk does not reset the decay timer.
+            int lost = (int) Math.min((long) storedQi, 1 + (now - nextQiDecayTick) / interval);
+            storedQi -= lost;
+            nextQiDecayTick = storedQi == 0 ? -1 : nextQiDecayTick + (long) lost * interval;
+            setChanged();
+        }
+    }
+
+    public int getStoredQi() { return storedQi; }
+
+    public boolean isReceivingQi() {
+        return level != null && level.getGameTime() < receivingUntil;
+    }
+
+    public int receiveQi(int amount) {
+        if (!(level instanceof ServerLevel) || amount <= 0) return 0;
+        depleteIdleQi();
+        int accepted = Math.min(amount, Integer.MAX_VALUE - storedQi);
+        if (accepted > 0) {
+            storedQi += accepted;
+            receivingUntil = level.getGameTime() + 40;
+            nextQiDecayTick = level.getGameTime() + qiDecayInterval();
+            setChanged();
+        }
+        return accepted;
+    }
 
     public AlchemyCauldronBlockEntity(BlockPos pos, BlockState state) {
         super(BlockRegister.ALCHEMY_CAULDRON_ENTITY.get(), pos, state);
@@ -90,6 +139,8 @@ public class AlchemyCauldronBlockEntity extends BaseContainerBlockEntity {
     protected void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);
         ContainerHelper.saveAllItems(tag, items);
+        tag.putInt("StoredQi", storedQi);
+        tag.putLong("NextQiDecayTick", nextQiDecayTick);
     }
 
     @Override
@@ -97,6 +148,8 @@ public class AlchemyCauldronBlockEntity extends BaseContainerBlockEntity {
         super.load(tag);
         items.clear();
         ContainerHelper.loadAllItems(tag, items);
+        storedQi = Math.max(0, tag.getInt("StoredQi"));
+        nextQiDecayTick = tag.contains("NextQiDecayTick") ? tag.getLong("NextQiDecayTick") : -1;
     }
 
     @Override
