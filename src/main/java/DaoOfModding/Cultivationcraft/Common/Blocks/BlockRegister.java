@@ -1,7 +1,9 @@
 package DaoOfModding.Cultivationcraft.Common.Blocks;
 
+import DaoOfModding.Cultivationcraft.Common.Blocks.Plants.ProceduralPlantBlock;
 import DaoOfModding.Cultivationcraft.Common.Blocks.custom.FrozenBlock;
 import DaoOfModding.Cultivationcraft.Common.Blocks.entity.FrozenBlockEntity;
+import DaoOfModding.Cultivationcraft.Common.Blocks.Plants.entity.ProceduralPlantBlockEntity;
 import DaoOfModding.Cultivationcraft.Common.Items.ItemRegister;
 import DaoOfModding.Cultivationcraft.Cultivationcraft;
 import net.minecraft.world.item.BlockItem;
@@ -19,8 +21,10 @@ import java.util.function.Supplier;
 
 public class BlockRegister {
 
-    public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, Cultivationcraft.MODID);
-    public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, Cultivationcraft.MODID);
+    public static final DeferredRegister<Block> BLOCKS = 
+            DeferredRegister.create(ForgeRegistries.BLOCKS, Cultivationcraft.MODID);
+    public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = 
+            DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, Cultivationcraft.MODID);
 /*
     public static final DeferredRegister<ConfiguredFeature<?, ?>> CONFIGURED_FEATURE = DeferredRegister.create(Registry.CONFIGURED_FEATURE_REGISTRY, Cultivationcraft.MODID);
 */
@@ -31,6 +35,15 @@ public class BlockRegister {
             () -> BlockEntityType.Builder.of(
                     FrozenBlockEntity::new,
                     FROZEN_BLOCK.get()
+            ).build(null)
+    );
+
+    public static final RegistryObject<Block> PROCEDURAL_PLANT =
+            BLOCKS.register("procedural_plant", ProceduralPlantBlock::new);
+    public static RegistryObject<BlockEntityType<ProceduralPlantBlockEntity>> PROCEDURAL_PLANT_ENTITY = BLOCK_ENTITIES.register("procedural_plant_entity",
+            () -> BlockEntityType.Builder.of(
+                    ProceduralPlantBlockEntity::new,
+                    PROCEDURAL_PLANT.get()
             ).build(null)
     );
 

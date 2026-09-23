@@ -1,0 +1,33 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "cultivationcraft:procedural_plant",
+          "functions": [
+            {
+              "function": "minecraft:copy_state",
+              "block": "cultivationcraft:procedural_plant",
+              "properties": ["species", "host_qi", "tier"]
+            },
+            {
+              "function": "minecraft:copy_nbt",
+              "source": "block_entity",
+              "ops": [
+                { "source": "SpiritualGrowth", "target": "SpiritualGrowth", "op": "replace" },
+                { "source": "SpiritualGrowth", "target": "PlantAge", "op": "replace" },
+                { "source": "QiHostData", "target": "QiHostData", "op": "replace" }
+              ]
+            }
+          ]
+        }
+      ],
+      "conditions": [
+        { "condition": "minecraft:survives_explosion" }
+      ]
+    }
+  ]
+}

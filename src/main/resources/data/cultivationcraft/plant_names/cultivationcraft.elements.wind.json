@@ -1,0 +1,6 @@
+{
+  "prefixes": ["Windy", "Whispering", "Breezy", "Zephyr", "Sky", "High"],
+  "cores": ["Reed", "Fern", "Thorn", "Bloom", "Vine", "Grass"],
+  "suffixes": ["plume", "tuft", "frond", "leaf", "seed", "down"]
+}
+

@@ -10,6 +10,7 @@ import DaoOfModding.Cultivationcraft.Client.Renderers.FlyingSwordRenderer;
 import DaoOfModding.Cultivationcraft.Client.Renderers.QiProjectileRenderer;
 import DaoOfModding.Cultivationcraft.Common.Containers.FlyingSwordContainer;
 import DaoOfModding.Cultivationcraft.Common.Qi.QiProjectile;
+import DaoOfModding.Cultivationcraft.Common.Worldgen.ProceduralPlantPatchFeature;
 import DaoOfModding.Cultivationcraft.Cultivationcraft;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.SimpleParticleType;
@@ -20,6 +21,8 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.level.levelgen.feature.Feature;
+import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.client.event.EntityRenderersEvent;
@@ -43,6 +46,9 @@ public class Register {
     public static DeferredRegister<EntityType<?>> ENTITY_TYPES = DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, Cultivationcraft.MODID);
     public static DeferredRegister<MenuType<?>> CONTAINERS = DeferredRegister.create(ForgeRegistries.MENU_TYPES, Cultivationcraft.MODID);
     public static DeferredRegister<ParticleType<?>> PARTICLES = DeferredRegister.create(ForgeRegistries.PARTICLE_TYPES, Cultivationcraft.MODID);
+    private static final DeferredRegister<FluidType> VANILLA_FLUID_TYPES = DeferredRegister.create(ForgeRegistries.Keys.FLUID_TYPES, "minecraft");
+    public static final DeferredRegister<Feature<?>> FEATURES = DeferredRegister.create(ForgeRegistries.FEATURES, Cultivationcraft.MODID);
+
 
     public static RegistryObject<EntityType<FlyingSwordEntity>> FLYINGSWORD = ENTITY_TYPES.register("flyingsword", () ->
             EntityType.Builder.<FlyingSwordEntity>of(FlyingSwordEntity::new, MobCategory.MISC)
@@ -68,7 +74,6 @@ public class Register {
     public static final RegistryObject<FireParticleType> fireParticleType = PARTICLES.register("fireparticle", () -> new FireParticleType());
 
     // Override vanilla lava to make it swimmable and drownable
-    private static final DeferredRegister<FluidType> VANILLA_FLUID_TYPES = DeferredRegister.create(ForgeRegistries.Keys.FLUID_TYPES, "minecraft");
     public static final RegistryObject<FluidType> LAVA_TYPE = VANILLA_FLUID_TYPES.register("lava", () ->
             new FluidType(FluidType.Properties.create()
                     .descriptionId("block.minecraft.lava")
@@ -109,11 +114,15 @@ public class Register {
                 }
             });
 
+    public static final RegistryObject<Feature<NoneFeatureConfiguration>> PROCEDURAL_PLANT_PATCH =
+            FEATURES.register("procedural_plant_patch", () -> new ProceduralPlantPatchFeature());
+    
     public static void init(IEventBus bus) {
         ENTITY_TYPES.register(bus);
         CONTAINERS.register(bus);
         PARTICLES.register(bus);
         VANILLA_FLUID_TYPES.register(bus);
+        FEATURES.register(bus);
     }
 
     @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)

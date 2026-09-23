@@ -1,0 +1,6 @@
+{
+  "prefixes": ["Earthen", "Dusty", "Rocky", "Loamy", "Sandy", "Stone"],
+  "cores": ["Bloom", "Thorn", "Moss", "Root", "Reed", "Bramble"],
+  "suffixes": ["root", "bud", "leaf", "sprig", "tuft", "clump"]
+}
+

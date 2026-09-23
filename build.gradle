@@ -137,7 +137,9 @@ dependencies {
     // that the dep is a ForgeGradle 'patcher' dependency, and its patches will be applied.
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
     minecraft 'net.minecraftforge:forge:1.19.2-43.1.52'
-    implementation fg.deobf("curse.maven:mlmanimator-896957:4719675")
+    implementation 'daoofmodding.mlmanimator:mlmanimator:0.2.2'
+
+    // implementation fg.deobf("curse.maven:mlmanimator-896957:4719675")
     implementation fg.deobf("curse.maven:ironchest-228756:3966365")
     runtimeOnly fg.deobf("curse.maven:jade-324717:4800904")
 

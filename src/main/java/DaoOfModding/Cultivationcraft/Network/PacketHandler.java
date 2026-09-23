@@ -1,5 +1,6 @@
 package DaoOfModding.Cultivationcraft.Network;
 
+import DaoOfModding.Cultivationcraft.Common.Blocks.Plants.world.PlantCatalogSavedData;
 import DaoOfModding.Cultivationcraft.Common.Capabilities.BodyModifications.BodyModifications;
 import DaoOfModding.Cultivationcraft.Common.Capabilities.BodyModifications.IBodyModifications;
 import DaoOfModding.Cultivationcraft.Common.Capabilities.ChunkQiSources.ChunkQiSources;
@@ -30,6 +31,8 @@ import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class PacketHandler
@@ -56,7 +59,8 @@ public class PacketHandler
     protected static final byte CULTIVATOR_TECHNIQUES = 98;
     protected static final byte CULTIVATOR_STATS = 99;
     protected static final byte FROZEN_BLOCK_RENDER = 100;
-    protected static final String PROTOCOL_VERSION = "1";
+    protected static final byte PLANT_CATALOG_SYNC = 101;
+    protected static final String PROTOCOL_VERSION = "2";
 
     public static final SimpleChannel channel = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(Cultivationcraft.MODID, "main"),
@@ -88,6 +92,7 @@ public class PacketHandler
         channel.registerMessage(BODY_FORGE_SELECTION, BodyForgeSelectionPacket.class, BodyForgeSelectionPacket::encode, BodyForgeSelectionPacket::decode, BodyForgeSelectionPacket::handle);
         channel.registerMessage(BODY_MODIFICATIONS, BodyModificationsPacket.class, BodyModificationsPacket::encode, BodyModificationsPacket::decode, BodyModificationsPacket::handle);
         channel.registerMessage(CULTIVATOR_TECH_STAT, TechniqueStatSelectionPacket.class, TechniqueStatSelectionPacket::encode, TechniqueStatSelectionPacket::decode, TechniqueStatSelectionPacket::handle);
+        channel.registerMessage(PLANT_CATALOG_SYNC, DaoOfModding.Cultivationcraft.Network.Packets.PlantCatalogSyncPacket.class, DaoOfModding.Cultivationcraft.Network.Packets.PlantCatalogSyncPacket::encode, DaoOfModding.Cultivationcraft.Network.Packets.PlantCatalogSyncPacket::decode, DaoOfModding.Cultivationcraft.Network.Packets.PlantCatalogSyncPacket::handle);
     }
 
     public static void sendAttackToClient(UUID playerID, HitResult.Type type, Vec3 pos, UUID targetID, Direction direction, int slot)
@@ -212,5 +217,19 @@ public class PacketHandler
 
         CultivatorTechniquesPacket pack = new CultivatorTechniquesPacket(player.getUUID(), techs);
         channel.send(PacketDistributor.PLAYER.with(() -> toSend), pack);
+    }
+
+    // ===== Procedural Plant catalog sync =====
+    public static void sendPlantCatalogToClient(ServerPlayer player,
+                                                List<PlantCatalogSavedData.Entry> entries)
+    {
+        ArrayList<PlantCatalogSyncPacket.Entry> list = new ArrayList<>(entries.size());
+        for (var e : entries) {
+            list.add(new PlantCatalogSyncPacket.Entry(
+                e.id, e.displayName, e.genome.colorRGB(), e.genome.qiElement().toString(), e.genome.tier(),
+                e.genome.stemVariant(), e.genome.foliageVariant(), e.genome.fruitVariant()));
+        }
+        PlantCatalogSyncPacket pkt = new PlantCatalogSyncPacket(list);
+        channel.send(PacketDistributor.PLAYER.with(() -> player), pkt);
     }
 }
