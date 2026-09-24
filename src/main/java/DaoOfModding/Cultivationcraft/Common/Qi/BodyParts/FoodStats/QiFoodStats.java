@@ -26,7 +26,7 @@ public class QiFoodStats extends FoodData
     public int tickTimer = 0;
     protected float lastFoodLevel = 20;
 
-    protected float lastSendFood = 0;
+    protected float lastSendFood = Float.NaN;
 
     protected animatedTexture outerfilling = new animatedTexture(new ResourceLocation(Cultivationcraft.MODID, "textures/gui/outerfilling.png"));
     protected Vector3f staminaColor = new Vector3f(1.0F, 0.5F, 0.0F);
@@ -106,10 +106,10 @@ public class QiFoodStats extends FoodData
 
     public boolean shouldUpdate()
     {
-        if (foodLevel == lastFoodLevel)
+        if (foodLevel == lastSendFood)
             return false;
 
-        lastFoodLevel = foodLevel;
+        lastSendFood = foodLevel;
 
         return true;
     }

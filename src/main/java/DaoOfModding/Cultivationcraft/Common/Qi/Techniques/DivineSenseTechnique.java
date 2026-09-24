@@ -81,8 +81,7 @@ public class DivineSenseTechnique extends Technique
         if (PlayerUtils.isClientPlayerCharacter(event.player))
             Renderer.QiSourcesVisible = true;
 
-        if (event.player.getFoodData().getFoodLevel() == 0)
-            this.deactivate(event.player);
+        // Resource depletion is decided on the server, not from a stale client reserve.
     }
 
     @Override
@@ -93,10 +92,15 @@ public class DivineSenseTechnique extends Technique
         if (CultivatorStats.getCultivatorStats(event.player).getCultivationType() == CultivationTypes.QI_CONDENSER)
         {
             if (!CultivatorStats.getCultivatorStats(event.player).getCultivation().consumeQi(event.player, getTechniqueStat(DefaultTechniqueStatIDs.qiCost, event.player) / 20f))
+            {
                 this.deactivate(event.player);
+                DaoOfModding.Cultivationcraft.Network.PacketHandler.sendCultivatorTechniquesToClient(event.player);
+            }
         }
-        else if (event.player.getFoodData().getFoodLevel() == 0)
+        else if (event.player.getFoodData().getFoodLevel() == 0) {
             this.deactivate(event.player);
+            DaoOfModding.Cultivationcraft.Network.PacketHandler.sendCultivatorTechniquesToClient(event.player);
+        }
     }
 
     @Override

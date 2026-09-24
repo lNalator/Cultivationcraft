@@ -130,7 +130,12 @@ public class QiSource
         currentAbsorbing = absorbing;
         absorbing = new HashMap();
 
-        qiCurrent += (1.0 / qiRegen);
+        // A submerged non-water plant retains its reserve but cannot replenish it.
+        boolean submergedPlant = level.getBlockState(pos).getBlock() instanceof
+                DaoOfModding.Cultivationcraft.Common.Blocks.Plants.ProceduralPlantBlock
+                && !DaoOfModding.Cultivationcraft.Common.Blocks.Plants.world.ProceduralPlantElementConditions
+                        .canGenerateQiInWater(level, pos, getElement());
+        if (!submergedPlant) qiCurrent += (1.0 / qiRegen);
 
         if (qiCurrent > 1)
             qiCurrent = 1;

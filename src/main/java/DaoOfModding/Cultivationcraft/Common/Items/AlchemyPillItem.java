@@ -14,7 +14,13 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 
 public class AlchemyPillItem extends Item {
-    public AlchemyPillItem(Properties properties) { super(properties); }
+    public AlchemyPillItem(Properties properties) { super(properties.stacksTo(16)); }
+    @Override public void inventoryTick(ItemStack stack, Level level, net.minecraft.world.entity.Entity entity, int slot, boolean selected) {
+        if (!level.isClientSide) {
+            DaoOfModding.Cultivationcraft.Common.Alchemy.PillStacks.clearLegacyAnalysis(stack);
+            DaoOfModding.Cultivationcraft.Common.Alchemy.PillStacks.refreshCooldown(stack);
+        }
+    }
     @Override public Component getName(ItemStack stack) {
         Component name = DistExecutor.unsafeCallWhenOn(Dist.CLIENT, () -> () -> AlchemyPillPresentation.name(stack));
         return name == null ? Component.literal("???") : name;

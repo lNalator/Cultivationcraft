@@ -9,6 +9,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.FluidTags;
+import DaoOfModding.Cultivationcraft.Common.Qi.Elements.Elements;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 
@@ -22,6 +24,8 @@ public final class ProceduralPlantElementConditions {
     private ProceduralPlantElementConditions() {}
 
     public static boolean canSpawn(ServerLevel server, LevelAccessor level, BlockPos pos, ResourceLocation element) {
+        if (level.getFluidState(pos).is(FluidTags.WATER)
+                && (!Elements.waterElement.equals(element) || level.getFluidState(pos.above()).is(FluidTags.WATER))) return false;
         String key = elementKey(element);
         if (key.contains("none")) {
             return noneSpawn(level, pos);
@@ -51,6 +55,7 @@ public final class ProceduralPlantElementConditions {
     }
 
     public static float growthModifier(Level level, BlockPos pos, PlantGenome genome) {
+        if (!canGenerateQiInWater(level, pos, genome == null ? null : genome.qiElement())) return 0;
         if (genome == null) {
             return 1.0f;
         }
@@ -80,6 +85,10 @@ public final class ProceduralPlantElementConditions {
             return waterGrowth(level, pos);
         }
         return 1.0f;
+    }
+
+    public static boolean canGenerateQiInWater(LevelAccessor level, BlockPos pos, ResourceLocation element) {
+        return !level.getFluidState(pos).is(FluidTags.WATER) || Elements.waterElement.equals(element);
     }
 
     private static String elementKey(ResourceLocation element) {
@@ -276,10 +285,7 @@ public final class ProceduralPlantElementConditions {
                 for (int dy = -1; dy <= 1; dy++) {
                     cursor.set(center.getX() + dx, center.getY() + dy, center.getZ() + dz);
                     FluidState fluid = level.getFluidState(cursor);
-                    if (!fluid.isEmpty() && (fluid.isSource())) {
-                        return true;
-                    }
-                    if (level.getBlockState(cursor).getBlock() == Blocks.WATER) {
+                    if (fluid.is(FluidTags.WATER)) {
                         return true;
                     }
                 }

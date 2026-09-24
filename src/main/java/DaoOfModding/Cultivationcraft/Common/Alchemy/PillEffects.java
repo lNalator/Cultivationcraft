@@ -8,6 +8,9 @@ import DaoOfModding.Cultivationcraft.Common.Qi.Elements.Elements;
 import DaoOfModding.Cultivationcraft.Cultivationcraft;
 import DaoOfModding.Cultivationcraft.Network.PacketHandler;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraftforge.event.entity.living.MobEffectEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -31,20 +34,38 @@ public final class PillEffects {
     public static void refineInBind(Player player, ItemStack stack, long elapsedNanos) {
         var tag = stack.getOrCreateTag();
         if (tag.getString("Entry").isEmpty() || PillDefinition.get(tag.getString("Pill")) == null) return;
-        String owner = player.getStringUUID();
-        if (!owner.equals(tag.getString("AnalyzingPlayer"))) {
-            tag.putString("AnalyzingPlayer", owner);
-            tag.putLong("AnalysisTime", 0);
+        PillStacks.clearLegacyAnalysis(stack);
+        CompoundTag progressData = data(player);
+        String entry = tag.getString("Entry");
+        if (!entry.equals(progressData.getString("AnalyzingEntry"))) {
+            progressData.putString("AnalyzingEntry", entry);
+            progressData.putLong("AnalysisTime", 0);
         }
         long progress = identified(player, stack) ? 5_000_000_000L
-                : Math.min(5_000_000_000L, tag.getLong("AnalysisTime") + Math.max(0, Math.min(elapsedNanos, 250_000_000L)));
-        tag.putLong("AnalysisTime", progress);
-        tag.putFloat("BindPercent", progress / 5_000_000_000f);
-        tag.putFloat("BindRemaining", (5_000_000_000L - progress) / 1_000_000_000f);
+                : Math.min(5_000_000_000L, progressData.getLong("AnalysisTime") + Math.max(0, Math.min(elapsedNanos, 250_000_000L)));
+        progressData.putLong("AnalysisTime", progress);
         if (progress == 5_000_000_000L && !identified(player, stack)) {
-            data(player).putBoolean("Known:" + tag.getString("Entry"), true);
+            progressData.putBoolean("Known:" + entry, true);
             PacketHandler.sendCultivatorStatsToClient(player);
         }
+    }
+
+    public static int analysisProgress(Player player, ItemStack stack) {
+        if (identified(player, stack)) return 1000;
+        return stack.hasTag() && stack.getTag().getString("Entry").equals(data(player).getString("AnalyzingEntry"))
+                ? (int) Math.min(1000, data(player).getLong("AnalysisTime") / 5_000_000L) : 0;
+    }
+
+    public static float cooldownFraction(Player player, ItemStack stack, float partialTick) {
+        if (player == null || !stack.hasTag()) return 0;
+        try {
+            String group = PillDefinition.group(PillDefinition.Effect.valueOf(stack.getTag().getString("Effect")));
+            CompoundTag data = data(player);
+            long duration = data.getLong("CooldownLength:" + group);
+            if (duration <= 0) duration = (long) stack.getTag().getInt("Cooldown") * 20;
+            return duration <= 0 ? 0 : net.minecraft.util.Mth.clamp(
+                    (data.getLong("Cooldown:" + group) - now(player) - partialTick) / duration, 0, 1);
+        } catch (IllegalArgumentException invalid) { return 0; }
     }
 
     private static long now(Player player) {
@@ -54,7 +75,7 @@ public final class PillEffects {
     public static double absorptionBonus(Player player) {
         if (!(CultivatorStats.getCultivatorStats(player).getCultivation() instanceof FoundationEstablishmentCultivation)) return 0;
         CompoundTag data = data(player);
-        return data.getLong("AbsorptionUntil") > now(player) ? data.getDouble("AbsorptionAmount") : 0;
+        return player.hasEffect(AlchemyEffects.QI_ABSORPTION.get()) && data.getLong("AbsorptionUntil") > now(player) ? data.getDouble("AbsorptionAmount") : 0;
     }
 
     public static boolean consume(ServerPlayer player, ItemStack stack) {
@@ -78,6 +99,8 @@ public final class PillEffects {
         if (definition.cultivation() && (affinity == null || affinity.equals(Elements.noElement) || !cultivation.canCultivate(affinity)))
             return reject(player, "affinity_mismatch");
         double amount = definition.amount();
+        if (definition.group().equals("healing") || definition.group().equals("qi"))
+            amount *= PillPotency.restorationMultiplier(player, tag.getInt("Tier"));
         // Cooldowns are per effect family and persisted in the player's capability.
         // Purity describes batch quality; potency changes need separate balancing.
         switch (definition.effect()) {
@@ -92,7 +115,10 @@ public final class PillEffects {
                 if (food.getTrueFoodLevel() >= food.getMaxFood()) return reject(player, "full");
                 float qi = (float) (amount * food.getMaxFood());
                 if (definition.effect() == PillDefinition.Effect.QI) restoreQi(player, qi);
-                else schedule(data, "Qi", qi, definition.duration(), time);
+                else {
+                    showStatus(player, AlchemyEffects.QI_RESTORATION.get(), definition.duration() * 20 + 1, 0);
+                    schedule(data, "Qi", qi, definition.duration(), time);
+                }
             }
             case CULTIVATION -> {
                 float supplied = (float) amount;
@@ -100,6 +126,8 @@ public final class PillEffects {
                 if (unused >= supplied) return reject(player, "full");
             }
             case ABSORPTION -> {
+                showStatus(player, AlchemyEffects.QI_ABSORPTION.get(), definition.duration() * 20,
+                        Math.max(0, (int) definition.amount() - 1));
                 data.putDouble("AbsorptionAmount", definition.amount());
                 data.putLong("AbsorptionUntil", time + Math.max(1, definition.duration() * 20L));
             }
@@ -110,10 +138,54 @@ public final class PillEffects {
                 player.getFoodData().eat((int) definition.amount(), .5f); // Four hunger and four saturation.
             }
         }
+        data.putBoolean("StatusEffectsMigrated", true);
         data.putLong(cooldown, time + (long) definition.cooldown() * 20);
+        data.putLong("CooldownLength:" + definition.group(), (long) definition.cooldown() * 20);
         if (!player.getAbilities().instabuild) stack.shrink(1);
         PacketHandler.sendCultivatorStatsToClient(player);
         return true;
+    }
+
+    private static void showStatus(Player player, MobEffect effect, int ticks, int amplifier) {
+        // Replace the timer without a hidden effect that could resume after expiry.
+        player.forceAddEffect(new MobEffectInstance(effect, Math.max(1, ticks), amplifier, false, false, true), player);
+    }
+
+    private static void reconcileStatus(Player player, CompoundTag data, long time) {
+        // Upgrade existing saves once. Afterwards curing a status must cancel its benefit.
+        if (!data.getBoolean("StatusEffectsMigrated")) {
+            if (data.getLong("QiEnd") > time && data.getInt("QiPulses") > 0) {
+                showStatus(player, AlchemyEffects.QI_RESTORATION.get(), (int) (data.getLong("QiEnd") - time + 1), 0);
+            }
+            if (data.getLong("AbsorptionUntil") > time) {
+                long end = data.getLong("AbsorptionUntil");
+                double amount = data.getDouble("AbsorptionAmount");
+                showStatus(player, AlchemyEffects.QI_ABSORPTION.get(), (int) (end - time), Math.max(0, (int) amount - 1));
+            }
+            data.putBoolean("StatusEffectsMigrated", true);
+        }
+        reconcileOne(player, AlchemyEffects.QI_RESTORATION.get(), data.getLong("QiEnd") - time + 1);
+        if (!(CultivatorStats.getCultivatorStats(player).getCultivation() instanceof FoundationEstablishmentCultivation)
+                && player.hasEffect(AlchemyEffects.QI_ABSORPTION.get())) player.removeEffect(AlchemyEffects.QI_ABSORPTION.get());
+        reconcileOne(player, AlchemyEffects.QI_ABSORPTION.get(), data.getLong("AbsorptionUntil") - time);
+        if (!player.hasEffect(AlchemyEffects.QI_RESTORATION.get())) data.putInt("QiPulses", 0);
+        if (!player.hasEffect(AlchemyEffects.QI_ABSORPTION.get())) data.remove("AbsorptionUntil");
+    }
+
+    private static void reconcileOne(Player player, MobEffect type, long remaining) {
+        MobEffectInstance effect = player.getEffect(type);
+        if (effect == null) return;
+        if (remaining <= 0) player.removeEffect(type);
+        // Vanilla timers pause offline; these pill timers use world time.
+        else if (effect.getDuration() > remaining + 1)
+            showStatus(player, type, (int) remaining, effect.getAmplifier());
+    }
+
+    @SubscribeEvent(priority = net.minecraftforge.eventbus.api.EventPriority.LOWEST)
+    public static void removed(MobEffectEvent.Remove event) {
+        if (event.isCanceled() || !(event.getEntity() instanceof ServerPlayer player)) return;
+        if (event.getEffect() == AlchemyEffects.QI_RESTORATION.get()) data(player).putInt("QiPulses", 0);
+        if (event.getEffect() == AlchemyEffects.QI_ABSORPTION.get()) data(player).remove("AbsorptionUntil");
     }
 
     private static boolean reject(Player player, String key, Object... args) {
@@ -139,6 +211,7 @@ public final class PillEffects {
         if (event.phase != TickEvent.Phase.END || !(event.player instanceof ServerPlayer player) || !player.isAlive()) return;
         CompoundTag data = data(player);
         long time = now(player);
+        reconcileStatus(player, data, time);
         for (String effect : new String[]{"Healing", "Qi"}) {
             int pulses = data.getInt(effect + "Pulses");
             if (pulses <= 0 || time < data.getLong(effect + "Next")) continue;

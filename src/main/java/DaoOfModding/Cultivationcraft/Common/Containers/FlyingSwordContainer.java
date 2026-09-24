@@ -16,6 +16,8 @@ public class FlyingSwordContainer extends BasicContainer
     public static final int FLYING_SWORD_ITEM_XPOS = 80;
 
     protected final FlyingSwordContainerItemHandler itemStackHandler;
+    private final net.minecraft.world.inventory.ContainerData pillProgress = new net.minecraft.world.inventory.SimpleContainerData(1);
+    private final Player owner;
 
     public static FlyingSwordContainer createContainerServerSide(int windowID, Inventory playerInventory, FlyingSwordContainerItemHandler handler)
     {
@@ -33,11 +35,20 @@ public class FlyingSwordContainer extends BasicContainer
         super(Register.ContainerTypeFlyingSword.get(), windowId);
 
         itemStackHandler = handler;
+        owner = playerInv.player;
+        addDataSlots(pillProgress);
 
         // Add the players inventory slots into the container
         addPlayerInventory(playerInv);
 
         addSlot(new SlotItemHandler(handler, 0, FLYING_SWORD_ITEM_XPOS, FLYING_SWORD_ITEM_YPOS));
+    }
+
+    @Override
+    public void broadcastChanges() {
+        if (!owner.level.isClientSide) pillProgress.set(0, isRefiningPill()
+                ? DaoOfModding.Cultivationcraft.Common.Alchemy.PillEffects.analysisProgress(owner, itemStackHandler.getStackInSlot(0)) : 0);
+        super.broadcastChanges();
     }
 
     public boolean isRefiningPill() {
@@ -60,12 +71,12 @@ public class FlyingSwordContainer extends BasicContainer
 
     public float getBindTime()
     {
-        return getNbt("BindRemaining");
+        return isRefiningPill() ? 5 * (1 - getBindPercent()) : getNbt("BindRemaining");
     }
 
     public float getBindPercent()
     {
-        return getNbt("BindPercent");
+        return isRefiningPill() ? pillProgress.get(0) / 1000f : getNbt("BindPercent");
     }
 
     protected float getNbt(String tag)

@@ -28,11 +28,11 @@ public record PillDefinition(ResourceLocation id, Effect effect, int qi, int[] t
         var tag = stack.getTag();
         PillDefinition recipe = get(tag.getString("Pill"));
         if (recipe == null) return null;
-        // Crafted pills retain their advertised parameters after a data-pack reload.
+        // Effects remain fixed when crafted; cooldowns follow the current balancing data.
         try {
             Effect effect = Effect.valueOf(tag.getString("Effect"));
             double amount = tag.getDouble("Amount");
-            int duration = tag.getInt("Duration"), cooldown = tag.getInt("Cooldown");
+            int duration = tag.getInt("Duration"), cooldown = recipe.cooldown();
             if (!Double.isFinite(amount) || amount <= 0 || duration < 0 || cooldown <= 0
                     || ((effect == Effect.HEAL_OVER_TIME || effect == Effect.QI_OVER_TIME || effect == Effect.ABSORPTION) && duration == 0)) return null;
             return new PillDefinition(recipe.id, effect, recipe.qi, recipe.targets, recipe.minimumScore,
@@ -40,7 +40,8 @@ public record PillDefinition(ResourceLocation id, Effect effect, int qi, int[] t
         } catch (IllegalArgumentException invalid) { return null; }
     }
     public boolean cultivation() { return effect == Effect.CULTIVATION || effect == Effect.ABSORPTION; }
-    public String group() {
+    public String group() { return group(effect); }
+    public static String group(Effect effect) {
         return switch (effect) {
             case HEAL, HEAL_OVER_TIME -> "healing";
             case QI, QI_OVER_TIME -> "qi";

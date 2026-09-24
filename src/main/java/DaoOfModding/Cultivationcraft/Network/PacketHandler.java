@@ -60,7 +60,8 @@ public class PacketHandler
     protected static final byte CULTIVATOR_STATS = 99;
     protected static final byte FROZEN_BLOCK_RENDER = 100;
     protected static final byte PLANT_CATALOG_SYNC = 101;
-    protected static final String PROTOCOL_VERSION = "2";
+    protected static final byte BINDING_VISUAL = 102;
+    protected static final String PROTOCOL_VERSION = "3";
 
     public static final SimpleChannel channel = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(Cultivationcraft.MODID, "main"),
@@ -71,6 +72,9 @@ public class PacketHandler
 
     public static void init()
     {
+        channel.registerMessage(BINDING_VISUAL, BindingVisualPacket.class, BindingVisualPacket::encode,
+                BindingVisualPacket::decode, BindingVisualPacket::handle,
+                java.util.Optional.of(net.minecraftforge.network.NetworkDirection.PLAY_TO_CLIENT));
         channel.registerMessage(KEYPRESS, keypressPacket.class, keypressPacket::encode, keypressPacket::decode, keypressPacket::handle);
         channel.registerMessage(ATTACK, AttackPacket.class, AttackPacket::encode, AttackPacket::decode, AttackPacket::handle);
         channel.registerMessage(STAMINA_USE, StaminaUsePacket.class, StaminaUsePacket::encode, StaminaUsePacket::decode, StaminaUsePacket::handle);

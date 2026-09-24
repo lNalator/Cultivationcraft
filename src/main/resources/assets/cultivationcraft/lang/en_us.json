@@ -540,5 +540,8 @@
   "cultivationcraft.pill.effect.qi_over_time": "Restores %s%% max Qi over %s s.",
   "cultivationcraft.pill.effect.cultivation": "Adds %s cultivation progress, up to the current stage limit.",
   "cultivationcraft.pill.effect.absorption": "+%s Qi absorption speed for %s s.",
-  "cultivationcraft.pill.effect.food": "Restores %s hunger and 4 saturation."
+  "cultivationcraft.pill.effect.food": "Restores %s hunger and 4 saturation.",
+  "effect.cultivationcraft.qi_restoration": "Qi Restoration",
+  "effect.cultivationcraft.qi_absorption": "Qi Absorption",
+  "cultivationcraft.pill.realm_potency": "Effectiveness in your realm: %s%%"
 }

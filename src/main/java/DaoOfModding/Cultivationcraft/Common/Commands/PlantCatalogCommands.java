@@ -172,6 +172,7 @@ public class PlantCatalogCommands {
 
     private static int showHelp(CommandSourceStack src, String section) {
         src.sendSuccess(Component.literal("Testing commands: <required>, [optional trailing arguments]. Press Tab for values; hover suggestions for details."), false);
+        if (section.equals("all")) PillCommands.help(src);
         if (section.equals("all") || section.equals("plantcatalog")) {
             usage(src, "/cultivation plantcatalog", "List plant IDs, generated names, elements and catalog tiers. Click a row to prepare giveplant.");
             usage(src, "/cultivation plantcatalog element <element>", "Filter by element.");

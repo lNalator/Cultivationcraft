@@ -37,9 +37,10 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.Vec3;
 
-public class ProceduralPlantBlock extends BushBlock implements BonemealableBlock, EntityBlock {
+public class ProceduralPlantBlock extends BushBlock implements BonemealableBlock, EntityBlock, net.minecraft.world.level.block.SimpleWaterloggedBlock {
     public static final IntegerProperty TIER = IntegerProperty.create("tier", 1, 3);
     public static final IntegerProperty SPECIES = IntegerProperty.create("species", 0, 63);
+    public static final BooleanProperty WATERLOGGED = net.minecraft.world.level.block.state.properties.BlockStateProperties.WATERLOGGED;
     public static final BooleanProperty HOST_QI = BooleanProperty.create("host_qi");
 
     private static final int NEIGHBOR_SCAN_RADIUS = 6;
@@ -48,7 +49,33 @@ public class ProceduralPlantBlock extends BushBlock implements BonemealableBlock
 
     public ProceduralPlantBlock() {
         super(BlockBehaviour.Properties.copy(Blocks.DANDELION).noOcclusion().randomTicks());
-        this.registerDefaultState(this.stateDefinition.any().setValue(TIER, 1).setValue(SPECIES, 0).setValue(HOST_QI, false));
+        this.registerDefaultState(this.stateDefinition.any().setValue(TIER, 1).setValue(SPECIES, 0).setValue(HOST_QI, false).setValue(WATERLOGGED, false));
+    }
+
+    @Override
+    public BlockState getStateForPlacement(net.minecraft.world.item.context.BlockPlaceContext context) {
+        return defaultBlockState().setValue(WATERLOGGED,
+                context.getLevel().getFluidState(context.getClickedPos()).is(net.minecraft.tags.FluidTags.WATER));
+    }
+
+    @Override
+    public net.minecraft.world.level.material.FluidState getFluidState(BlockState state) {
+        return state.getValue(WATERLOGGED) ? net.minecraft.world.level.material.Fluids.WATER.getSource(false) : super.getFluidState(state);
+    }
+
+    @Override
+    public BlockState updateShape(BlockState state, Direction direction, BlockState neighbor,
+                                  net.minecraft.world.level.LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+        if (state.getValue(WATERLOGGED))
+            level.scheduleTick(pos, net.minecraft.world.level.material.Fluids.WATER,
+                    net.minecraft.world.level.material.Fluids.WATER.getTickDelay(level));
+        return super.updateShape(state, direction, neighbor, level, pos, neighborPos);
+    }
+
+    @Override
+    public boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
+        // Retain this plant's solid-floor rule instead of Forge's default plains-flower soil rule.
+        return mayPlaceOn(level.getBlockState(pos.below()), level, pos.below());
     }
 
     protected boolean mayPlaceOn(BlockState state, LevelReader level, BlockPos pos) {
@@ -171,7 +198,7 @@ public class ProceduralPlantBlock extends BushBlock implements BonemealableBlock
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(TIER, SPECIES, HOST_QI);
+        builder.add(TIER, SPECIES, HOST_QI, WATERLOGGED);
     }
 
     @Override

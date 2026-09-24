@@ -19,6 +19,18 @@ import java.util.Locale;
 
 @Mod.EventBusSubscriber(modid = Cultivationcraft.MODID, value = Dist.CLIENT)
 public final class AlchemyPillPresentation {
+    public static boolean renderCooldown(net.minecraft.client.gui.Font font, ItemStack stack, int x, int y, float blitOffset) {
+        Minecraft mc = Minecraft.getInstance();
+        float fraction = PillEffects.cooldownFraction(mc.player, stack, mc.getFrameTime());
+        if (fraction <= 0) return false;
+        // Vanilla's white cooldown sweep, evaluated per stack's effect family.
+        // ItemCooldowns is keyed by Item and would incorrectly lock every pill family.
+        com.mojang.blaze3d.systems.RenderSystem.disableDepthTest();
+        net.minecraft.client.gui.GuiComponent.fill(new com.mojang.blaze3d.vertex.PoseStack(), x,
+                y + net.minecraft.util.Mth.floor(16 * (1 - fraction)), x + 16, y + 16, 0x7FFFFFFF);
+        return true;
+    }
+
     public static Component name(ItemStack stack) {
         return PillEffects.identified(Minecraft.getInstance().player, stack)
                 ? Component.literal(stack.getTag().getString("PillName")) : Component.literal("???");
@@ -42,11 +54,16 @@ public final class AlchemyPillPresentation {
         String effect = tag.getString("Effect").toLowerCase(Locale.ROOT);
         double amount = tag.getDouble("Amount");
         int duration = tag.getInt("Duration");
-        if (effect.equals("heal") || effect.equals("heal_over_time") || effect.equals("qi") || effect.equals("qi_over_time")) amount *= 100;
+        boolean restoration = effect.equals("heal") || effect.equals("heal_over_time") || effect.equals("qi") || effect.equals("qi_over_time");
+        double multiplier = restoration ? DaoOfModding.Cultivationcraft.Common.Alchemy.PillPotency.restorationMultiplier(
+                Minecraft.getInstance().player, tag.getInt("Tier")) : 1;
+        if (restoration) amount *= 100 * multiplier;
         lines.add(Component.translatable("cultivationcraft.pill.tier_purity", tag.getInt("Tier"), tag.getInt("Purity")).withStyle(ChatFormatting.GRAY));
         lines.add(Component.translatable("cultivationcraft.pill.effect." + effect, format.format(amount), duration));
+        if (restoration && multiplier < 1)
+            lines.add(Component.translatable("cultivationcraft.pill.realm_potency", format.format(multiplier * 100)).withStyle(ChatFormatting.GRAY));
         ResourceLocation affinity = ResourceLocation.tryParse(tag.getString("Affinity"));
-        if (affinity != null) {
+        if (affinity != null && (effect.equals("cultivation") || effect.equals("absorption"))) {
             lines.add(Component.translatable("cultivationcraft.pill.affinity", Component.translatable(affinity.getPath())));
             lines.add(Component.translatable("cultivationcraft.pill.foundation_only").withStyle(ChatFormatting.GRAY));
         }

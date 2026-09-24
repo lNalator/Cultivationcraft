@@ -93,19 +93,7 @@ public record AlchemyBatch(PillDefinition definition, int[] scores, boolean vali
         // D = 1 for these starter definitions. Invalid mandatory requirements always ruin a batch.
         double failure = Mth.clamp(5 + 8 * (1 - cauldronTier) + 6 * impurity - 3 * neutralBonus, 2, 90);
         if (!valid || level.random.nextDouble() * 100 < failure) return new ItemStack(ItemRegister.ALCHEMY_REMNANTS.get());
-        ItemStack result = new ItemStack(ItemRegister.ALCHEMY_PILL.get());
-        var tag = result.getOrCreateTag();
-        PillCatalog catalog = PillCatalog.get(level);
-        tag.putString("Pill", definition.id().toString());
-        tag.putString("Entry", catalog.key(definition));
-        tag.putString("PillName", catalog.name(definition, level));
-        tag.putInt("Tier", 1);
-        tag.putInt("Purity", (int) Math.round(Mth.clamp(95 - 50 * impurity + 5 * neutralBonus, 1, 100)));
-        tag.putInt("Color", definition.color());
-        tag.putString("Effect", definition.effect().name());
-        tag.putDouble("Amount", definition.amount());
-        tag.putInt("Duration", definition.duration());
-        tag.putInt("Cooldown", definition.cooldown());
+        net.minecraft.resources.ResourceLocation affinity = null;
         if (definition.cultivation()) {
             List<Integer> dominant = new ArrayList<>();
             int highest = 0;
@@ -113,8 +101,8 @@ public record AlchemyBatch(PillDefinition definition, int[] scores, boolean vali
                 if (scores[i] > highest) { highest = scores[i]; dominant.clear(); }
                 if (scores[i] == highest && highest > 0) dominant.add(i);
             }
-            tag.putString("Affinity", AlchemyQi.ELEMENTS.get(dominant.get(level.random.nextInt(dominant.size()))).toString());
+            affinity = AlchemyQi.ELEMENTS.get(dominant.get(level.random.nextInt(dominant.size())));
         }
-        return result;
+        return PillStacks.create(level, definition, (int) Math.round(Mth.clamp(95 - 50 * impurity + 5 * neutralBonus, 1, 100)), affinity);
     }
 }

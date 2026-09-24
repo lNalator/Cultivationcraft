@@ -8,7 +8,7 @@
   "minimum_score": 0,
   "amount": 0.25,
   "duration_seconds": 0,
-  "cooldown_seconds": 45,
+  "cooldown_seconds": 8,
   "color": "C65353",
   "names": [
     "Blood Mending Pill",

@@ -68,12 +68,8 @@ public class FlightTechnique extends Technique
 
         if (!event.player.isOnGround())
         {
-            if (!spendExternalQi(event.player, 0.05))
-            {
-                deactivate(event.player);
-                return;
-            }
-
+            // The server pays Qi and decides when flight ends. Client-only spending
+            // drifts downward while meditation replenishes the server's reserve.
             event.player.getAbilities().setFlyingSpeed((float) getTechniqueStat(DefaultTechniqueStatIDs.movementSpeed, event.player));
             event.player.getAbilities().flying = true;
 
@@ -91,6 +87,7 @@ public class FlightTechnique extends Technique
             if (!spendExternalQi(event.player, 0.05))
             {
                 deactivate(event.player);
+                DaoOfModding.Cultivationcraft.Network.PacketHandler.sendCultivatorTechniquesToClient(event.player);
                 return;
             }
 
