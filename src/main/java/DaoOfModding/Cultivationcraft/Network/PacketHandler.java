@@ -22,7 +22,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
@@ -61,7 +60,10 @@ public class PacketHandler
     protected static final byte FROZEN_BLOCK_RENDER = 100;
     protected static final byte PLANT_CATALOG_SYNC = 101;
     protected static final byte BINDING_VISUAL = 102;
-    protected static final String PROTOCOL_VERSION = "3";
+    protected static final byte KNOWLEDGE_PAGES = 103;
+    protected static final byte ALCHEMY_PREVIEW = 104;
+    protected static final byte QI_STREAM = 105;
+    protected static final String PROTOCOL_VERSION = "4";
 
     public static final SimpleChannel channel = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(Cultivationcraft.MODID, "main"),
@@ -72,6 +74,15 @@ public class PacketHandler
 
     public static void init()
     {
+        channel.registerMessage(KNOWLEDGE_PAGES, KnowledgePagesPacket.class, KnowledgePagesPacket::encode,
+                KnowledgePagesPacket::decode, KnowledgePagesPacket::handle,
+                java.util.Optional.of(net.minecraftforge.network.NetworkDirection.PLAY_TO_CLIENT));
+        channel.registerMessage(ALCHEMY_PREVIEW, AlchemyPreviewPacket.class, AlchemyPreviewPacket::encode,
+                AlchemyPreviewPacket::decode, AlchemyPreviewPacket::handle,
+                java.util.Optional.of(net.minecraftforge.network.NetworkDirection.PLAY_TO_CLIENT));
+        channel.registerMessage(QI_STREAM, QiStreamPacket.class, QiStreamPacket::encode,
+                QiStreamPacket::decode, QiStreamPacket::handle,
+                java.util.Optional.of(net.minecraftforge.network.NetworkDirection.PLAY_TO_CLIENT));
         channel.registerMessage(BINDING_VISUAL, BindingVisualPacket.class, BindingVisualPacket::encode,
                 BindingVisualPacket::decode, BindingVisualPacket::handle,
                 java.util.Optional.of(net.minecraftforge.network.NetworkDirection.PLAY_TO_CLIENT));

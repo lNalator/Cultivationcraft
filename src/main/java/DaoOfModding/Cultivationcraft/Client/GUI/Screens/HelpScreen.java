@@ -1,5 +1,6 @@
 package DaoOfModding.Cultivationcraft.Client.GUI.Screens;
 
+import DaoOfModding.Cultivationcraft.Client.ClientKnowledge;
 import DaoOfModding.Cultivationcraft.Client.GUI.HelpItems;
 import DaoOfModding.Cultivationcraft.Client.GUI.SelectableTextField;
 import DaoOfModding.Cultivationcraft.Client.GUI.TextField;
@@ -27,12 +28,22 @@ public class HelpScreen extends GenericTabScreen
 
     protected TextField helpText = new TextField();
     protected SelectableTextField selectText = new SelectableTextField();
+    private int knowledgeRevision = -1;
     
     public HelpScreen()
     {
         super(3, Component.translatable("cultivationcraft.gui.help"), new ResourceLocation(Cultivationcraft.MODID, "textures/gui/stats.png"));
         
         helpText.resetScroll();
+
+        refreshEntries();
+        selectText.setSize(selectTextWidth, selectTextHeight, (int)(selectTextWidth * 2));
+    }
+
+    private void refreshEntries() {
+        selectText = new SelectableTextField();
+        selectText.setSize(selectTextWidth, selectTextHeight, (int)(selectTextWidth * 2));
+        knowledgeRevision = ClientKnowledge.revision();
 
         for (SelectableText text : HelpItems.getText())
             selectText.addSelectable(text);
@@ -41,7 +52,13 @@ public class HelpScreen extends GenericTabScreen
             for (SelectableText text : HelpItems.getOPText())
                 selectText.addSelectable(text);
 
-        selectText.setSize(selectTextWidth, selectTextHeight, (int)(selectTextWidth * 2));
+        for (SelectableText text : ClientKnowledge.helpPages())
+            selectText.addSelectable(text);
+    }
+
+    @Override public void tick() {
+        super.tick();
+        if (knowledgeRevision != ClientKnowledge.revision()) refreshEntries();
     }
 
     @Override

@@ -1,5 +1,17 @@
 package DaoOfModding.Cultivationcraft.Common.Containers;
 
+import DaoOfModding.Cultivationcraft.Network.Packets.AlchemyPreviewPacket;
+import DaoOfModding.Cultivationcraft.Common.Items.ItemRegister;
+import DaoOfModding.Cultivationcraft.Common.Alchemy.AlchemyBatch;
+import DaoOfModding.Cultivationcraft.Common.Alchemy.PillStacks;
+import DaoOfModding.Cultivationcraft.Common.Knowledge.PlayerKnowledge;
+import DaoOfModding.Cultivationcraft.Network.PacketHandler;
+import net.minecraftforge.network.PacketDistributor;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.network.chat.Component;
+import net.minecraft.ChatFormatting;
+import java.util.List;
+import java.util.ArrayList;
 import DaoOfModding.Cultivationcraft.Common.Blocks.BlockRegister;
 import DaoOfModding.Cultivationcraft.Common.Blocks.entity.AlchemyCauldronBlockEntity;
 import DaoOfModding.Cultivationcraft.Common.Register;
@@ -17,6 +29,24 @@ import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.item.ItemStack;
 
 public class AlchemyCauldronMenu extends AbstractContainerMenu {
+    private final Player viewer;
+    private AlchemyPreviewPacket preview;
+    private AlchemyPreviewPacket lastPreview;
+
+    public void setPreview(AlchemyPreviewPacket preview) { this.preview = preview; }
+    public ItemStack getPreviewItem() {
+        return preview == null || preview.item().isEmpty()
+                ? new ItemStack(ItemRegister.ALCHEMY_PILL.get()) : preview.item();
+    }
+    public List<Component> previewTooltip() {
+        var lines = new ArrayList<Component>();
+        if (preview == null || preview.item().isEmpty()) { lines.add(Component.literal("???")); return lines; }
+        lines.add(Component.literal(preview.item().getTag().getString("PillName")));
+        lines.add(Component.translatable("cultivationcraft.jade.preview_qi", preview.qi()));
+        if (!preview.valid()) lines.add(Component.translatable("cultivationcraft.jade.invalid_batch").withStyle(ChatFormatting.RED));
+        if (preview.purityLow() >= 0) lines.add(Component.translatable("cultivationcraft.jade.purity_estimate", preview.purityLow(), preview.purityHigh()));
+        return lines;
+    }
     public static final int INGREDIENT_X = 32;
     public static final int INGREDIENT_Y = 30;
     public static final int INVENTORY_X = 8;
@@ -66,6 +96,7 @@ public class AlchemyCauldronMenu extends AbstractContainerMenu {
         super(Register.ALCHEMY_CAULDRON_MENU.get(), id);
         checkContainerSize(container, STATION_SLOTS);
         this.container = container;
+        this.viewer = inventory.player;
         this.access = access;
         this.serverLevel = inventory.player.level instanceof ServerLevel server ? server : null;
         addDataSlots(qiData);
@@ -110,6 +141,34 @@ public class AlchemyCauldronMenu extends AbstractContainerMenu {
     public void broadcastChanges() {
         updateQi();
         super.broadcastChanges();
+        updatePreview();
+    }
+
+    private void updatePreview() {
+        if (!(viewer instanceof ServerPlayer player) || serverLevel == null) return;
+        var batch = AlchemyBatch.inspect(container, serverLevel);
+        ItemStack item = ItemStack.EMPTY;
+        int qi = 0, low = -1, high = -1;
+        boolean valid = false;
+        if (getPreviewSlot() >= 0 && batch != null
+                && PlayerKnowledge.knowsRecipe(player, batch.definition())) {
+            item = PillStacks.create(serverLevel, batch.definition(), 0, null);
+            // Neither exact purity nor a randomly chosen affinity belongs in a preview.
+            item.getTag().remove("Purity");
+            item.getTag().remove("Affinity");
+            qi = batch.definition().qi();
+            valid = batch.valid();
+            if (valid && PlayerKnowledge.knows(player,
+                    PlayerKnowledge.PURITY_KNOWLEDGE)) {
+                low = Math.min(90, batch.purity() / 10 * 10);
+                high = low + 10;
+            }
+        }
+        var next = new AlchemyPreviewPacket(containerId, item, qi, low, high, valid);
+        if (!next.sameAs(lastPreview)) {
+            lastPreview = next;
+            PacketHandler.channel.send(PacketDistributor.PLAYER.with(() -> player), next);
+        }
     }
 
     public int getElementalQi(int element) {

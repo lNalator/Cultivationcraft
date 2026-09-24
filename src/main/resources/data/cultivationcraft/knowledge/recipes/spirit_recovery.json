@@ -1,0 +1,15 @@
+{
+  "title": "{pill} - Recipe",
+  "titles": [
+    "A Simple Qi Formula",
+    "A Clear Spirit Method",
+    "{pill}: Recipe"
+  ],
+  "text": "A starter pill that immediately restores a portion of the Qi reserve.",
+  "loot_pools": [
+    "village",
+    "common"
+  ],
+  "weight": 2,
+  "recipe": "cultivationcraft:spirit_recovery"
+}

@@ -1,0 +1,14 @@
+{
+  "title": "Alchemy Cauldrons",
+  "titles": [
+    "The First Cauldron",
+    "A Beginner's Alchemy Notes",
+    "On Herbs and Refinement"
+  ],
+  "text": "Place ingredients in the cauldron's nine input slots. Elemental totals use spiritual growth times stack count, not a plant's Qi-source reserve.\n\nChannel Qi Transfer into the cauldron to charge and ignite it. With enough Qi, the ingredients refine into a pill or remnants. Every input stack is consumed. Leave an output slot free. The starter cauldron loses one stored Qi per five idle seconds.\n\nJade slips teach recipes. Analyzing a pill in the Bind slot reveals that pill without consuming it, but does not teach its recipe.",
+  "loot_pools": [
+    "village",
+    "common"
+  ],
+  "weight": 4
+}

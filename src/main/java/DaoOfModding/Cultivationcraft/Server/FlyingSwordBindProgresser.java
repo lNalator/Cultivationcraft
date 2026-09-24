@@ -1,5 +1,7 @@
 package DaoOfModding.Cultivationcraft.Server;
 
+import DaoOfModding.Cultivationcraft.Common.Items.JadeSlipItem;
+import DaoOfModding.Cultivationcraft.Common.Knowledge.PlayerKnowledge;
 import DaoOfModding.Cultivationcraft.Common.Advancements.CultivationAdvancements;
 import DaoOfModding.Cultivationcraft.Common.Advancements.Triggers.FlyingSwordTrigger;
 import DaoOfModding.Cultivationcraft.Common.Capabilities.FlyingSwordContainerItemStack.FlyingSwordContainerItemStack;
@@ -20,6 +22,8 @@ public class FlyingSwordBindProgresser {
         for (Player player : ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayers()) {
             if (player.isAlive()) {
                 ItemStack testItem = FlyingSwordContainerItemStack.getCapability(player).getItemStackHandler().getStackInSlot(0);
+                if (player instanceof ServerPlayer server) PlayerKnowledge.refine(server, testItem, time);
+                if (testItem.getItem() instanceof JadeSlipItem) continue;
 
                 // If the item in the binding slot exists
                 if (!testItem.isEmpty()) {

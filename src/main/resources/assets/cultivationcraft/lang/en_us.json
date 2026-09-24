@@ -543,5 +543,16 @@
   "cultivationcraft.pill.effect.food": "Restores %s hunger and 4 saturation.",
   "effect.cultivationcraft.qi_restoration": "Qi Restoration",
   "effect.cultivationcraft.qi_absorption": "Qi Absorption",
-  "cultivationcraft.pill.realm_potency": "Effectiveness in your realm: %s%%"
+  "cultivationcraft.pill.realm_potency": "Effectiveness in your realm: %s%%",
+  "item.cultivationcraft.jade_slip": "Jade Slip",
+  "cultivationcraft.jade.hint": "Refine in the cultivation Bind slot to absorb its knowledge.",
+  "cultivationcraft.jade.known": "You already know this teaching. The slip has been preserved.",
+  "cultivationcraft.jade.invalid": "This jade slip contains no available teaching.",
+  "cultivationcraft.jade.learned": "Knowledge learned: %s",
+  "cultivationcraft.gui.refine_jade": "Refine Jade Slip",
+  "cultivationcraft.jade.preview_qi": "Required refinement Qi: %s",
+  "cultivationcraft.jade.invalid_batch": "Requirements unmet: this batch will be ruined.",
+  "cultivationcraft.jade.purity_estimate": "Estimated purity on success: %s-%s%%",
+  "cultivationcraft.gui.tab.1.4": "Refine",
+  "cultivationcraft.jade.already_learned": "Teaching already learned"
 }

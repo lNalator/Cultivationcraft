@@ -1,0 +1,15 @@
+{
+  "title": "{pill} - Recipe",
+  "titles": [
+    "The Returning Spring Method",
+    "Notes on Tender Shoots",
+    "{pill}: Recipe"
+  ],
+  "text": "A starter pill that restores health gradually.",
+  "loot_pools": [
+    "common",
+    "rare"
+  ],
+  "weight": 2,
+  "recipe": "cultivationcraft:green_sprout"
+}

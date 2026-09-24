@@ -1,0 +1,14 @@
+{
+  "title": "Divine Sense",
+  "titles": [
+    "Eyes Beyond the Veil",
+    "The Unseen Garden",
+    "Listening to Hidden Roots"
+  ],
+  "text": "Divine Sense reveals nearby spiritual plants through obstacles. Detection radius and the highlight limit grow with cultivation; major realm breakthroughs grant much larger gains.\n\nThe skill stats show its radius and highlight limit. Highlights strengthen inside detection range and fade at very close distances to keep dense gardens readable.",
+  "loot_pools": [
+    "rare",
+    "end_city"
+  ],
+  "weight": 3
+}

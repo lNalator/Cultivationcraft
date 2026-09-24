@@ -120,7 +120,7 @@ public class AlchemyCauldronScreen extends AbstractContainerScreen<AlchemyCauldr
         }
         renderTooltip(pose, mouseX, mouseY);
         if (hoveredSlot != null && hoveredSlot.index == menu.getPreviewSlot() && menu.getCarried().isEmpty())
-            renderTooltip(pose, Component.literal("???"), mouseX, mouseY);
+            renderComponentTooltip(pose, menu.previewTooltip(), mouseX, mouseY);
         if (hoveredSlot == null && menu.getCarried().isEmpty()) {
             if (inPanel(mouseX, mouseY)) drawPanelTooltip(pose, mouseX, mouseY);
             else if (inStation(mouseX, mouseY))
@@ -163,8 +163,7 @@ public class AlchemyCauldronScreen extends AbstractContainerScreen<AlchemyCauldr
         int preview = menu.getPreviewSlot();
         if (preview >= 0) {
             Slot slot = menu.slots.get(preview);
-            itemRenderer.renderAndDecorateItem(new net.minecraft.world.item.ItemStack(
-                    DaoOfModding.Cultivationcraft.Common.Items.ItemRegister.ALCHEMY_PILL.get()), leftPos + slot.x, topPos + slot.y);
+            itemRenderer.renderAndDecorateItem(menu.getPreviewItem(), leftPos + slot.x, topPos + slot.y);
         }
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1, 1, 1, 1);

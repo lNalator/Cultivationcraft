@@ -1,0 +1,15 @@
+{
+  "title": "{pill} - Recipe",
+  "titles": [
+    "A Simple Bigu Formula",
+    "Grain Without Hunger",
+    "{pill}: Recipe"
+  ],
+  "text": "A simple sustenance recipe for body cultivators.",
+  "loot_pools": [
+    "village",
+    "common"
+  ],
+  "weight": 2,
+  "recipe": "cultivationcraft:bigu"
+}

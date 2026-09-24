@@ -1,0 +1,15 @@
+{
+  "title": "{pill} - Recipe",
+  "titles": [
+    "A Minor Mending Formula",
+    "Notes on Red Herbs",
+    "{pill}: Recipe"
+  ],
+  "text": "A starter pill that immediately restores a portion of maximum health.",
+  "loot_pools": [
+    "village",
+    "common"
+  ],
+  "weight": 2,
+  "recipe": "cultivationcraft:blood_mending"
+}

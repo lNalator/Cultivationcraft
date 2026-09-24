@@ -58,6 +58,7 @@ public class Cultivationcraft {
         Register.init(modEventBus);
         BlockRegister.init(modEventBus);
         ItemRegister.init(modEventBus);
+        DaoOfModding.Cultivationcraft.Common.Knowledge.JadeSlipLootModifier.init(modEventBus);
         DaoOfModding.Cultivationcraft.Common.Alchemy.AlchemyEffects.init(modEventBus);
         ModWorldgen.init();
         ModBiomeModifiers.init();

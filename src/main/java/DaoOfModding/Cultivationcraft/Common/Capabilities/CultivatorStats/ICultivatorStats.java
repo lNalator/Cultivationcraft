@@ -28,6 +28,7 @@ public interface ICultivatorStats
     public boolean isDisconnected();
 
     public CompoundTag getPillData();
+    public CompoundTag getKnowledgeData();
     public CompoundTag writeNBT();
     public void readNBT(CompoundTag nbt);
 }

@@ -1,0 +1,15 @@
+{
+  "title": "{pill} - Recipe",
+  "titles": [
+    "Tending the First Root",
+    "A Foundation Nourishing Method",
+    "{pill}: Recipe"
+  ],
+  "text": "A Foundation cultivation pill that supplies 50 cultivation progress and retains the batch's dominant element.",
+  "loot_pools": [
+    "common",
+    "rare"
+  ],
+  "weight": 2,
+  "recipe": "cultivationcraft:foundation_nourishing"
+}

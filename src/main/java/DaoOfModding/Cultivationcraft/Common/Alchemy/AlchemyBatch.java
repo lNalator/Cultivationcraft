@@ -89,6 +89,8 @@ public record AlchemyBatch(PillDefinition definition, int[] scores, boolean vali
         return new AlchemyBatch(selected, scores, valid, total == 0 ? 1 : Mth.clamp(waste / total, 0, 1), bonus);
     }
 
+    public int purity() { return (int) Math.round(Mth.clamp(95 - 50 * impurity + 5 * neutralBonus, 1, 100)); }
+
     public ItemStack refine(ServerLevel level, int cauldronTier) {
         // D = 1 for these starter definitions. Invalid mandatory requirements always ruin a batch.
         double failure = Mth.clamp(5 + 8 * (1 - cauldronTier) + 6 * impurity - 3 * neutralBonus, 2, 90);
@@ -103,6 +105,6 @@ public record AlchemyBatch(PillDefinition definition, int[] scores, boolean vali
             }
             affinity = AlchemyQi.ELEMENTS.get(dominant.get(level.random.nextInt(dominant.size())));
         }
-        return PillStacks.create(level, definition, (int) Math.round(Mth.clamp(95 - 50 * impurity + 5 * neutralBonus, 1, 100)), affinity);
+        return PillStacks.create(level, definition, purity(), affinity);
     }
 }

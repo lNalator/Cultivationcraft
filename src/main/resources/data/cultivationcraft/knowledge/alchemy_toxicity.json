@@ -1,0 +1,15 @@
+{
+  "title": "Alchemy and Impurities",
+  "titles": [
+    "On Clouded Elixirs",
+    "The Dregs Beneath the Jade",
+    "A Treatise on Alchemy and Toxicity"
+  ],
+  "text": "Balanced elemental scores produce cleaner pills. Missing mandatory requirements ruin a batch. Excess or unrelated elemental Qi increases impurity. A modest neutral base can improve purity and reduce failure; too much becomes waste.\n\nThis knowledge lets you estimate purity in the cauldron preview when you also know the recipe. The estimate is a range, not a guarantee of success. Analyze an unfamiliar finished pill in the Bind slot to learn its properties.",
+  "loot_pools": [
+    "common",
+    "rare",
+    "end_city"
+  ],
+  "weight": 2
+}

@@ -1,5 +1,10 @@
 package DaoOfModding.Cultivationcraft.Common.Qi.Techniques.QiCondenserTechniques;
 
+import net.minecraft.server.level.ServerPlayer;
+import DaoOfModding.Cultivationcraft.Network.PacketHandler;
+import DaoOfModding.Cultivationcraft.Network.Packets.QiStreamPacket;
+import DaoOfModding.Cultivationcraft.Server.BindingVisualSync;
+import net.minecraftforge.network.PacketDistributor;
 import DaoOfModding.Cultivationcraft.Common.Blocks.Plants.entity.ProceduralPlantBlockEntity;
 import DaoOfModding.Cultivationcraft.Common.Blocks.entity.AlchemyCauldronBlockEntity;
 import DaoOfModding.Cultivationcraft.Common.Capabilities.CultivatorStats.CultivatorStats;
@@ -9,7 +14,6 @@ import DaoOfModding.Cultivationcraft.Common.Qi.Techniques.TechniqueStats.Default
 import DaoOfModding.Cultivationcraft.Common.Qi.Techniques.TechniqueStats.TechniqueStatModification;
 import DaoOfModding.Cultivationcraft.Cultivationcraft;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -26,6 +30,8 @@ public class QiTransferTechnique extends Technique {
             "cultivationcraft.tstat.qitransferrate");
     private double pulseProgress;
     private BlockPos targetPos;
+    private BlockPos visualTarget;
+    private long lastVisualTick;
 
     public QiTransferTechnique() {
         langLocation = "cultivationcraft.technique.qitransfer";
@@ -63,6 +69,7 @@ public class QiTransferTechnique extends Technique {
 
     @Override
     public void deactivate(Player player) {
+        stopVisual(player);
         resetPulse();
         super.deactivate(player);
     }
@@ -83,10 +90,12 @@ public class QiTransferTechnique extends Technique {
         var hit = level.clip(new ClipContext(start, end, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, player));
         BlockEntity target = hit.getType() == HitResult.Type.BLOCK ? level.getBlockEntity(hit.getBlockPos()) : null;
         if (!canReceive(target)) {
+            stopVisual(player);
             resetPulse();
             return;
         }
         if (!hit.getBlockPos().equals(targetPos)) {
+            stopVisual(player);
             resetPulse();
             targetPos = hit.getBlockPos().immutable();
         }
@@ -112,11 +121,25 @@ public class QiTransferTechnique extends Technique {
         else if (target instanceof AlchemyCauldronBlockEntity cauldron) cauldron.receiveQi(1);
         // Standard progression includes selected training focus, stage limits and mastery.
         levelUp(player, 1);
-        Vec3 destination = Vec3.atCenterOf(hit.getBlockPos());
-        for (int i = 1; i <= 8; i++) {
-            Vec3 point = start.lerp(destination, i / 8.0);
-            level.sendParticles(ParticleTypes.ENCHANT, point.x, point.y, point.z, 1, 0.015, 0.015, 0.015, 0);
+        if (visualTarget == null || level.getGameTime() - lastVisualTick >= 5) {
+            visualTarget = hit.getBlockPos().immutable();
+            lastVisualTick = level.getGameTime();
+            sendVisual(player, visualTarget, true);
         }
+    }
+
+    private void stopVisual(Player player) {
+        if (visualTarget != null) sendVisual(player, visualTarget, false);
+        visualTarget = null;
+    }
+
+    private void sendVisual(Player player, BlockPos target, boolean active) {
+        if (!(player instanceof ServerPlayer server)) return;
+        PacketHandler.channel.send(
+                PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> server),
+                new QiStreamPacket(server.getUUID(),
+                        server.level.dimension().location(), target,
+                        BindingVisualSync.elementColor(server), active));
     }
 
     private boolean canReceive(BlockEntity target) {

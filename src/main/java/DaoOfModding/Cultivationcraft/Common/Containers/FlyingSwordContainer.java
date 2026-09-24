@@ -1,5 +1,9 @@
 package DaoOfModding.Cultivationcraft.Common.Containers;
 
+import DaoOfModding.Cultivationcraft.Common.Knowledge.PlayerKnowledge;
+import DaoOfModding.Cultivationcraft.Common.Alchemy.PillEffects;
+import DaoOfModding.Cultivationcraft.Common.Items.JadeSlipItem;
+import DaoOfModding.Cultivationcraft.Common.Items.AlchemyPillItem;
 import DaoOfModding.Cultivationcraft.Common.BasicContainer;
 import DaoOfModding.Cultivationcraft.Common.Capabilities.FlyingSwordContainerItemStack.FlyingSwordContainerItemHandler;
 import net.minecraft.world.entity.player.Inventory;
@@ -47,12 +51,17 @@ public class FlyingSwordContainer extends BasicContainer
     @Override
     public void broadcastChanges() {
         if (!owner.level.isClientSide) pillProgress.set(0, isRefiningPill()
-                ? DaoOfModding.Cultivationcraft.Common.Alchemy.PillEffects.analysisProgress(owner, itemStackHandler.getStackInSlot(0)) : 0);
+                ? PillEffects.analysisProgress(owner, itemStackHandler.getStackInSlot(0))
+                : isRefiningJadeSlip() ? PlayerKnowledge.progress(owner, itemStackHandler.getStackInSlot(0)) : 0);
         super.broadcastChanges();
     }
 
     public boolean isRefiningPill() {
-        return itemStackHandler.getStackInSlot(0).getItem() instanceof DaoOfModding.Cultivationcraft.Common.Items.AlchemyPillItem;
+        return itemStackHandler.getStackInSlot(0).getItem() instanceof AlchemyPillItem;
+    }
+
+    public boolean isRefiningJadeSlip() {
+        return itemStackHandler.getStackInSlot(0).getItem() instanceof JadeSlipItem;
     }
 
     @Override
@@ -71,12 +80,12 @@ public class FlyingSwordContainer extends BasicContainer
 
     public float getBindTime()
     {
-        return isRefiningPill() ? 5 * (1 - getBindPercent()) : getNbt("BindRemaining");
+        return isRefiningPill() || isRefiningJadeSlip() ? 5 * (1 - getBindPercent()) : getNbt("BindRemaining");
     }
 
     public float getBindPercent()
     {
-        return isRefiningPill() ? pillProgress.get(0) / 1000f : getNbt("BindPercent");
+        return isRefiningPill() || isRefiningJadeSlip() ? pillProgress.get(0) / 1000f : getNbt("BindPercent");
     }
 
     protected float getNbt(String tag)

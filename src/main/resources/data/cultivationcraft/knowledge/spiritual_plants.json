@@ -1,0 +1,14 @@
+{
+  "title": "Spiritual Plants",
+  "titles": [
+    "Spiritual Herbs",
+    "Spiritual Plants",
+    "A Gatherer's Notes"
+  ],
+  "text": "Spiritual plants carry an elemental nature and accumulate spiritual growth. Growth determines their tier and contributes to alchemy. A stack contributes each plant's growth multiplied by its count.\n\nAll spiritual plants can be planted in water, but only Water plants continue generating Qi while submerged. Water plants can naturally appear in shallow, one-block-deep water.\n\nTheir names and traits belong to the world you explore.",
+  "loot_pools": [
+    "village",
+    "common"
+  ],
+  "weight": 5
+}

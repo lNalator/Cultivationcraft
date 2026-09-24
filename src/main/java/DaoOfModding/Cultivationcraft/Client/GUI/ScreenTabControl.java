@@ -17,7 +17,7 @@ import java.awt.*;
 
 public class ScreenTabControl
 {
-    protected static final int TAB_BAR_NUMBER[] = {4, 4};
+    protected static final int TAB_BAR_NUMBER[] = {4, 5};
 
     protected static final int TAB_BAR_PADDING = 2;
 
@@ -91,6 +91,7 @@ public class ScreenTabControl
             Minecraft.getInstance().forceSetScreen(new CultivationSelectionScreen());
         else
         {
+            if (selectedScreen >= TAB_BAR_NUMBER[cultivationType]) selectedScreen = 0;
             if (selectedScreen == 0)
             {
                 if (cultivationType == CultivationTypes.QI_CONDENSER)
@@ -121,6 +122,8 @@ public class ScreenTabControl
                     Minecraft.getInstance().forceSetScreen(new BodyforgeScreen());
             } else if (selectedScreen == 3)
                 Minecraft.getInstance().forceSetScreen(new HelpScreen());
+            else if (selectedScreen == 4 && cultivationType == CultivationTypes.BODY_CULTIVATOR)
+                ClientPacketHandler.sendKeypressToServer(Register.keyPresses.FLYINGSWORDSCREEN);
         }
     }
 

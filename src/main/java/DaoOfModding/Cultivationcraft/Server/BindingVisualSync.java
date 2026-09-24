@@ -1,5 +1,7 @@
 package DaoOfModding.Cultivationcraft.Server;
 
+import DaoOfModding.Cultivationcraft.Common.Items.JadeSlipItem;
+import DaoOfModding.Cultivationcraft.Common.Knowledge.PlayerKnowledge;
 import DaoOfModding.Cultivationcraft.Common.Alchemy.PillDefinition;
 import DaoOfModding.Cultivationcraft.Common.Alchemy.PillEffects;
 import DaoOfModding.Cultivationcraft.Common.Capabilities.CultivatorStats.CultivatorStats;
@@ -47,7 +49,7 @@ public final class BindingVisualSync {
             visual.getTag().remove("BindPercent");
             visual.getTag().remove(Cultivationcraft.MODID + "bindtime");
         }
-        int color = elementColor(player);
+        int color = stack.getItem() instanceof JadeSlipItem ? 0xFFFFFF : elementColor(player);
         ResourceLocation dimension = player.level.dimension().location();
         if (previous == null || previous.color != color || !previous.dimension.equals(dimension)
                 || !ItemStack.matches(previous.item, visual) || player.tickCount % 20 == 0) {
@@ -58,6 +60,8 @@ public final class BindingVisualSync {
 
     private static boolean isWorking(ServerPlayer player, ItemStack stack) {
         if (stack.isEmpty()) return false;
+        if (stack.getItem() instanceof JadeSlipItem)
+            return PlayerKnowledge.canRefine(player, stack);
         if (stack.getItem() instanceof AlchemyPillItem)
             return stack.hasTag() && !stack.getTag().getString("Entry").isEmpty()
                     && PillDefinition.get(stack.getTag().getString("Pill")) != null && !PillEffects.identified(player, stack);
@@ -65,7 +69,7 @@ public final class BindingVisualSync {
                 && !(FlyingSwordBind.isBound(stack) && player.getUUID().equals(FlyingSwordBind.getOwner(stack)));
     }
 
-    private static int elementColor(ServerPlayer player) {
+    public static int elementColor(ServerPlayer player) {
         var cultivation = CultivatorStats.getCultivatorStats(player).getCultivation();
         ResourceLocation element = Elements.noElement;
         if (cultivation instanceof QiCondenserCultivation condenser) element = condenser.getCurrentElementFocus();

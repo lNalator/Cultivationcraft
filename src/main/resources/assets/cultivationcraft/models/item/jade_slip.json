@@ -1,0 +1,200 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "jade": "minecraft:block/emerald_block",
+    "gold": "minecraft:block/gold_block",
+    "particle": "minecraft:block/emerald_block"
+  },
+  "elements": [
+    {
+      "from": [
+        4,
+        1,
+        7
+      ],
+      "to": [
+        12,
+        15,
+        9
+      ],
+      "faces": {
+        "north": {
+          "texture": "#jade"
+        },
+        "south": {
+          "texture": "#jade"
+        },
+        "east": {
+          "texture": "#jade"
+        },
+        "west": {
+          "texture": "#jade"
+        },
+        "up": {
+          "texture": "#jade"
+        },
+        "down": {
+          "texture": "#jade"
+        }
+      }
+    },
+    {
+      "from": [
+        3.8,
+        2,
+        6.8
+      ],
+      "to": [
+        12.2,
+        3,
+        9.2
+      ],
+      "faces": {
+        "north": {
+          "texture": "#gold"
+        },
+        "south": {
+          "texture": "#gold"
+        },
+        "east": {
+          "texture": "#gold"
+        },
+        "west": {
+          "texture": "#gold"
+        },
+        "up": {
+          "texture": "#gold"
+        },
+        "down": {
+          "texture": "#gold"
+        }
+      }
+    },
+    {
+      "from": [
+        3.8,
+        13,
+        6.8
+      ],
+      "to": [
+        12.2,
+        14,
+        9.2
+      ],
+      "faces": {
+        "north": {
+          "texture": "#gold"
+        },
+        "south": {
+          "texture": "#gold"
+        },
+        "east": {
+          "texture": "#gold"
+        },
+        "west": {
+          "texture": "#gold"
+        },
+        "up": {
+          "texture": "#gold"
+        },
+        "down": {
+          "texture": "#gold"
+        }
+      }
+    },
+    {
+      "from": [
+        7.5,
+        5,
+        6.8
+      ],
+      "to": [
+        8.5,
+        11,
+        7
+      ],
+      "faces": {
+        "north": {
+          "texture": "#gold"
+        },
+        "south": {
+          "texture": "#gold"
+        },
+        "east": {
+          "texture": "#gold"
+        },
+        "west": {
+          "texture": "#gold"
+        },
+        "up": {
+          "texture": "#gold"
+        },
+        "down": {
+          "texture": "#gold"
+        }
+      }
+    }
+  ],
+  "display": {
+    "gui": {
+      "rotation": [
+        12,
+        -22,
+        0
+      ],
+      "scale": [
+        0.85,
+        0.85,
+        0.85
+      ]
+    },
+    "ground": {
+      "translation": [
+        0,
+        3,
+        0
+      ],
+      "scale": [
+        0.5,
+        0.5,
+        0.5
+      ]
+    },
+    "fixed": {
+      "scale": [
+        0.8,
+        0.8,
+        0.8
+      ]
+    },
+    "thirdperson_righthand": {
+      "translation": [
+        0,
+        2,
+        1
+      ],
+      "scale": [
+        0.5,
+        0.5,
+        0.5
+      ]
+    },
+    "firstperson_righthand": {
+      "rotation": [
+        0,
+        -25,
+        0
+      ],
+      "translation": [
+        1,
+        2,
+        0
+      ],
+      "scale": [
+        0.6,
+        0.6,
+        0.6
+      ]
+    }
+  }
+}

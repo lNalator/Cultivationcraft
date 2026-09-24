@@ -1,5 +1,6 @@
 package DaoOfModding.Cultivationcraft.Client.Renderers;
 
+import DaoOfModding.Cultivationcraft.Common.Items.JadeSlipItem;
 import DaoOfModding.Cultivationcraft.Cultivationcraft;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
@@ -37,7 +38,9 @@ import java.util.UUID;
 @Mod.EventBusSubscriber(modid = Cultivationcraft.MODID, value = Dist.CLIENT)
 public final class BindingItemRenderer {
     private record Visual(ItemStack item, int color, long started, long updated) {}
+    private record Transfer(BlockPos target, int color, long started, long emissionEnd) {}
     private static final Map<UUID, Visual> visuals = new HashMap<>();
+    private static final Map<UUID, Transfer> transfers = new HashMap<>();
     private static final MultiBufferSource.BufferSource ITEMS = MultiBufferSource.immediate(new BufferBuilder(4096));
     private static final BufferBuilder MOTES = new BufferBuilder(16384);
     private static ClientLevel world;
@@ -45,7 +48,22 @@ public final class BindingItemRenderer {
     private static void checkWorld(ClientLevel current) {
         if (world != current) {
             visuals.clear();
+            transfers.clear();
             world = current;
+        }
+    }
+
+    public static void transfer(UUID player, ResourceLocation dimension, BlockPos target, int color, boolean active) {
+        ClientLevel current = Minecraft.getInstance().level;
+        checkWorld(current);
+        if (current == null || !current.dimension().location().equals(dimension)) return;
+        long time = current.getGameTime();
+        Transfer previous = transfers.get(player);
+        if (!active) {
+            if (previous != null) transfers.put(player, new Transfer(previous.target, previous.color, previous.started, time));
+        } else {
+            long start = previous != null && previous.target.equals(target) && previous.emissionEnd >= time ? previous.started : time;
+            transfers.put(player, new Transfer(target, color, start, time + 25));
         }
     }
 
@@ -71,13 +89,14 @@ public final class BindingItemRenderer {
         if (current == null) return;
         // Expire projections after an entity leaves tracking range or disconnects.
         visuals.entrySet().removeIf(entry -> current.getGameTime() - entry.getValue().updated > 100);
+        transfers.entrySet().removeIf(entry -> current.getGameTime() > entry.getValue().emissionEnd + 36);
     }
 
     @SubscribeEvent
     public static void render(RenderLevelStageEvent event) {
         if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_PARTICLES) return;
         Minecraft mc = Minecraft.getInstance();
-        if (mc.level == null || mc.level != world || visuals.isEmpty()) return;
+        if (mc.level == null || mc.level != world || (visuals.isEmpty() && transfers.isEmpty())) return;
         Vec3 camera = event.getCamera().getPosition();
         float partialTick = event.getPartialTick();
         double time = mc.level.getGameTime() + (double) partialTick;
@@ -132,8 +151,21 @@ public final class BindingItemRenderer {
                 Vec3 forward = forward(player, partialTick);
                 Vec3 chest = chest(player, partialTick, forward);
                 double elapsed = time - visual.started;
-                drawMotes(pose.last().pose(), chest, target(chest, forward, elapsed), forward,
-                        camera, right, up, elapsed, visual.color);
+                Vec3 item = target(chest, forward, elapsed);
+                boolean slip = visual.item.getItem() instanceof JadeSlipItem;
+                Vec3 source = slip ? item : chest;
+                Vec3 destination = slip ? player.getEyePosition(partialTick).add(forward.scale(.08)) : item;
+                drawMotes(pose.last().pose(), source, destination, forward,
+                        camera, right, up, elapsed, Double.POSITIVE_INFINITY, visual.color);
+            }
+            for (var entry : transfers.entrySet()) {
+                Player player = mc.level.getPlayerByUUID(entry.getKey());
+                if (!visible(player, mc, camera)) continue;
+                Transfer transfer = entry.getValue();
+                Vec3 forward = forward(player, partialTick);
+                Vec3 destination = Vec3.atCenterOf(transfer.target).add(0, .2, 0);
+                drawMotes(pose.last().pose(), chest(player, partialTick, forward), destination, forward,
+                        camera, right, up, time - transfer.started, transfer.emissionEnd - transfer.started, transfer.color);
             }
             BufferUploader.drawWithShader(MOTES.end());
         } finally {
@@ -171,13 +203,14 @@ public final class BindingItemRenderer {
     }
 
     private static void drawMotes(Matrix4f matrix, Vec3 chest, Vec3 target, Vec3 forward, Vec3 camera,
-                                  Vec3 right, Vec3 up, double elapsed, int color) {
+                                  Vec3 right, Vec3 up, double elapsed, double emissionEnd, int color) {
         Vec3 side = new Vec3(forward.z, 0, -forward.x);
         // One mote every three ticks; each takes 1.8 seconds to reach the item.
         // Analytic paths stay smooth at any frame rate and follow the moving player.
         for (int i = 0; i < 12; i++) {
             double age = elapsed - i * 3;
             if (age < 0) continue;
+            if (elapsed - age % 36 > emissionEnd) continue;
             double progress = (age % 36) / 36;
             double envelope = Math.pow(Math.sin(progress * Math.PI), 1.3);
             double angle = i * 2.39996 + progress * Math.PI;
