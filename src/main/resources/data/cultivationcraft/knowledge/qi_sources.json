@@ -6,13 +6,18 @@
     "The Hidden Wellspring"
   ],
   "text": "Some spiritual plants carry a Qi source with its own reserve and regeneration. Cultivators can draw from compatible nearby sources while meditating.\n\nThis stored reserve is separate from spiritual growth. Protect rare source-bearing plants when gathering ingredients.",
-  "loot_pools": [
-    "rare",
-    "end_city"
-  ],
-  "weight": 3,
   "category": [
     "Qi",
     "Qi Source"
-  ]
+  ],
+  "loot_weights": {
+    "village": 0,
+    "common": 1,
+    "rare": 10,
+    "stronghold": 12,
+    "end_city": 10
+  },
+  "chest_weights": {
+    "minecraft:chests/abandoned_mineshaft": 250
+  }
 }

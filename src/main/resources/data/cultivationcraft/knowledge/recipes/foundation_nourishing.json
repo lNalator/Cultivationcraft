@@ -6,10 +6,12 @@
     "{pill}: Recipe"
   ],
   "text": "A Foundation cultivation pill that supplies 50 cultivation progress and retains the batch's dominant element.",
-  "loot_pools": [
-    "common",
-    "rare"
-  ],
-  "weight": 2,
-  "recipe": "cultivationcraft:foundation_nourishing"
+  "recipe": "cultivationcraft:foundation_nourishing",
+  "loot_weights": {
+    "village": 0.25,
+    "common": 3,
+    "rare": 4,
+    "stronghold": 5,
+    "end_city": 0.1
+  }
 }

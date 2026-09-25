@@ -6,12 +6,14 @@
     "A Gatherer's Notes"
   ],
   "text": "Spiritual plants carry an elemental nature and accumulate spiritual growth. Growth determines their tier.\n\nAll spiritual plants can be planted in water, but only Water plants continue generating Qi while submerged. Water plants can naturally appear in shallow, one-block-deep water.\n\nTheir names and traits belong to the world you explore.",
-  "loot_pools": [
-    "village",
-    "common"
-  ],
-  "weight": 5,
   "category": [
     "Nature"
-  ]
+  ],
+  "loot_weights": {
+    "village": 100,
+    "common": 8,
+    "rare": 1,
+    "stronghold": 2,
+    "end_city": 0
+  }
 }

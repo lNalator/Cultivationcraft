@@ -6,10 +6,12 @@
     "{pill}: Recipe"
   ],
   "text": "A simple sustenance recipe for body cultivators.",
-  "loot_pools": [
-    "village",
-    "common"
-  ],
-  "weight": 2,
-  "recipe": "cultivationcraft:bigu"
+  "recipe": "cultivationcraft:bigu",
+  "loot_weights": {
+    "village": 35,
+    "common": 6,
+    "rare": 0.2,
+    "stronghold": 0.2,
+    "end_city": 0.01
+  }
 }

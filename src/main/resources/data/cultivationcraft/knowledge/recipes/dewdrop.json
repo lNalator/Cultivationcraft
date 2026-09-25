@@ -6,10 +6,12 @@
     "{pill}: Recipe"
   ],
   "text": "A starter pill that restores Qi gradually, with a Qi Restoration status.",
-  "loot_pools": [
-    "common",
-    "rare"
-  ],
-  "weight": 2,
-  "recipe": "cultivationcraft:dewdrop"
+  "recipe": "cultivationcraft:dewdrop",
+  "loot_weights": {
+    "village": 1,
+    "common": 4,
+    "rare": 2,
+    "stronghold": 3,
+    "end_city": 0.05
+  }
 }

@@ -9,12 +9,14 @@
   "category": [
     "Alchemy"
   ],
-  "loot_pools": [
-    "village",
-    "common"
-  ],
-  "weight": 4,
   "aliases": [
     "cultivationcraft:alchemy_batches"
-  ]
+  ],
+  "loot_weights": {
+    "village": 4,
+    "common": 7,
+    "rare": 3,
+    "stronghold": 8,
+    "end_city": 0.3
+  }
 }

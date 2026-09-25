@@ -6,10 +6,12 @@
     "{pill}: Recipe"
   ],
   "text": "A starter pill that immediately restores a portion of the Qi reserve.",
-  "loot_pools": [
-    "village",
-    "common"
-  ],
-  "weight": 2,
-  "recipe": "cultivationcraft:spirit_recovery"
+  "recipe": "cultivationcraft:spirit_recovery",
+  "loot_weights": {
+    "village": 3,
+    "common": 7,
+    "rare": 1,
+    "stronghold": 2,
+    "end_city": 0.02
+  }
 }

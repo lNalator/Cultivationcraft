@@ -6,10 +6,12 @@
     "{pill}: Recipe"
   ],
   "text": "A Foundation cultivation pill that temporarily improves Qi absorption, with a Qi Absorption status.",
-  "loot_pools": [
-    "common",
-    "rare"
-  ],
-  "weight": 2,
-  "recipe": "cultivationcraft:foundation_absorption"
+  "recipe": "cultivationcraft:foundation_absorption",
+  "loot_weights": {
+    "village": 0.25,
+    "common": 3,
+    "rare": 4,
+    "stronghold": 5,
+    "end_city": 0.1
+  }
 }

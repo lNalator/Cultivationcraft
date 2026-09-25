@@ -16,7 +16,8 @@ import java.util.*;
 
 public record KnowledgeEntry(ResourceLocation id, String title, String text, List<String> titles,
                              String recipe, Set<String> lootPools, int weight, List<String> category, boolean unlockedByDefault,
-                             boolean operatorOnly, int cultivationType, String translationKey, List<String> aliases) {
+                             boolean operatorOnly, int cultivationType, String translationKey, List<String> aliases,
+                             Map<String, Double> lootWeights, Map<String, Double> chestWeights) {
     private static Map<ResourceLocation, KnowledgeEntry> entries = Map.of();
     public static Collection<KnowledgeEntry> all() { return entries.values(); }
     public static KnowledgeEntry get(String id) {
@@ -43,6 +44,13 @@ public record KnowledgeEntry(ResourceLocation id, String title, String text, Lis
     }
     public boolean hasSlip() { return !unlockedByDefault && !titles.isEmpty(); }
     public boolean available() { return recipe.isEmpty() || PillDefinition.get(recipe) != null; }
+    /** Exact chest overrides win, including zero; explicit pool weights replace the legacy pool list. */
+    public double lootWeight(String pool, ResourceLocation chest) {
+        Double override = chestWeights.get(chest.toString());
+        if (override != null) return override;
+        if (!lootWeights.isEmpty()) return lootWeights.getOrDefault(pool, 0.0);
+        return lootPools.contains(pool) ? weight : 0;
+    }
     public String resolveTitle(String value, ServerLevel level) {
         PillDefinition pill = PillDefinition.get(recipe);
         return pill == null ? value : value.replace("{pill}", PillCatalog.get(level).name(pill, level));
@@ -79,13 +87,31 @@ public record KnowledgeEntry(ResourceLocation id, String title, String text, Lis
                         || (!recipe.isEmpty() && ResourceLocation.tryParse(recipe) == null))
                     throw new JsonParseException("Invalid knowledge entry: " + id);
                 loaded.put(id, new KnowledgeEntry(id, object.get("title").getAsString(), object.get("text").getAsString(),
-                        List.copyOf(titles), recipe, Set.copyOf(pools), weight, List.copyOf(category), unlocked, operatorOnly, cultivationType, translationKey, List.copyOf(aliases)));
+                        List.copyOf(titles), recipe, Set.copyOf(pools), weight, List.copyOf(category), unlocked, operatorOnly,
+                        cultivationType, translationKey, List.copyOf(aliases), readWeights(object, "loot_weights", id, false),
+                        readWeights(object, "chest_weights", id, true)));
             });
             Set<String> keys = new HashSet<>();
             loaded.keySet().forEach(id -> keys.add(id.toString()));
             for (KnowledgeEntry entry : loaded.values()) for (String alias : entry.aliases)
                 if (!keys.add(alias)) throw new JsonParseException("Duplicate knowledge alias: " + alias);
             entries = Collections.unmodifiableMap(loaded);
+        }
+
+        private static Map<String, Double> readWeights(JsonObject object, String field, ResourceLocation id, boolean chestIds) {
+            if (!object.has(field)) return Map.of();
+            if (!object.get(field).isJsonObject()) throw new JsonParseException(id + " " + field + " must be an object");
+            Map<String, Double> weights = new TreeMap<>();
+            object.getAsJsonObject(field).entrySet().forEach(entry -> {
+                if (entry.getKey().isBlank() || (chestIds && ResourceLocation.tryParse(entry.getKey()) == null)
+                        || !entry.getValue().isJsonPrimitive() || !entry.getValue().getAsJsonPrimitive().isNumber())
+                    throw new JsonParseException("Invalid " + field + " entry in " + id + ": " + entry.getKey());
+                double value = entry.getValue().getAsDouble();
+                if (!Double.isFinite(value) || value < 0 || value > 1_000_000)
+                    throw new JsonParseException(id + " " + field + " weights must be finite numbers between 0 and 1000000");
+                weights.put(entry.getKey(), value);
+            });
+            return Map.copyOf(weights);
         }
     }
 }

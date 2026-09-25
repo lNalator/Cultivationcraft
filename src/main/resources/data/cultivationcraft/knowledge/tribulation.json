@@ -11,10 +11,12 @@
     "Cultivate",
     "Qi Cultivation"
   ],
-  "loot_pools": [
-    "village",
-    "common"
-  ],
-  "weight": 4,
-  "cultivation_type": 0
+  "cultivation_type": 0,
+  "loot_weights": {
+    "village": 2,
+    "common": 5,
+    "rare": 6,
+    "stronghold": 10,
+    "end_city": 1
+  }
 }

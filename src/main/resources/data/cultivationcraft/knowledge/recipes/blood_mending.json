@@ -6,10 +6,12 @@
     "{pill}: Recipe"
   ],
   "text": "A starter pill that immediately restores a portion of maximum health.",
-  "loot_pools": [
-    "village",
-    "common"
-  ],
-  "weight": 2,
-  "recipe": "cultivationcraft:blood_mending"
+  "recipe": "cultivationcraft:blood_mending",
+  "loot_weights": {
+    "village": 3,
+    "common": 7,
+    "rare": 1,
+    "stronghold": 2,
+    "end_city": 0.02
+  }
 }

@@ -2,7 +2,7 @@ package DaoOfModding.Cultivationcraft.Server;
 
 import DaoOfModding.Cultivationcraft.Common.Refinement.RefinementHandlers;
 import DaoOfModding.Cultivationcraft.Common.Capabilities.CultivatorStats.CultivatorStats;
-import DaoOfModding.Cultivationcraft.Common.Capabilities.RefinementInventory.RefinementInventory;
+import DaoOfModding.Cultivationcraft.Common.Capabilities.RefinementInventory.RefinementInventoryProvider;
 import DaoOfModding.Cultivationcraft.Common.Qi.Cultivation.QiCondenserCultivation;
 import DaoOfModding.Cultivationcraft.Common.Qi.Elements.Elements;
 import DaoOfModding.Cultivationcraft.Cultivationcraft;
@@ -29,10 +29,20 @@ public final class RefinementVisualSync {
     @SubscribeEvent
     public static void tick(TickEvent.PlayerTickEvent event) {
         if (event.phase != TickEvent.Phase.END || !(event.player instanceof ServerPlayer player)) return;
-        ItemStack stack = RefinementInventory.getCapability(player).getItemStackHandler().getStackInSlot(0);
+        // Death invalidates capabilities while the old player may still receive ticks.
+        if (!player.isAlive() || player.isRemoved() || player.isSpectator()) {
+            clear(player);
+            return;
+        }
+        var inventory = player.getCapability(RefinementInventoryProvider.INSTANCE).orElse(null);
+        if (inventory == null) {
+            clear(player);
+            return;
+        }
+        ItemStack stack = inventory.getItemStackHandler().getStackInSlot(0);
         State previous = active.get(player);
-        if (!player.isAlive() || player.isSpectator() || !RefinementHandlers.isActive(player, stack)) {
-            if (active.remove(player) != null) send(player, ItemStack.EMPTY, 0xFFFFFF);
+        if (!RefinementHandlers.isActive(player, stack)) {
+            clear(player);
             return;
         }
         ItemStack visual = stack.copy();
@@ -50,6 +60,15 @@ public final class RefinementVisualSync {
             active.put(player, new State(visual, color, dimension));
             send(player, visual, color);
         }
+    }
+
+    private static void clear(ServerPlayer player) {
+        if (active.remove(player) != null) send(player, ItemStack.EMPTY, 0xFFFFFF);
+    }
+
+    @SubscribeEvent
+    public static void logout(PlayerEvent.PlayerLoggedOutEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player) active.remove(player);
     }
 
     public static int elementColor(ServerPlayer player) {

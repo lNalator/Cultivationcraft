@@ -9,9 +9,11 @@
   "category": [
     "Cultivation Menu"
   ],
-  "loot_pools": [
-    "village",
-    "common"
-  ],
-  "weight": 4
+  "loot_weights": {
+    "village": 6,
+    "common": 8,
+    "rare": 3,
+    "stronghold": 5,
+    "end_city": 0.2
+  }
 }

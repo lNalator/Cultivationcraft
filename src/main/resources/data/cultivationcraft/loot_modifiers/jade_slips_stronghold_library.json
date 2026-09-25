@@ -6,11 +6,13 @@
       "terms": [
         {
           "condition": "forge:loot_table_id",
-          "loot_table_id": "minecraft:chests/end_city_treasure"
+          "loot_table_id": "minecraft:chests/stronghold_library"
         }
       ]
     }
   ],
-  "pool": "end_city",
-  "chance": 0.9
+  "pool": "stronghold",
+  "chance": 1.0,
+  "min_slips": 1,
+  "max_slips": 3
 }

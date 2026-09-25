@@ -10,10 +10,6 @@
         },
         {
           "condition": "forge:loot_table_id",
-          "loot_table_id": "minecraft:chests/abandoned_mineshaft"
-        },
-        {
-          "condition": "forge:loot_table_id",
           "loot_table_id": "minecraft:chests/desert_pyramid"
         },
         {
@@ -52,5 +48,5 @@
     }
   ],
   "pool": "common",
-  "chance": 0.3
+  "chance": 0.75
 }
