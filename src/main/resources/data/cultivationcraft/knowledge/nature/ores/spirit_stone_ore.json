@@ -1,0 +1,23 @@
+{
+  "title": "Spirit Stone Ore",
+  "titles": [
+    "Pale Crystals of the Deep",
+    "The Miner's Hidden Radiance",
+    "Reading the Spirit Seams"
+  ],
+  "text": "Spirit stone ore is a pale blue-gray mineral found in deepslate. Its generation follows diamond rarity, depth distribution and vein sizes.\n\nUse an iron pickaxe or better. Each ore normally drops 1-3 spirit stones and a little experience. Fortune can increase the yield; Silk Touch preserves the ore block.\n\nDivine Sense reveals these deposits through walls, using the same detection range, shared highlight limit and distance fading as spiritual plants.",
+  "category": [
+    "Nature",
+    "Ores"
+  ],
+  "loot_weights": {
+    "village": 0.5,
+    "common": 3,
+    "rare": 4,
+    "stronghold": 5,
+    "end_city": 1
+  },
+  "chest_weights": {
+    "minecraft:chests/abandoned_mineshaft": 200
+  }
+}

@@ -12,6 +12,7 @@ public interface RefinementHandler {
     float remainingSeconds(Player player, ItemStack stack);
     void tick(ServerPlayer player, ItemStack stack, long elapsedNanos);
     default void onDeselected(ServerPlayer player) {}
-    /** Knowledge flows into the head; ordinary refinement sends elemental Qi outward. */
+    /** Incoming energy ends at the chest unless the handler requests the head. */
     default boolean flowsTowardPlayer() { return false; }
+    default boolean flowsTowardHead() { return false; }
 }

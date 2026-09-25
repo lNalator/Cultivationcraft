@@ -1,8 +1,6 @@
 {
   "replace": false,
   "values": [
-    "cultivationcraft:alchemy_cauldron",
-    "cultivationcraft:jade_ore",
     "cultivationcraft:spirit_stone_ore"
   ]
 }

@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "J J",
+    "J J",
+    "JJJ"
+  ],
+  "key": {
+    "J": {
+      "item": "cultivationcraft:jade_chunk"
+    }
+  },
+  "result": {
+    "item": "cultivationcraft:alchemy_cauldron"
+  }
+}

@@ -155,7 +155,8 @@ public final class RefinementItemRenderer {
                 var handler = RefinementHandlers.find(visual.item);
                 boolean inward = handler != null && handler.flowsTowardPlayer();
                 Vec3 source = inward ? item : chest;
-                Vec3 destination = inward ? player.getEyePosition(partialTick).add(forward.scale(.08)) : item;
+                Vec3 destination = inward ? (handler.flowsTowardHead()
+                        ? player.getEyePosition(partialTick).add(forward.scale(.08)) : chest) : item;
                 drawMotes(pose.last().pose(), source, destination, forward,
                         camera, right, up, elapsed, Double.POSITIVE_INFINITY, visual.color);
             }

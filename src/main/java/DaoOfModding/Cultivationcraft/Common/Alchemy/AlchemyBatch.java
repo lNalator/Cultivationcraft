@@ -2,9 +2,7 @@ package DaoOfModding.Cultivationcraft.Common.Alchemy;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import DaoOfModding.Cultivationcraft.Common.Blocks.Plants.entity.ProceduralPlantBlockEntity;
 import DaoOfModding.Cultivationcraft.Common.Blocks.Plants.world.PlantGenomes;
@@ -23,7 +21,6 @@ public record AlchemyBatch(PillDefinition definition, int[] scores, boolean vali
         int[] scores = AlchemyQi.totals(inventory, level);
         int total = Arrays.stream(scores).sum();
         int elemental = total - scores[0];
-        Set<Integer> species = new HashSet<>();
         boolean occupied = false, valid = true, tierPlant = false;
         for (int i = 0; i < AlchemyCauldronBlockEntity.SLOT_COUNT; i++) {
             ItemStack stack = inventory.getItem(i);
@@ -32,7 +29,6 @@ public record AlchemyBatch(PillDefinition definition, int[] scores, boolean vali
             int id = ProceduralPlantItem.readSpecies(stack);
             if (!(stack.getItem() instanceof ProceduralPlantItem) || AlchemyQi.contribution(stack) <= 0
                     || PlantGenomes.getById(level, id) == null) { valid = false; continue; }
-            species.add(id);
             tierPlant |= ProceduralPlantBlockEntity.growthToTier(AlchemyQi.contribution(stack) / stack.getCount()) >= 1;
         }
         if (!occupied) return null;
@@ -65,7 +61,8 @@ public record AlchemyBatch(PillDefinition definition, int[] scores, boolean vali
             }
         }
         if (selected == null) return null;
-        valid &= tierPlant && species.size() >= 2 && species.size() <= 3;
+        // Ingredient diversity comes from the recipe's scores, not a global species limit.
+        valid &= tierPlant;
         double waste = 0;
         if (selected.cultivation()) {
             valid &= elemental >= selected.minimumScore();

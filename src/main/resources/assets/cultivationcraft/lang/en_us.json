@@ -567,5 +567,10 @@
   "cultivationcraft.gui.help.debug.givejadeslip.text": "/cultivation givejadeslip <player> <entry>\n\nTab suggests available knowledge IDs, including recipes. The command gives one unread slip; it does not unlock knowledge directly. Refine the slip to learn its entry.\n\nExample:\n/cultivation givejadeslip @s cultivationcraft:refinement\n\nRecipe example:\n/cultivation givejadeslip @s cultivationcraft:recipes/spirit_recovery\n\nTab can search spirit_recovery or a generated pill name. Unique short IDs are also accepted.",
   "cultivationcraft.gui.help.debug.bodyforge.revertcultivation": "Revert Cultivation",
   "cultivationcraft.gui.help.debug.bodyforge.revertcultivation.text": "/cultivation revertCultivation <players>\n\nReverts the selected cultivators to an earlier cultivation state. Use player names or selectors such as @s. Press Tab for player suggestions.",
-  "cultivationcraft.jade.missing_recipe": "Jade slip %s exists, but its pill definition %s is not loaded. Check the alchemy loading messages in the server log."
+  "cultivationcraft.jade.missing_recipe": "Jade slip %s exists, but its pill definition %s is not loaded. Check the alchemy loading messages in the server log.",
+  "block.cultivationcraft.jade_ore": "Deepslate Jade Ore",
+  "block.cultivationcraft.spirit_stone_ore": "Deepslate Spirit Stone Ore",
+  "item.cultivationcraft.jade_chunk": "Jade Chunk",
+  "item.cultivationcraft.spirit_stone": "Spirit Stone",
+  "cultivationcraft.spirit_stone.refine": "Refine for 5 cultivation progress and 50 Qi (external cultivation)."
 }

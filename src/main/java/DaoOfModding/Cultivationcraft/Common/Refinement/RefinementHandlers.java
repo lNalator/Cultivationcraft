@@ -21,6 +21,7 @@ public final class RefinementHandlers {
         register(new SwordRefinement());
         register(new PillRefinement());
         register(new JadeSlipRefinement());
+        register(new SpiritStoneRefinement());
     }
     /** Register new item behavior during setup; the first matching handler wins. */
     public static void register(RefinementHandler handler) { handlers.add(java.util.Objects.requireNonNull(handler)); }
@@ -52,6 +53,7 @@ public final class RefinementHandlers {
     }
     private static final class JadeSlipRefinement extends FiveSecondRefinement {
         @Override public boolean flowsTowardPlayer() { return true; }
+        @Override public boolean flowsTowardHead() { return true; }
         @Override public boolean accepts(ItemStack stack) { return stack.getItem() instanceof JadeSlipItem; }
         @Override public boolean isActive(Player player, ItemStack stack) { return PlayerKnowledge.canRefine(player, stack); }
         @Override public float progress(Player player, ItemStack stack) { return PlayerKnowledge.progress(player, stack) / 1000f; }

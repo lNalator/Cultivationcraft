@@ -13,6 +13,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.DropExperienceBlock;
+import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -57,6 +59,15 @@ public class BlockRegister {
     public static final RegistryObject<BlockEntityType<AlchemyCauldronBlockEntity>> ALCHEMY_CAULDRON_ENTITY =
             BLOCK_ENTITIES.register("alchemy_cauldron", () -> BlockEntityType.Builder.of(
                     AlchemyCauldronBlockEntity::new, ALCHEMY_CAULDRON.get()).build(null));
+
+    public static final RegistryObject<Block> JADE_ORE = BLOCKS.register("jade_ore",
+            () -> new DropExperienceBlock(BlockBehaviour.Properties.copy(Blocks.DEEPSLATE_DIAMOND_ORE), UniformInt.of(1, 3)));
+    public static final RegistryObject<Block> SPIRIT_STONE_ORE = BLOCKS.register("spirit_stone_ore",
+            () -> new DropExperienceBlock(BlockBehaviour.Properties.copy(Blocks.DEEPSLATE_DIAMOND_ORE), UniformInt.of(1, 3)));
+    public static final RegistryObject<Item> JADE_ORE_ITEM = ItemRegister.ITEMS.register("jade_ore",
+            () -> new BlockItem(JADE_ORE.get(), new Item.Properties().tab(CreativeModeTab.TAB_BUILDING_BLOCKS)));
+    public static final RegistryObject<Item> SPIRIT_STONE_ORE_ITEM = ItemRegister.ITEMS.register("spirit_stone_ore",
+            () -> new BlockItem(SPIRIT_STONE_ORE.get(), new Item.Properties().tab(CreativeModeTab.TAB_BUILDING_BLOCKS)));
 
     public static void init(IEventBus bus) {
         BLOCKS.register(bus);

@@ -12,6 +12,7 @@ import DaoOfModding.Cultivationcraft.Common.Containers.RefinementContainer;
 import DaoOfModding.Cultivationcraft.Common.Containers.AlchemyCauldronMenu;
 import DaoOfModding.Cultivationcraft.Common.Qi.QiProjectile;
 import DaoOfModding.Cultivationcraft.Common.Worldgen.ProceduralPlantPatchFeature;
+import DaoOfModding.Cultivationcraft.Common.Worldgen.JadeOreFeature;
 import DaoOfModding.Cultivationcraft.Cultivationcraft;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.SimpleParticleType;
@@ -120,6 +121,8 @@ public class Register {
 
     public static final RegistryObject<Feature<NoneFeatureConfiguration>> PROCEDURAL_PLANT_PATCH =
             FEATURES.register("procedural_plant_patch", () -> new ProceduralPlantPatchFeature());
+    public static final RegistryObject<Feature<NoneFeatureConfiguration>> JADE_ORE =
+            FEATURES.register("jade_ore", JadeOreFeature::new);
     
     public static void init(IEventBus bus) {
         ENTITY_TYPES.register(bus);
