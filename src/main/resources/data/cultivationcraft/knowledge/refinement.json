@@ -1,0 +1,17 @@
+{
+  "title": "Item Refinement",
+  "titles": [
+    "The Art of Refinement",
+    "A Primer on Binding",
+    "Reading the Jade"
+  ],
+  "text": "Place an item in the cultivation menu's refinement slot. Refinement continues after closing the menu.\n\nSwords bind to you as flying swords. \n\nPills are analyzed without being consumed, revealing their name, effect and purity. \n\nJade slips are consumed to unlock a teaching in Help; already learned slips are preserved.",
+  "category": [
+    "Cultivation Menu"
+  ],
+  "loot_pools": [
+    "village",
+    "common"
+  ],
+  "weight": 4
+}

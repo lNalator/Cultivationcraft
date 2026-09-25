@@ -1,0 +1,11 @@
+{
+  "title": "fillQi",
+  "text": "§n/cultivation §nfillQi §n§lplayerName\n \nThis command will completely fill the Qi/Stamina of the supplied character.",
+  "translation_key": "cultivationcraft.gui.help.debug.bodyforge.fillqi",
+  "category": [
+    "Debug",
+    "cultivation"
+  ],
+  "unlocked_by_default": true,
+  "operator_only": true
+}

@@ -1,5 +1,6 @@
 {
   "effect": "FOOD",
+  "complexity": 1,
   "refinement_qi": 20,
   "elements": {
     "none": 20,

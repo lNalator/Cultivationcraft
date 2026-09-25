@@ -14,6 +14,8 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 
 public class AlchemyPillItem extends Item {
+    // Cosmetic flag used only by the cauldron's unattainable preview stack.
+    public static final String BLIND_PREVIEW_TAG = "BlindAlchemyPreview";
     public AlchemyPillItem(Properties properties) { super(properties.stacksTo(16)); }
     @Override public void inventoryTick(ItemStack stack, Level level, net.minecraft.world.entity.Entity entity, int slot, boolean selected) {
         if (!level.isClientSide) {

@@ -10,5 +10,10 @@
     "rare",
     "end_city"
   ],
-  "weight": 3
+  "weight": 3,
+  "category": [
+    "Cultivation Menu",
+    "Skills",
+    "Important Skills"
+  ]
 }

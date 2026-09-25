@@ -2,7 +2,7 @@ package DaoOfModding.Cultivationcraft.Server;
 
 import DaoOfModding.Cultivationcraft.Client.GUI.Screens.StatScreen;
 import DaoOfModding.Cultivationcraft.Common.Capabilities.CultivatorStats.CultivatorStats;
-import DaoOfModding.Cultivationcraft.Common.Containers.FlyingSwordContainerProvider;
+import DaoOfModding.Cultivationcraft.Common.Containers.RefinementMenuProvider;
 import DaoOfModding.Cultivationcraft.Network.PacketHandler;
 import DaoOfModding.Cultivationcraft.Common.Capabilities.CultivatorStats.ICultivatorStats;
 import DaoOfModding.Cultivationcraft.Common.Register;
@@ -24,10 +24,10 @@ public class ServerItemControl
 
     public static void handleKeyPress(Register.keyPresses keyPressed, ServerPlayer pressedBy)
     {
-        if (keyPressed == Register.keyPresses.FLYINGSWORDSCREEN)
+        if (keyPressed == Register.keyPresses.REFINEMENT_SCREEN)
         {
-            MenuProvider flyingSwordContainerProvider = new FlyingSwordContainerProvider(pressedBy);
-            NetworkHooks.openScreen(pressedBy, flyingSwordContainerProvider);
+            MenuProvider refinementMenuProvider = new RefinementMenuProvider(pressedBy);
+            NetworkHooks.openScreen(pressedBy, refinementMenuProvider);
         }
 
         if (keyPressed == Register.keyPresses.SKILLHOTBARSWITCH)

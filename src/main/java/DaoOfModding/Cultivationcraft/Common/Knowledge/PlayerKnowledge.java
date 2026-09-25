@@ -24,15 +24,22 @@ import java.util.ArrayList;
 
 @Mod.EventBusSubscriber(modid = Cultivationcraft.MODID)
 public final class PlayerKnowledge {
-    public static final String PURITY_KNOWLEDGE = "cultivationcraft:alchemy_toxicity";
+    public static final String PURITY_KNOWLEDGE = "cultivationcraft:alchemy/alchemy_toxicity";
     public static CompoundTag data(Player player) { return CultivatorStats.getCultivatorStats(player).getKnowledgeData(); }
-    public static boolean knows(Player player, String id) { return player != null && data(player).getBoolean("Known:" + id); }
+    public static boolean knows(Player player, String id) {
+        if (player == null) return false;
+        KnowledgeEntry entry = KnowledgeEntry.get(id);
+        CompoundTag data = data(player);
+        return data.getBoolean("Known:" + id) || (entry != null && (entry.unlockedByDefault()
+                || data.getBoolean("Known:" + entry.id())
+                || entry.aliases().stream().anyMatch(alias -> data.getBoolean("Known:" + alias))));
+    }
     public static KnowledgeEntry entry(ItemStack stack) {
         return stack.getItem() instanceof JadeSlipItem && stack.hasTag() ? KnowledgeEntry.get(stack.getTag().getString("Knowledge")) : null;
     }
     public static boolean canRefine(Player player, ItemStack stack) {
         KnowledgeEntry entry = entry(stack);
-        return entry != null && entry.available() && !knows(player, entry.id().toString());
+        return entry != null && entry.hasSlip() && entry.available() && !knows(player, entry.id().toString());
     }
     public static boolean knowsRecipe(ServerPlayer player, PillDefinition pill) {
         return PillEffects.data(player).getBoolean("Recipe:" + PillCatalog.get(player.getLevel()).key(pill));
@@ -57,7 +64,7 @@ public final class PlayerKnowledge {
         }
         KnowledgeEntry entry = entry(stack);
         String id = stack.hasTag() ? stack.getTag().getString("Knowledge") : "";
-        if (entry == null || !entry.available() || knows(player, id)) {
+        if (entry == null || !entry.hasSlip() || !entry.available() || knows(player, id)) {
             if (!data.getString("Notice").equals(id + ":blocked")) {
                 player.displayClientMessage(Component.translatable(knows(player, id) ? "cultivationcraft.jade.known" : "cultivationcraft.jade.invalid"), true);
                 data.putString("Notice", id + ":blocked");
@@ -71,7 +78,7 @@ public final class PlayerKnowledge {
         long progress = Math.min(5_000_000_000L, data.getLong("RefineTime") + Math.max(0, Math.min(elapsedNanos, 250_000_000L)));
         data.putLong("RefineTime", progress);
         if (progress < 5_000_000_000L) return;
-        data.putBoolean("Known:" + id, true);
+        data.putBoolean("Known:" + entry.id(), true);
         data.putString("Notice", id + ":blocked");
         stack.shrink(1);
         sync(player);
@@ -88,14 +95,27 @@ public final class PlayerKnowledge {
                 PillEffects.data(player).putBoolean("Recipe:" + PillCatalog.get(player.getLevel()).key(pill), true);
                 body += recipeText(pill);
             }
-            pages.add(new KnowledgePagesPacket.Page(entry.id().toString(), entry.resolveTitle(entry.title(), player.getLevel()), body));
+            pages.add(new KnowledgePagesPacket.Page(entry.id().toString(), entry.resolveTitle(entry.title(), player.getLevel()), body, category(entry, pill),
+                    entry.translationKey(), entry.operatorOnly(), entry.cultivationType(), entry.aliases()));
         }
         PacketHandler.sendCultivatorStatsToClient(player);
         PacketHandler.channel.send(PacketDistributor.PLAYER.with(() -> player), new KnowledgePagesPacket(pages));
     }
 
+    private static java.util.List<String> category(KnowledgeEntry entry, PillDefinition pill) {
+        if (pill == null) return entry.category();
+        String family = switch (pill.group()) {
+            case "healing" -> "Healing";
+            case "qi" -> "Qi Restoration";
+            case "cultivation" -> "Cultivation";
+            case "food" -> "Sustenance";
+            default -> "Other Pills";
+        };
+        return java.util.List.of("Recipe", family);
+    }
+
     private static String recipeText(PillDefinition pill) {
-        StringBuilder text = new StringBuilder("\n\nT1 refinement\nUse 2-3 different spiritual plant species, including at least one T1 or higher plant.\nElemental scores use spiritual growth multiplied by stack count. All input stacks are consumed.\n\nRequired scores:");
+        StringBuilder text = new StringBuilder("\n\nRequired scores:");
         if (pill.cultivation()) text.append("\nNon-neutral total: ").append(pill.minimumScore());
         for (int i = 0; i < pill.targets().length; i++) {
             if (pill.targets()[i] <= 0) continue;
@@ -103,9 +123,6 @@ public final class PlayerKnowledge {
             text.append("\n").append(element.substring(element.lastIndexOf('.') + 1)).append(": ").append(pill.targets()[i]);
         }
         text.append("\n\nQi to channel: ").append(pill.qi());
-        if (pill.targets()[0] == 0) text.append("\nA small neutral base is optional and can improve the batch's purity and success rate.");
-        if (pill.cultivation()) text.append("\nThe dominant non-neutral element becomes the pill's affinity; ties choose randomly.");
-        text.append("\nUnmet requirements ruin the batch. Excess or unrelated elemental Qi can lower purity. Even a valid batch can fail.");
         return text.toString();
     }
 

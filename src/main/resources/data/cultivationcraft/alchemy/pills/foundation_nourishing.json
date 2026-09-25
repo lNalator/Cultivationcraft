@@ -1,5 +1,6 @@
 {
   "effect": "CULTIVATION",
+  "complexity": 1,
   "refinement_qi": 50,
   "elements": {},
   "minimum_score": 30,

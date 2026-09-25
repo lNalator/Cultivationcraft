@@ -1,0 +1,11 @@
+{
+  "title": "Bone Attack Modifier",
+  "text": "Damage multiplier for attacks made with any of the character's bones",
+  "translation_key": "cultivationcraft.stat.boneattackmodifier",
+  "category": [
+    "Cultivation Menu",
+    "Stats"
+  ],
+  "unlocked_by_default": true,
+  "cultivation_type": 1
+}

@@ -1,0 +1,20 @@
+{
+  "title": "Alchemy Cauldrons",
+  "titles": [
+    "The First Cauldron",
+    "A Beginner's Alchemy Notes",
+    "On Herbs and Refinement"
+  ],
+  "text": "Place ingredients in the cauldron's nine input slots and keep output slots free.\n\nChannel Qi Transfer into the cauldron to charge it and light its fire. Each pulse supplies one Qi for one Qi spent plus the skill's stamina overhead. Once enough Qi has accumulated, the batch refines. The starter cauldron loses one stored Qi every five idle seconds.\n\nJade slips teach recipes and reveal their cauldron previews. Analyzing a finished pill reveals its properties without teaching its recipe.",
+  "loot_pools": [
+    "village",
+    "common"
+  ],
+  "weight": 4,
+  "category": [
+    "Alchemy"
+  ],
+  "aliases": [
+    "cultivationcraft:alchemy"
+  ]
+}

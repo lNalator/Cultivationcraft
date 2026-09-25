@@ -1,0 +1,11 @@
+{
+  "title": "Stamina Use",
+  "text": "The amount of stamina used by this character is multiplied by this value",
+  "translation_key": "cultivationcraft.stat.staminause",
+  "category": [
+    "Cultivation Menu",
+    "Stats"
+  ],
+  "unlocked_by_default": true,
+  "cultivation_type": 1
+}

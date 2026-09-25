@@ -1,5 +1,6 @@
 {
   "effect": "HEAL",
+  "complexity": 1,
   "refinement_qi": 50,
   "elements": {
     "wood": 20,

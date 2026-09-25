@@ -30,8 +30,8 @@ public final class PillEffects {
         return !entry.isEmpty() && (data(player).getBoolean("Known:" + entry) || data(player).getBoolean("Recipe:" + entry));
     }
 
-    /** Reuses Bind's timing/progress display; never binds, transforms, or consumes the pill. */
-    public static void refineInBind(Player player, ItemStack stack, long elapsedNanos) {
+    /** Uses the shared refinement timing/progress display; never binds, transforms, or consumes the pill. */
+    public static void refinePill(Player player, ItemStack stack, long elapsedNanos) {
         var tag = stack.getOrCreateTag();
         if (tag.getString("Entry").isEmpty() || PillDefinition.get(tag.getString("Pill")) == null) return;
         PillStacks.clearLegacyAnalysis(stack);

@@ -1,0 +1,9 @@
+{
+  "title": "Cultivate",
+  "text": "Control the cultivation of your character",
+  "translation_key": "cultivationcraft.gui.help.cultivationmenu.cultivate",
+  "category": [
+    "Cultivation Menu"
+  ],
+  "unlocked_by_default": true
+}

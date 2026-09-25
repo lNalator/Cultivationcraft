@@ -1,0 +1,20 @@
+{
+  "title": "Cultivation Pill Affinity",
+  "titles": [
+    "The Element Within",
+    "Threads of a Cultivation Pill",
+    "On Balanced Affinities"
+  ],
+  "text": "When refining a cultivation pill, the highest non-neutral elemental score determines its affinity. If several elements tie for the highest score, each has an equal chance of becoming the pill's affinity.",
+  "category": [
+    "Alchemy"
+  ],
+  "loot_pools": [
+    "common",
+    "rare"
+  ],
+  "weight": 2,
+  "aliases": [
+    "cultivationcraft:alchemy_affinity"
+  ]
+}

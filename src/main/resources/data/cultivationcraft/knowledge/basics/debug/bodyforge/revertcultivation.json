@@ -1,0 +1,11 @@
+{
+  "title": "Revert Cultivation",
+  "text": "/cultivation revertCultivation <players>\n\nReverts the selected cultivators to an earlier cultivation state. Use player names or selectors such as @s. Press Tab for player suggestions.",
+  "translation_key": "cultivationcraft.gui.help.debug.bodyforge.revertcultivation",
+  "category": [
+    "Debug",
+    "cultivation"
+  ],
+  "unlocked_by_default": true,
+  "operator_only": true
+}

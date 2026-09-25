@@ -1,0 +1,11 @@
+{
+  "title": "Qi Absorb",
+  "text": "The amount of Qi this character is capable of absorbing per tick",
+  "translation_key": "cultivationcraft.stat.qiabsorb",
+  "category": [
+    "Cultivation Menu",
+    "Stats"
+  ],
+  "unlocked_by_default": true,
+  "cultivation_type": 1
+}

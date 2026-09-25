@@ -1,5 +1,6 @@
 {
   "effect": "QI",
+  "complexity": 1,
   "refinement_qi": 50,
   "elements": {
     "water": 20,

@@ -1,0 +1,11 @@
+{
+  "title": "Weight",
+  "text": "How much the character weights, a higher weight increases stamina costs and can decrease movement speed",
+  "translation_key": "cultivationcraft.stat.weight",
+  "category": [
+    "Cultivation Menu",
+    "Stats"
+  ],
+  "unlocked_by_default": true,
+  "cultivation_type": 1
+}

@@ -35,8 +35,10 @@ public class AlchemyCauldronMenu extends AbstractContainerMenu {
 
     public void setPreview(AlchemyPreviewPacket preview) { this.preview = preview; }
     public ItemStack getPreviewItem() {
-        return preview == null || preview.item().isEmpty()
-                ? new ItemStack(ItemRegister.ALCHEMY_PILL.get()) : preview.item();
+        if (preview != null && !preview.item().isEmpty()) return preview.item();
+        ItemStack silhouette = new ItemStack(ItemRegister.ALCHEMY_PILL.get());
+        silhouette.getOrCreateTag().putBoolean(DaoOfModding.Cultivationcraft.Common.Items.AlchemyPillItem.BLIND_PREVIEW_TAG, true);
+        return silhouette;
     }
     public List<Component> previewTooltip() {
         var lines = new ArrayList<Component>();

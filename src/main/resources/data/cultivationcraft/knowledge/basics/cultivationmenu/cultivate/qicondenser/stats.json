@@ -1,0 +1,12 @@
+{
+  "title": "Stats",
+  "text": "Allows you to view your cultivations stats and select what stat to focus on, increasing its value as your cultivation progresses.",
+  "translation_key": "cultivationcraft.gui.help.cultivationmenu.cultivate.qicondenser.stats",
+  "category": [
+    "Cultivation Menu",
+    "Cultivate",
+    "Qi Cultivation"
+  ],
+  "unlocked_by_default": true,
+  "cultivation_type": 0
+}

@@ -37,8 +37,10 @@ public final class AlchemyPillPresentation {
     }
 
     public static int color(ItemStack stack, int layer) {
-        return PillEffects.identified(Minecraft.getInstance().player, stack)
-                ? 0xFF000000 | stack.getTag().getInt("Color") : 0xFF000000;
+        var tag = stack.getTag();
+        if (tag != null && tag.getBoolean(AlchemyPillItem.BLIND_PREVIEW_TAG)) return 0xFF000000;
+        // Knowledge hides the name and effects, never the appearance of a real pill.
+        return tag != null && tag.contains("Color") ? 0xFF000000 | tag.getInt("Color") : 0xFFFFFFFF;
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

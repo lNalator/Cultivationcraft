@@ -1,0 +1,11 @@
+{
+  "title": "Leg Weight Limit",
+  "text": "The amount of weight this character's legs can support before their movement speed starts being slowed",
+  "translation_key": "cultivationcraft.stat.legweight",
+  "category": [
+    "Cultivation Menu",
+    "Stats"
+  ],
+  "unlocked_by_default": true,
+  "cultivation_type": 1
+}

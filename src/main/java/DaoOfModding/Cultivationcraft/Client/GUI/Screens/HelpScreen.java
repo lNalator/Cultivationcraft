@@ -1,7 +1,6 @@
 package DaoOfModding.Cultivationcraft.Client.GUI.Screens;
 
 import DaoOfModding.Cultivationcraft.Client.ClientKnowledge;
-import DaoOfModding.Cultivationcraft.Client.GUI.HelpItems;
 import DaoOfModding.Cultivationcraft.Client.GUI.SelectableTextField;
 import DaoOfModding.Cultivationcraft.Client.GUI.TextField;
 import DaoOfModding.Cultivationcraft.Cultivationcraft;
@@ -29,6 +28,19 @@ public class HelpScreen extends GenericTabScreen
     protected TextField helpText = new TextField();
     protected SelectableTextField selectText = new SelectableTextField();
     private int knowledgeRevision = -1;
+    private boolean debugVisible;
+    private int cultivationType;
+
+    private int currentCultivationType() {
+        if (Minecraft.getInstance().player == null) return -1;
+        return DaoOfModding.Cultivationcraft.Common.Capabilities.CultivatorStats.CultivatorStats
+                .getCultivatorStats(Minecraft.getInstance().player).getCultivationType();
+    }
+
+    private boolean canSeeDebug() {
+        var player = Minecraft.getInstance().player;
+        return player != null && player.hasPermissions(2);
+    }
     
     public HelpScreen()
     {
@@ -45,12 +57,8 @@ public class HelpScreen extends GenericTabScreen
         selectText.setSize(selectTextWidth, selectTextHeight, (int)(selectTextWidth * 2));
         knowledgeRevision = ClientKnowledge.revision();
 
-        for (SelectableText text : HelpItems.getText())
-            selectText.addSelectable(text);
-
-        if (Minecraft.getInstance().player.isCreative())
-            for (SelectableText text : HelpItems.getOPText())
-                selectText.addSelectable(text);
+        debugVisible = canSeeDebug();
+        cultivationType = currentCultivationType();
 
         for (SelectableText text : ClientKnowledge.helpPages())
             selectText.addSelectable(text);
@@ -58,7 +66,8 @@ public class HelpScreen extends GenericTabScreen
 
     @Override public void tick() {
         super.tick();
-        if (knowledgeRevision != ClientKnowledge.revision()) refreshEntries();
+        if (knowledgeRevision != ClientKnowledge.revision() || debugVisible != canSeeDebug()
+                || cultivationType != currentCultivationType()) refreshEntries();
     }
 
     @Override
@@ -106,8 +115,11 @@ public class HelpScreen extends GenericTabScreen
         int edgeSpacingX = (this.width - this.xSize) / 2;
         int edgeSpacingY = (this.height - this.ySize) / 2;
 
-        if (selectText.getSelected() != null)
-            font.draw(PoseStack, selectText.getSelected().getName(), edgeSpacingX + (int)(this.xSize / 2) - (int)(font.width(selectText.getSelected().name) / 2),  edgeSpacingY + nameTextY, Color.darkGray.getRGB());
+        if (selectText.getSelected() != null) {
+            String title = selectText.getSelected().getName();
+            font.draw(PoseStack, title, edgeSpacingX + (this.xSize - font.width(title)) / 2,
+                    edgeSpacingY + nameTextY, Color.darkGray.getRGB());
+        }
 
         helpText.setPos(edgeSpacingX + helpTextX, edgeSpacingY + helpTextY);
         helpText.setSize(helpTextWidth, helpTextHeight);

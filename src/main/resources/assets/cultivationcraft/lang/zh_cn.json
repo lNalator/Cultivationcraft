@@ -149,7 +149,7 @@
   "cultivationcraft.gui.tab2": "修炼",
   "cultivationcraft.gui.tab3": "帮助",
 
-  "cultivationcraft.gui.bind": "绑定",
+  "cultivationcraft.gui.refinement": "绑定", //TODO: Update translation from bind to refinement(?)
   "cultivationcraft.gui.done": "确定",
   "cultivationcraft.gui.cancel": "取消",
   "cultivationcraft.gui.remaining": "剩余时间: %s秒",

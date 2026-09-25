@@ -1,0 +1,11 @@
+{
+  "title": "Jump Height",
+  "text": "The amount of blocks this character can jump",
+  "translation_key": "cultivationcraft.stat.jumpheight",
+  "category": [
+    "Cultivation Menu",
+    "Stats"
+  ],
+  "unlocked_by_default": true,
+  "cultivation_type": 1
+}

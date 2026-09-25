@@ -1,0 +1,20 @@
+{
+  "title": "Breakthroughs and Tribulations",
+  "titles": [
+    "A First Step Beyond",
+    "Weathering Heaven's Trial",
+    "Notes on Cultivation Breakthroughs"
+  ],
+  "text": "The cultivation screen displays the requirements for your next breakthrough. Complete the current stage's requirements to advance.\n\nAt the end of a major realm, a tribulation challenges you with powerful lightning strikes. Survive the trial to progress beyond that realm. Failure can cost cultivation progress, so recover and prepare before beginning.",
+  "category": [
+    "Cultivation Menu",
+    "Cultivate",
+    "Qi Cultivation"
+  ],
+  "loot_pools": [
+    "village",
+    "common"
+  ],
+  "weight": 4,
+  "cultivation_type": 0
+}

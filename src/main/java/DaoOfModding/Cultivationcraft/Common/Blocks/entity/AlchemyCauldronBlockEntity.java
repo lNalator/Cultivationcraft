@@ -3,6 +3,10 @@ package DaoOfModding.Cultivationcraft.Common.Blocks.entity;
 import DaoOfModding.Cultivationcraft.Common.Blocks.BlockRegister;
 import DaoOfModding.Cultivationcraft.Common.Blocks.custom.AlchemyCauldronBlock;
 import DaoOfModding.Cultivationcraft.Common.Containers.AlchemyCauldronMenu;
+import DaoOfModding.Cultivationcraft.Common.Alchemy.AlchemyFailureExplosion;
+import DaoOfModding.Cultivationcraft.Common.Items.ItemRegister;
+import java.util.UUID;
+import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
@@ -28,6 +32,7 @@ public class AlchemyCauldronBlockEntity extends BaseContainerBlockEntity {
     private int storedQi;
     private long receivingUntil;
     private long nextQiDecayTick = -1;
+    private UUID lastRefiner;
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, AlchemyCauldronBlockEntity cauldron) {
         cauldron.depleteIdleQi();
@@ -37,18 +42,33 @@ public class AlchemyCauldronBlockEntity extends BaseContainerBlockEntity {
     private void refineBatch() {
         if (!(level instanceof ServerLevel server)) return;
         int output = -1;
+        int wasteOutput = -1;
         for (int i = SLOT_COUNT; i < INVENTORY_SIZE; i++) {
-            if (items.get(i).isEmpty()) { output = i; break; }
+            if (items.get(i).isEmpty()) {
+                if (output < 0) output = i;
+                else { wasteOutput = i; break; }
+            }
         }
         if (output < 0) return;
         var batch = DaoOfModding.Cultivationcraft.Common.Alchemy.AlchemyBatch.inspect(this, server);
         if (batch == null || storedQi < batch.definition().qi()) return;
+        int waste = batch.wasteCount();
+        // Reserve both possible outputs before rolling, so a full output cannot discard
+        // waste or repeatedly reroll the batch without consuming its ingredients.
+        if (batch.valid() && waste > 0 && wasteOutput < 0) return;
         ItemStack result = batch.refine(server, 1);
         // Validate capacity before rolling or consuming anything. Commit on the server thread.
         for (int i = 0; i < SLOT_COUNT; i++) items.set(i, ItemStack.EMPTY);
         items.set(output, result);
+        if (result.is(ItemRegister.ALCHEMY_PILL.get()) && waste > 0)
+            items.set(wasteOutput, new ItemStack(ItemRegister.ALCHEMY_REMNANTS.get(), waste));
         storedQi -= batch.definition().qi();
         setChanged();
+        // Commit the failed batch before applying damage; no second roll or block explosion.
+        if (result.is(ItemRegister.ALCHEMY_REMNANTS.get())) {
+            Player refiner = lastRefiner == null ? null : server.getPlayerByUUID(lastRefiner);
+            AlchemyFailureExplosion.burst(server, worldPosition, batch.definition().complexity(), refiner);
+        }
     }
 
     @Override
@@ -82,11 +102,16 @@ public class AlchemyCauldronBlockEntity extends BaseContainerBlockEntity {
     }
 
     public int receiveQi(int amount) {
+        return receiveQi(amount, null);
+    }
+
+    public int receiveQi(int amount, @Nullable Player refiner) {
         if (!(level instanceof ServerLevel) || amount <= 0) return 0;
         depleteIdleQi();
         int accepted = Math.min(amount, Integer.MAX_VALUE - storedQi);
         if (accepted > 0) {
             storedQi += accepted;
+            lastRefiner = refiner != null && refiner.level == level ? refiner.getUUID() : null;
             receivingUntil = level.getGameTime() + 40;
             nextQiDecayTick = level.getGameTime() + qiDecayInterval();
             setChanged();
@@ -172,6 +197,9 @@ public class AlchemyCauldronBlockEntity extends BaseContainerBlockEntity {
         ContainerHelper.loadAllItems(tag, items);
         storedQi = Math.max(0, tag.getInt("StoredQi"));
         nextQiDecayTick = tag.contains("NextQiDecayTick") ? tag.getLong("NextQiDecayTick") : -1;
+        // A reloaded cauldron must receive fresh Qi before refining another batch.
+        receivingUntil = 0;
+        lastRefiner = null;
     }
 
     @Override

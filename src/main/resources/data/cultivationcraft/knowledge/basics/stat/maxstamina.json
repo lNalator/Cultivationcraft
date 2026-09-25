@@ -1,0 +1,11 @@
+{
+  "title": "Max Stamina",
+  "text": "The maximum stamina (hunger) of the character (each point represents half a drumstick)",
+  "translation_key": "cultivationcraft.stat.maxstamina",
+  "category": [
+    "Cultivation Menu",
+    "Stats"
+  ],
+  "unlocked_by_default": true,
+  "cultivation_type": 1
+}

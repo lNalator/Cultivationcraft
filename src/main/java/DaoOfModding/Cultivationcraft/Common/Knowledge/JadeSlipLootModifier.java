@@ -30,7 +30,7 @@ public final class JadeSlipLootModifier extends LootModifier {
     @Override public Codec<? extends IGlobalLootModifier> codec() { return CODEC; }
     @Override protected ObjectArrayList<ItemStack> doApply(ObjectArrayList<ItemStack> loot, LootContext context) {
         if (context.getRandom().nextFloat() >= chance) return loot;
-        var choices = KnowledgeEntry.all().stream().filter(entry -> entry.available() && entry.lootPools().contains(pool)).toList();
+        var choices = KnowledgeEntry.all().stream().filter(entry -> entry.hasSlip() && entry.available() && entry.lootPools().contains(pool)).toList();
         int weight = choices.stream().mapToInt(KnowledgeEntry::weight).sum();
         if (weight == 0) return loot;
         int choice = context.getRandom().nextInt(weight);

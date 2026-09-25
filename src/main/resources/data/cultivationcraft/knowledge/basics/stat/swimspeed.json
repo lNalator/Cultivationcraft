@@ -1,0 +1,11 @@
+{
+  "title": "Swim Speed",
+  "text": "The characters movement speed is multiplied by this number whilst swimming",
+  "translation_key": "cultivationcraft.stat.swimspeed",
+  "category": [
+    "Cultivation Menu",
+    "Stats"
+  ],
+  "unlocked_by_default": true,
+  "cultivation_type": 1
+}

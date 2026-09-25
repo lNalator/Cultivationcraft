@@ -1,0 +1,12 @@
+{
+  "title": "Breakthrough requirements",
+  "text": "Displays the requirements to breakthrough to the next stage of cultivation",
+  "translation_key": "cultivationcraft.gui.help.cultivationmenu.cultivate.qicondenser.breakthrough",
+  "category": [
+    "Cultivation Menu",
+    "Cultivate",
+    "Qi Cultivation"
+  ],
+  "unlocked_by_default": true,
+  "cultivation_type": 0
+}

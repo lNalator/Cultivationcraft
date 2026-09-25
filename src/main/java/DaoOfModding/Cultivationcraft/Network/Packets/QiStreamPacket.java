@@ -1,6 +1,6 @@
 package DaoOfModding.Cultivationcraft.Network.Packets;
 
-import DaoOfModding.Cultivationcraft.Client.Renderers.BindingItemRenderer;
+import DaoOfModding.Cultivationcraft.Client.Renderers.RefinementItemRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -21,7 +21,7 @@ public record QiStreamPacket(UUID player, ResourceLocation dimension, BlockPos t
     public void handle(Supplier<NetworkEvent.Context> supplier) {
         var context = supplier.get();
         context.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT,
-                () -> () -> BindingItemRenderer.transfer(player, dimension, target, color, active)));
+                () -> () -> RefinementItemRenderer.transfer(player, dimension, target, color, active)));
         context.setPacketHandled(true);
     }
 }

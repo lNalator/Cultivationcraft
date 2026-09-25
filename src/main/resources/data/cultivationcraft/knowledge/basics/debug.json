@@ -1,0 +1,8 @@
+{
+  "title": "Debug",
+  "text": "OP Commands for testing purposes",
+  "translation_key": "cultivationcraft.gui.help.debug",
+  "category": [],
+  "unlocked_by_default": true,
+  "operator_only": true
+}

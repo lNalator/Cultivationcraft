@@ -1,0 +1,20 @@
+{
+  "title": "Refining a Batch",
+  "titles": [
+    "Balancing the Cauldron",
+    "On Elemental Measures",
+    "A Novice Refiner's Notes"
+  ],
+  "text": "Starter T1 recipes use 2-3 different spiritual plant species, including at least one T1 or higher plant.\n\nEach plant contributes its spiritual growth multiplied by stack count to its element's score. Qi-source reserves do not count toward these scores. Every input stack is consumed when the batch finishes.\n\nMissing mandatory requirements ruins the batch. Even a correct recipe can fail. Failed batches cause a small explosion that damages nearby creatures and the refiner, without breaking blocks or starting fires.",
+  "category": [
+    "Alchemy"
+  ],
+  "loot_pools": [
+    "village",
+    "common"
+  ],
+  "weight": 4,
+  "aliases": [
+    "cultivationcraft:alchemy_batches"
+  ]
+}

@@ -356,7 +356,7 @@ public class KeybindingControl
             {
                 ScreenTabControl.openTab();
                 //Minecraft.getInstance().forceSetScreen(new StatScreen());
-                //ClientPacketHandler.sendKeypressToServer(Register.keyPresses.FLYINGSWORDSCREEN);
+                //ClientPacketHandler.sendKeypressToServer(Register.keyPresses.REFINEMENT_SCREEN);
             }
 
             // Do not do hotbar interactions if the player has no cultivation

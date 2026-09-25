@@ -59,11 +59,11 @@ public class PacketHandler
     protected static final byte CULTIVATOR_STATS = 99;
     protected static final byte FROZEN_BLOCK_RENDER = 100;
     protected static final byte PLANT_CATALOG_SYNC = 101;
-    protected static final byte BINDING_VISUAL = 102;
+    protected static final byte REFINEMENT_VISUAL = 102;
     protected static final byte KNOWLEDGE_PAGES = 103;
     protected static final byte ALCHEMY_PREVIEW = 104;
     protected static final byte QI_STREAM = 105;
-    protected static final String PROTOCOL_VERSION = "4";
+    protected static final String PROTOCOL_VERSION = "7";
 
     public static final SimpleChannel channel = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(Cultivationcraft.MODID, "main"),
@@ -83,8 +83,8 @@ public class PacketHandler
         channel.registerMessage(QI_STREAM, QiStreamPacket.class, QiStreamPacket::encode,
                 QiStreamPacket::decode, QiStreamPacket::handle,
                 java.util.Optional.of(net.minecraftforge.network.NetworkDirection.PLAY_TO_CLIENT));
-        channel.registerMessage(BINDING_VISUAL, BindingVisualPacket.class, BindingVisualPacket::encode,
-                BindingVisualPacket::decode, BindingVisualPacket::handle,
+        channel.registerMessage(REFINEMENT_VISUAL, RefinementVisualPacket.class, RefinementVisualPacket::encode,
+                RefinementVisualPacket::decode, RefinementVisualPacket::handle,
                 java.util.Optional.of(net.minecraftforge.network.NetworkDirection.PLAY_TO_CLIENT));
         channel.registerMessage(KEYPRESS, keypressPacket.class, keypressPacket::encode, keypressPacket::decode, keypressPacket::handle);
         channel.registerMessage(ATTACK, AttackPacket.class, AttackPacket::encode, AttackPacket::decode, AttackPacket::handle);

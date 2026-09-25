@@ -91,10 +91,16 @@ public record AlchemyBatch(PillDefinition definition, int[] scores, boolean vali
 
     public int purity() { return (int) Math.round(Mth.clamp(95 - 50 * impurity + 5 * neutralBonus, 1, 100)); }
 
+    /** Successful impure batches leave one remnant per complete ten percent lost purity. */
+    public int wasteCount() {
+        int purity = purity();
+        return purity <= 70 ? (100 - purity) / 10 : 0;
+    }
+
     public ItemStack refine(ServerLevel level, int cauldronTier) {
         // D = 1 for these starter definitions. Invalid mandatory requirements always ruin a batch.
         double failure = Mth.clamp(5 + 8 * (1 - cauldronTier) + 6 * impurity - 3 * neutralBonus, 2, 90);
-        if (!valid || level.random.nextDouble() * 100 < failure) return new ItemStack(ItemRegister.ALCHEMY_REMNANTS.get());
+        if (!valid || level.random.nextDouble() * 100 < failure) return new ItemStack(ItemRegister.ALCHEMY_REMNANTS.get(), 10);
         net.minecraft.resources.ResourceLocation affinity = null;
         if (definition.cultivation()) {
             List<Integer> dominant = new ArrayList<>();

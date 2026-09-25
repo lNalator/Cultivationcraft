@@ -1,0 +1,10 @@
+{
+  "title": "Fire",
+  "text": "Mostly found in the Nether, the §cFire§r element is an element related to heat and burning\n \nIt is suppressed by §9Water§r and suppresses §2Wood§r",
+  "translation_key": "cultivationcraft.gui.help.elements.fire",
+  "category": [
+    "Qi",
+    "Elements"
+  ],
+  "unlocked_by_default": true
+}

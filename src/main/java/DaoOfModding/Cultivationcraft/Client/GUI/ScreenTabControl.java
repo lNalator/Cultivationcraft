@@ -117,13 +117,13 @@ public class ScreenTabControl
             else if (selectedScreen == 2)
             {
                 if (cultivationType == CultivationTypes.QI_CONDENSER)
-                    ClientPacketHandler.sendKeypressToServer(Register.keyPresses.FLYINGSWORDSCREEN);
+                    ClientPacketHandler.sendKeypressToServer(Register.keyPresses.REFINEMENT_SCREEN);
                 else if (cultivationType == CultivationTypes.BODY_CULTIVATOR)
                     Minecraft.getInstance().forceSetScreen(new BodyforgeScreen());
             } else if (selectedScreen == 3)
                 Minecraft.getInstance().forceSetScreen(new HelpScreen());
             else if (selectedScreen == 4 && cultivationType == CultivationTypes.BODY_CULTIVATOR)
-                ClientPacketHandler.sendKeypressToServer(Register.keyPresses.FLYINGSWORDSCREEN);
+                ClientPacketHandler.sendKeypressToServer(Register.keyPresses.REFINEMENT_SCREEN);
         }
     }
 

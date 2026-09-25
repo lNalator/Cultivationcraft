@@ -1,0 +1,10 @@
+{
+  "title": "Hotbar",
+  "text": "The skill hotbar can be toggled between by pressing the hotbar-toggle key (default ~) and works the same as the vanilla hotbar, except with skills instead of items.",
+  "translation_key": "cultivationcraft.gui.help.cultivationmenu.skills.hotbar",
+  "category": [
+    "Cultivation Menu",
+    "Skills"
+  ],
+  "unlocked_by_default": true
+}

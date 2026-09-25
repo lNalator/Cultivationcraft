@@ -155,7 +155,7 @@ public class ServerListeners
 
             if(ServerItemControl.loaded)
             {
-                FlyingSwordBindProgresser.bindFlyingSword(System.nanoTime() - lastServerTickTime);
+                RefinementProcessor.tick(System.nanoTime() - lastServerTickTime);
             }
 
             lastServerTickTime = System.nanoTime();

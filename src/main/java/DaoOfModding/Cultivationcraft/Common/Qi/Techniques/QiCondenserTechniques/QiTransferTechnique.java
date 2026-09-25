@@ -3,7 +3,7 @@ package DaoOfModding.Cultivationcraft.Common.Qi.Techniques.QiCondenserTechniques
 import net.minecraft.server.level.ServerPlayer;
 import DaoOfModding.Cultivationcraft.Network.PacketHandler;
 import DaoOfModding.Cultivationcraft.Network.Packets.QiStreamPacket;
-import DaoOfModding.Cultivationcraft.Server.BindingVisualSync;
+import DaoOfModding.Cultivationcraft.Server.RefinementVisualSync;
 import net.minecraftforge.network.PacketDistributor;
 import DaoOfModding.Cultivationcraft.Common.Blocks.Plants.entity.ProceduralPlantBlockEntity;
 import DaoOfModding.Cultivationcraft.Common.Blocks.entity.AlchemyCauldronBlockEntity;
@@ -118,7 +118,7 @@ public class QiTransferTechnique extends Technique {
             return;
         }
         if (target instanceof ProceduralPlantBlockEntity plant) plant.receiveQi(1);
-        else if (target instanceof AlchemyCauldronBlockEntity cauldron) cauldron.receiveQi(1);
+        else if (target instanceof AlchemyCauldronBlockEntity cauldron) cauldron.receiveQi(1, player);
         // Standard progression includes selected training focus, stage limits and mastery.
         levelUp(player, 1);
         if (visualTarget == null || level.getGameTime() - lastVisualTick >= 5) {
@@ -139,7 +139,7 @@ public class QiTransferTechnique extends Technique {
                 PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> server),
                 new QiStreamPacket(server.getUUID(),
                         server.level.dimension().location(), target,
-                        BindingVisualSync.elementColor(server), active));
+                        RefinementVisualSync.elementColor(server), active));
     }
 
     private boolean canReceive(BlockEntity target) {
