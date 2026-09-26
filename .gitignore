@@ -5,3 +5,5 @@
 !/gradle/wrapper/
 /run/
 /bin/
+/.settings/
+/.vscode/
