@@ -1,0 +1,22 @@
+{
+  "title": "Alchemy and Impurities",
+  "titles": [
+    "On Clouded Elixirs",
+    "The Dregs Beneath the Jade",
+    "A Treatise on Alchemy and Toxicity"
+  ],
+  "text": "Excess or unrelated elemental Qi increases impurity. A small neutral base improves purity and success; too much becomes waste.\n\nA successful pill with purity of 70% or less leaves one alchemy remnant for each complete 10% of lost purity: 70% yields 3, 60% yields 4. Leave two output slots free for the pill and waste. A ruined batch produces 10 remnants.\n\nWith this knowledge and the recipe, the cauldron preview shows an estimated purity range.",
+  "category": [
+    "Alchemy"
+  ],
+  "aliases": [
+    "cultivationcraft:alchemy_toxicity"
+  ],
+  "loot_weights": {
+    "village": 1,
+    "common": 3,
+    "rare": 8,
+    "stronghold": 14,
+    "end_city": 4
+  }
+}

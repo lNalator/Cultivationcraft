@@ -1,0 +1,11 @@
+{
+  "title": "Stamina Drain",
+  "text": "The amount of stamina consumed per second by the character",
+  "translation_key": "cultivationcraft.stat.staminadrain",
+  "category": [
+    "Cultivation Menu",
+    "Stats"
+  ],
+  "unlocked_by_default": true,
+  "cultivation_type": 1
+}

@@ -1,0 +1,11 @@
+{
+  "title": "Movement Speed",
+  "text": "The number of blocks at which the character moves per tick",
+  "translation_key": "cultivationcraft.stat.movementspeed",
+  "category": [
+    "Cultivation Menu",
+    "Stats"
+  ],
+  "unlocked_by_default": true,
+  "cultivation_type": 1
+}

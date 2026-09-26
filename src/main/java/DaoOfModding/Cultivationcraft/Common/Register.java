@@ -8,9 +8,11 @@ import DaoOfModding.Cultivationcraft.Client.Particles.WaterParticle.WaterParticl
 import DaoOfModding.Cultivationcraft.Client.Particles.WindParticle.WindParticleType;
 import DaoOfModding.Cultivationcraft.Client.Renderers.FlyingSwordRenderer;
 import DaoOfModding.Cultivationcraft.Client.Renderers.QiProjectileRenderer;
-import DaoOfModding.Cultivationcraft.Common.Containers.FlyingSwordContainer;
+import DaoOfModding.Cultivationcraft.Common.Containers.RefinementContainer;
+import DaoOfModding.Cultivationcraft.Common.Containers.AlchemyCauldronMenu;
 import DaoOfModding.Cultivationcraft.Common.Qi.QiProjectile;
 import DaoOfModding.Cultivationcraft.Common.Worldgen.ProceduralPlantPatchFeature;
+import DaoOfModding.Cultivationcraft.Common.Worldgen.JadeOreFeature;
 import DaoOfModding.Cultivationcraft.Cultivationcraft;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.SimpleParticleType;
@@ -41,7 +43,7 @@ import net.minecraftforge.registries.RegistryObject;
 import java.util.function.Consumer;
 
 public class Register {
-    public enum keyPresses {FLYINGSWORDSCREEN, SKILLHOTBARSWITCH}
+    public enum keyPresses {REFINEMENT_SCREEN, SKILLHOTBARSWITCH}
 
     public static DeferredRegister<EntityType<?>> ENTITY_TYPES = DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, Cultivationcraft.MODID);
     public static DeferredRegister<MenuType<?>> CONTAINERS = DeferredRegister.create(ForgeRegistries.MENU_TYPES, Cultivationcraft.MODID);
@@ -63,7 +65,10 @@ public class Register {
                     .updateInterval(20)
                     .build("qiprojectile"));
 
-    public static final RegistryObject<MenuType<FlyingSwordContainer>> ContainerTypeFlyingSword = CONTAINERS.register("flyingsword", () -> IForgeMenuType.create(FlyingSwordContainer::createContainerClientSide));
+    // Registry ID retained for compatibility with existing worlds.
+    public static final RegistryObject<MenuType<RefinementContainer>> REFINEMENT_MENU = CONTAINERS.register("flyingsword", () -> IForgeMenuType.create(RefinementContainer::createContainerClientSide));
+    public static final RegistryObject<MenuType<AlchemyCauldronMenu>> ALCHEMY_CAULDRON_MENU = CONTAINERS.register(
+            "alchemy_cauldron", () -> IForgeMenuType.create(AlchemyCauldronMenu::createClient));
 
     public static final RegistryObject<SimpleParticleType> qiParticleType = PARTICLES.register("qiparticle", () -> new SimpleParticleType(true));
     public static final RegistryObject<BloodParticleType> bloodParticleType = PARTICLES.register("bloodparticle", () -> new BloodParticleType());
@@ -116,6 +121,8 @@ public class Register {
 
     public static final RegistryObject<Feature<NoneFeatureConfiguration>> PROCEDURAL_PLANT_PATCH =
             FEATURES.register("procedural_plant_patch", () -> new ProceduralPlantPatchFeature());
+    public static final RegistryObject<Feature<NoneFeatureConfiguration>> JADE_ORE =
+            FEATURES.register("jade_ore", JadeOreFeature::new);
     
     public static void init(IEventBus bus) {
         ENTITY_TYPES.register(bus);
@@ -137,7 +144,8 @@ public class Register {
 
         @SubscribeEvent
         public static void register(RegisterEvent event) {
-            event.register(ForgeRegistries.Keys.MENU_TYPES, helper -> helper.register("flyingswordcontainer", IForgeMenuType.create(FlyingSwordContainer::createContainerClientSide)));
+            // Retain the old registry alias; implementation and UI are now generic refinement.
+            event.register(ForgeRegistries.Keys.MENU_TYPES, helper -> helper.register("flyingswordcontainer", IForgeMenuType.create(RefinementContainer::createContainerClientSide)));
         }
     }
 }

@@ -1,0 +1,10 @@
+{
+  "enabled": true,
+  "edge_damage_multiplier": 0.35,
+  "complexities": {
+    "1": { "radius": 2.5, "nearby_damage": 2.0, "refiner_damage": 3.0, "knockback": 0.15 },
+    "2": { "radius": 3.5, "nearby_damage": 3.0, "refiner_damage": 4.5, "knockback": 0.22 },
+    "3": { "radius": 4.5, "nearby_damage": 4.0, "refiner_damage": 6.0, "knockback": 0.30 },
+    "4": { "radius": 6.0, "nearby_damage": 6.0, "refiner_damage": 9.0, "knockback": 0.40 }
+  }
+}

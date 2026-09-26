@@ -1,0 +1,18 @@
+{
+  "type": "cultivationcraft:jade_slip",
+  "conditions": [
+    {
+      "condition": "minecraft:alternative",
+      "terms": [
+        {
+          "condition": "forge:loot_table_id",
+          "loot_table_id": "minecraft:chests/abandoned_mineshaft"
+        }
+      ]
+    }
+  ],
+  "pool": "common",
+  "chance": 0.9,
+  "min_slips": 1,
+  "max_slips": 2
+}

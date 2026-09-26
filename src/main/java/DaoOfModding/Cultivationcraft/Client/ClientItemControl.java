@@ -3,7 +3,7 @@ package DaoOfModding.Cultivationcraft.Client;
 import DaoOfModding.Cultivationcraft.Client.GUI.BodyPartGUIs;
 import DaoOfModding.Cultivationcraft.Common.Qi.BodyParts.BodyPartNames;
 import DaoOfModding.Cultivationcraft.Client.GUI.BodyPartGUI;
-import DaoOfModding.Cultivationcraft.Client.GUI.Screens.FlyingSwordContainerScreen;
+import DaoOfModding.Cultivationcraft.Client.GUI.Screens.RefinementScreen;
 import DaoOfModding.Cultivationcraft.Cultivationcraft;
 import DaoOfModding.Cultivationcraft.Common.Register;
 import net.minecraft.client.gui.screens.MenuScreens;
@@ -18,7 +18,7 @@ public class ClientItemControl
 
     public static void init(FMLClientSetupEvent event)
     {
-        MenuScreens.register(Register.ContainerTypeFlyingSword.get(), FlyingSwordContainerScreen::new);
+        MenuScreens.register(Register.REFINEMENT_MENU.get(), RefinementScreen::new);
 
         setupDefaultBodyPartGUIs();
     }

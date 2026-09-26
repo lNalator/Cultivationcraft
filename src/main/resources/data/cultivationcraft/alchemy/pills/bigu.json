@@ -1,0 +1,19 @@
+{
+  "effect": "FOOD",
+  "complexity": 1,
+  "refinement_qi": 20,
+  "elements": {
+    "none": 20,
+    "wood": 10
+  },
+  "minimum_score": 0,
+  "amount": 4,
+  "duration_seconds": 0,
+  "cooldown_seconds": 30,
+  "color": "C5B392",
+  "names": [
+    "Bigu Pill",
+    "Grain Pill",
+    "Simple Sustenance Pill"
+  ]
+}

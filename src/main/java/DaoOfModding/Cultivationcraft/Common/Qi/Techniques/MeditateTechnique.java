@@ -99,11 +99,20 @@ public class MeditateTechnique extends MovementOverrideTechnique
                 remaining = ((QiFoodStats)event.player.getFoodData()).meditation(remaining, event.player);
 
             // Loop through every source and try to cultivate from it
-            for (QiSource source : sources)
-                remaining -= cultivation.progressCultivation(event.player, (float)remaining, source.getElement());
+            for (QiSource source : sources) {
+                if (remaining <= 0) break;
+                if (!cultivation.canCultivate(source.getElement())) continue;
+                double absorbed = source.absorbQi(remaining, event.player);
+                float unused = cultivation.progressCultivation(event.player, (float) absorbed, source.getElement());
+                // progressCultivation returns unused Qi, not spent Qi. Return any
+                // surplus to the source when the current stage has reached its cap.
+                double returned = Math.min(absorbed, Math.max(0, unused));
+                if (returned > 0) source.subtractQi(-returned);
+                remaining = Math.max(0, remaining - (absorbed - returned));
+            }
 
             // Passively cultivate
-            if (event.player.getFoodData().getFoodLevel() == ((QiFoodStats)event.player.getFoodData()).getMaxFood())
+            if (event.player.getFoodData() instanceof QiFoodStats food && food.getTrueFoodLevel() >= food.getMaxFood())
                 cultivation.progressCultivation(event.player, (float) cultivation.getCultivationStat(event.player, DefaultCultivationStatIDs.qiPassiveAbsorbSpeed) / 20f, Elements.anyElement);
 
             PacketHandler.sendCultivatorStatsToClient(event.player);

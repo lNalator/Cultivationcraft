@@ -2,7 +2,6 @@ package DaoOfModding.Cultivationcraft;
 
 import DaoOfModding.Cultivationcraft.Client.Animations.GenericQiPoses;
 import DaoOfModding.Cultivationcraft.Client.ClientItemControl;
-import DaoOfModding.Cultivationcraft.Client.GUI.HelpItems;
 import DaoOfModding.Cultivationcraft.Client.Textures.initTextures;
 import DaoOfModding.Cultivationcraft.Client.Tooltip.PlantBadgeTooltip;
 import DaoOfModding.Cultivationcraft.Client.Tooltip.PlantBadgeTooltipData;
@@ -58,6 +57,8 @@ public class Cultivationcraft {
         Register.init(modEventBus);
         BlockRegister.init(modEventBus);
         ItemRegister.init(modEventBus);
+        DaoOfModding.Cultivationcraft.Common.Knowledge.JadeSlipLootModifier.init(modEventBus);
+        DaoOfModding.Cultivationcraft.Common.Alchemy.AlchemyEffects.init(modEventBus);
         ModWorldgen.init();
         ModBiomeModifiers.init();
         BodyPartNames.registerLungLocations();
@@ -79,7 +80,6 @@ public class Cultivationcraft {
     protected void clientInit(final FMLClientSetupEvent event) {
         ClientItemControl.init(event);
         GenericQiPoses.init();
-        HelpItems.setup();
         DefaultTechniqueStatIDs.init();
         initTextures.init();
         // Tooltip factories are registered via RegisterClientTooltipComponentFactoriesEvent

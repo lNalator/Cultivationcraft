@@ -1,0 +1,11 @@
+{
+  "title": "Bite Attack Modifier",
+  "text": "Damage multiplier for attacks made by the character biting",
+  "translation_key": "cultivationcraft.stat.biteattackmodifier",
+  "category": [
+    "Cultivation Menu",
+    "Stats"
+  ],
+  "unlocked_by_default": true,
+  "cultivation_type": 1
+}

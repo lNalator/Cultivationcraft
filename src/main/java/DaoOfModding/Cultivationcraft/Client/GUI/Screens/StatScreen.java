@@ -26,7 +26,8 @@ public class StatScreen extends GenericTabScreen
     protected int statTextX = 70;
     protected int statTextY = 35;
     protected int statTextWidth = 170;
-    protected int statTextHeight = 121;
+    protected int statTextHeight = 93;
+
 
     protected TextField stats = new TextField();
 
@@ -81,6 +82,9 @@ public class StatScreen extends GenericTabScreen
         stats.setSize(statTextWidth, statTextHeight);
         stats.setText(statString);
         stats.render(this, font, PoseStack, mouseX, mouseY);
+
+        ResourceReadout.draw(PoseStack, font, genericClientFunctions.getPlayer(),
+                edgeSpacingX + statTextX, edgeSpacingY + 137, statTextWidth);
     }
 
     protected void drawBody(PoseStack PoseStack)

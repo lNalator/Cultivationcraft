@@ -98,14 +98,19 @@ public class ServerListeners
             if (CultivatorStats.getCultivatorStats(event.player).getCultivationType() == CultivationTypes.QI_CONDENSER)
                 CultivatorStats.getCultivatorStats(event.player).getCultivation().tick(event.player);
 
-            // Update the client every second if it has not been updated to ensure that stamina doesn't get descynced
-            if (tick % 20 == 0)
-            {
-                if (event.player.getFoodData() instanceof QiFoodStats)
-                    if (((QiFoodStats) event.player.getFoodData()).shouldUpdate())
-                        PacketHandler.updateStaminaForClients(((QiFoodStats) event.player.getFoodData()).getTrueFoodLevel(), event.player);
-            }
+
         }
+    }
+
+    @SubscribeEvent(priority = net.minecraftforge.eventbus.api.EventPriority.LOWEST)
+    public static void syncResources(TickEvent.PlayerTickEvent event) {
+        // Send after skill costs, meditation, food ticking and pill effects have settled.
+        // A heartbeat also corrects client prediction when the server's net change is zero.
+        if (event.phase != TickEvent.Phase.END || !(event.player instanceof ServerPlayer)
+                || !(event.player.getFoodData() instanceof QiFoodStats food) || event.player.tickCount % 5 != 0) return;
+        boolean changed = food.shouldUpdate();
+        if (changed || event.player.tickCount % 20 == 0)
+            PacketHandler.updateStaminaForClients(food.getTrueFoodLevel(), event.player);
     }
 
     @SubscribeEvent
@@ -150,7 +155,7 @@ public class ServerListeners
 
             if(ServerItemControl.loaded)
             {
-                FlyingSwordBindProgresser.bindFlyingSword(System.nanoTime() - lastServerTickTime);
+                RefinementProcessor.tick(System.nanoTime() - lastServerTickTime);
             }
 
             lastServerTickTime = System.nanoTime();

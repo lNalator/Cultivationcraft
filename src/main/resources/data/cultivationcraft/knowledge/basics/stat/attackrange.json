@@ -1,0 +1,11 @@
+{
+  "title": "Attack Range",
+  "text": "The range (in blocks) the character can hit with an attack",
+  "translation_key": "cultivationcraft.stat.attackrange",
+  "category": [
+    "Cultivation Menu",
+    "Stats"
+  ],
+  "unlocked_by_default": true,
+  "cultivation_type": 1
+}

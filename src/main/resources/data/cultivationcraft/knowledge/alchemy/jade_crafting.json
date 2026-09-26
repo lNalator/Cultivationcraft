@@ -1,0 +1,23 @@
+{
+  "title": "Working with Jade",
+  "titles": [
+    "Shaping the First Cauldron",
+    "Seven Pieces of Jade",
+    "A Jade Craftsman's Notes"
+  ],
+  "text": "Seven jade chunks make one alchemy cauldron in a crafting table. Arrange them in a U: two chunks at the sides of the top row, two at the sides of the middle row, and three across the bottom row.\n\nThe cauldron holds the ingredients used to refine pills. Its operation is described in the Alchemy Cauldrons teaching.",
+  "category": [
+    "Alchemy",
+    "Materials"
+  ],
+  "loot_weights": {
+    "village": 6,
+    "common": 5,
+    "rare": 2,
+    "stronghold": 4,
+    "end_city": 0.1
+  },
+  "chest_weights": {
+    "minecraft:chests/abandoned_mineshaft": 20
+  }
+}

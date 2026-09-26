@@ -1,0 +1,17 @@
+{
+  "title": "{pill}",
+  "titles": [
+    "The Returning Spring Method",
+    "Notes on Tender Shoots",
+    "{pill}: Recipe"
+  ],
+  "text": "A starter pill that restores health gradually.",
+  "recipe": "cultivationcraft:green_sprout",
+  "loot_weights": {
+    "village": 1,
+    "common": 4,
+    "rare": 2,
+    "stronghold": 3,
+    "end_city": 0.05
+  }
+}

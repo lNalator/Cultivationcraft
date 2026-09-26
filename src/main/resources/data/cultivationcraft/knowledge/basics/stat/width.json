@@ -1,0 +1,11 @@
+{
+  "title": "Width",
+  "text": "The extra amount this character is stretched horizontally",
+  "translation_key": "cultivationcraft.stat.width",
+  "category": [
+    "Cultivation Menu",
+    "Stats"
+  ],
+  "unlocked_by_default": true,
+  "cultivation_type": 1
+}

@@ -1,0 +1,19 @@
+{
+  "effect": "HEAL_OVER_TIME",
+  "complexity": 1,
+  "refinement_qi": 50,
+  "elements": {
+    "wood": 30,
+    "wind": 10
+  },
+  "minimum_score": 0,
+  "amount": 0.4,
+  "duration_seconds": 10,
+  "cooldown_seconds": 8,
+  "color": "81AD53",
+  "names": [
+    "Green Sprout Pill",
+    "Young Leaf Pill",
+    "Tender Shoot Pill"
+  ]
+}

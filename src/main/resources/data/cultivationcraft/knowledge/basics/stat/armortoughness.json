@@ -1,0 +1,11 @@
+{
+  "title": "Armor Toughness",
+  "text": "The amount of natural armor toughness (not from equipment) of the character",
+  "translation_key": "cultivationcraft.stat.armortoughness",
+  "category": [
+    "Cultivation Menu",
+    "Stats"
+  ],
+  "unlocked_by_default": true,
+  "cultivation_type": 1
+}

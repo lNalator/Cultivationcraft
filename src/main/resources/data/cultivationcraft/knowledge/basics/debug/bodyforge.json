@@ -1,0 +1,10 @@
+{
+  "title": "cultivation",
+  "text": "Commands relating to Cultivation",
+  "translation_key": "cultivationcraft.gui.help.debug.bodyforge",
+  "category": [
+    "Debug"
+  ],
+  "unlocked_by_default": true,
+  "operator_only": true
+}

@@ -1,0 +1,11 @@
+{
+  "title": "Arm Attack Modifier",
+  "text": "Damage multiplier for attacks made with the character's arm",
+  "translation_key": "cultivationcraft.stat.armattackmodifier",
+  "category": [
+    "Cultivation Menu",
+    "Stats"
+  ],
+  "unlocked_by_default": true,
+  "cultivation_type": 1
+}

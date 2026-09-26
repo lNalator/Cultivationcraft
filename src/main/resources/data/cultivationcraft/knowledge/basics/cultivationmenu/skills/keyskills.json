@@ -1,0 +1,10 @@
+{
+  "title": "Important Skills",
+  "text": "Whilst there are numerous different skills a character can learn, there are a few key skills that all characters will acquire",
+  "translation_key": "cultivationcraft.gui.help.cultivationmenu.skills.keyskills",
+  "category": [
+    "Cultivation Menu",
+    "Skills"
+  ],
+  "unlocked_by_default": true
+}

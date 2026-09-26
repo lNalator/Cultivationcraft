@@ -1,0 +1,11 @@
+{
+  "title": "Qi Absorb Range",
+  "text": "The range (in blocks) this character can absorb Qi from",
+  "translation_key": "cultivationcraft.stat.qiabsorbrange",
+  "category": [
+    "Cultivation Menu",
+    "Stats"
+  ],
+  "unlocked_by_default": true,
+  "cultivation_type": 1
+}

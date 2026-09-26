@@ -16,7 +16,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
@@ -29,17 +28,14 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.Vec3;
 
-public class ProceduralPlantBlock extends BushBlock implements BonemealableBlock, EntityBlock {
+public class ProceduralPlantBlock extends BushBlock implements BonemealableBlock, EntityBlock, net.minecraft.world.level.block.SimpleWaterloggedBlock {
     public static final IntegerProperty TIER = IntegerProperty.create("tier", 1, 3);
     public static final IntegerProperty SPECIES = IntegerProperty.create("species", 0, 63);
+    public static final BooleanProperty WATERLOGGED = net.minecraft.world.level.block.state.properties.BlockStateProperties.WATERLOGGED;
     public static final BooleanProperty HOST_QI = BooleanProperty.create("host_qi");
 
     private static final int NEIGHBOR_SCAN_RADIUS = 6;
@@ -48,7 +44,33 @@ public class ProceduralPlantBlock extends BushBlock implements BonemealableBlock
 
     public ProceduralPlantBlock() {
         super(BlockBehaviour.Properties.copy(Blocks.DANDELION).noOcclusion().randomTicks());
-        this.registerDefaultState(this.stateDefinition.any().setValue(TIER, 1).setValue(SPECIES, 0).setValue(HOST_QI, false));
+        this.registerDefaultState(this.stateDefinition.any().setValue(TIER, 1).setValue(SPECIES, 0).setValue(HOST_QI, false).setValue(WATERLOGGED, false));
+    }
+
+    @Override
+    public BlockState getStateForPlacement(net.minecraft.world.item.context.BlockPlaceContext context) {
+        return defaultBlockState().setValue(WATERLOGGED,
+                context.getLevel().getFluidState(context.getClickedPos()).is(net.minecraft.tags.FluidTags.WATER));
+    }
+
+    @Override
+    public net.minecraft.world.level.material.FluidState getFluidState(BlockState state) {
+        return state.getValue(WATERLOGGED) ? net.minecraft.world.level.material.Fluids.WATER.getSource(false) : super.getFluidState(state);
+    }
+
+    @Override
+    public BlockState updateShape(BlockState state, Direction direction, BlockState neighbor,
+                                  net.minecraft.world.level.LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+        if (state.getValue(WATERLOGGED))
+            level.scheduleTick(pos, net.minecraft.world.level.material.Fluids.WATER,
+                    net.minecraft.world.level.material.Fluids.WATER.getTickDelay(level));
+        return super.updateShape(state, direction, neighbor, level, pos, neighborPos);
+    }
+
+    @Override
+    public boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
+        // Retain this plant's solid-floor rule instead of Forge's default plains-flower soil rule.
+        return mayPlaceOn(level.getBlockState(pos.below()), level, pos.below());
     }
 
     protected boolean mayPlaceOn(BlockState state, LevelReader level, BlockPos pos) {
@@ -64,28 +86,6 @@ public class ProceduralPlantBlock extends BushBlock implements BonemealableBlock
     @Override
     public boolean isRandomlyTicking(BlockState state) {
         return true;
-    }
-
-    @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        if (!level.isClientSide) {
-            Component message;
-            BlockEntity blockEntity = level.getBlockEntity(pos);
-            if (blockEntity instanceof ProceduralPlantBlockEntity plant) {
-                int species = state.getValue(SPECIES);
-                PlantGenome genome = PlantGenomes.getById((ServerLevel) level, species);
-                String element = genome != null ? genome.qiElement().toString() : "unknown";
-                int growth = plant.getSpiritualGrowth();
-                int tier = plant.getTier();
-                boolean host = state.getValue(HOST_QI);
-                boolean hasQiData = plant.getQiHostData() != null;
-                message = Component.literal("[ProcPlant] species=" + species + " element=" + element + " tier=" + tier + " growth=" + growth + " hostQi=" + host + " qiData=" + hasQiData);
-            } else {
-                message = Component.literal("[ProcPlant] Missing block entity");
-            }
-            player.displayClientMessage(message, false);
-        }
-        return InteractionResult.sidedSuccess(level.isClientSide);
     }
 
     @Override
@@ -171,7 +171,7 @@ public class ProceduralPlantBlock extends BushBlock implements BonemealableBlock
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(TIER, SPECIES, HOST_QI);
+        builder.add(TIER, SPECIES, HOST_QI, WATERLOGGED);
     }
 
     @Override

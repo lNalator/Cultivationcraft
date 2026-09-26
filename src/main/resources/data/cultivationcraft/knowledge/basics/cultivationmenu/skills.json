@@ -1,0 +1,9 @@
+{
+  "title": "Skills",
+  "text": "View and assigned the different skills available to your character",
+  "translation_key": "cultivationcraft.gui.help.cultivationmenu.skills",
+  "category": [
+    "Cultivation Menu"
+  ],
+  "unlocked_by_default": true
+}

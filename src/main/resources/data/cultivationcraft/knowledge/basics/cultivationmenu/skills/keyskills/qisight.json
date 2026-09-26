@@ -1,0 +1,11 @@
+{
+  "title": "Qi Sight",
+  "text": "One of the first skills learnt by all characters.\n \nWhen toggled on, gives the character night vision and allows them to see nearby Qi Sources.",
+  "translation_key": "cultivationcraft.gui.help.cultivationmenu.skills.keyskills.qisight",
+  "category": [
+    "Cultivation Menu",
+    "Skills",
+    "Important Skills"
+  ],
+  "unlocked_by_default": true
+}

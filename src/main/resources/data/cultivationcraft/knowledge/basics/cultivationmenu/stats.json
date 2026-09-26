@@ -1,0 +1,10 @@
+{
+  "title": "Stats",
+  "text": "View the stats of your character effected by your cultivation",
+  "translation_key": "cultivationcraft.gui.help.cultivationmenu.stats",
+  "category": [
+    "Cultivation Menu"
+  ],
+  "unlocked_by_default": true,
+  "cultivation_type": 1
+}

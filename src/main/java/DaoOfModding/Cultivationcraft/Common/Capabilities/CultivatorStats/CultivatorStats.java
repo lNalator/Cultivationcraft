@@ -19,6 +19,12 @@ public class CultivatorStats implements ICultivatorStats
     protected HashMap<ResourceLocation, Double> conceptProgress = new HashMap<>();
 
     protected boolean disconnected = false;
+    private CompoundTag pillData = new CompoundTag();
+    private CompoundTag knowledgeData = new CompoundTag();
+
+    public CompoundTag getKnowledgeData() { return knowledgeData; }
+
+    public CompoundTag getPillData() { return pillData; }
 
     public int getCultivationType()
     {
@@ -83,6 +89,8 @@ public class CultivatorStats implements ICultivatorStats
     {
         CompoundTag nbt = new CompoundTag();
         nbt.putInt("TYPE", cultivationType);
+        nbt.put("Pills", pillData.copy());
+        nbt.put("Knowledge", knowledgeData.copy());
         nbt.putString("CULTIVATIONID", cultivation.getClass().toString());
         nbt.put("CULTIVATION", cultivation.writeNBT());
 
@@ -113,6 +121,8 @@ public class CultivatorStats implements ICultivatorStats
     public void readNBT(CompoundTag nbt)
     {
         setCultivationType(nbt.getInt("TYPE"));
+        pillData = nbt.getCompound("Pills").copy();
+        knowledgeData = nbt.getCompound("Knowledge").copy();
 
         CultivationType newCultivation = ExternalCultivationHandler.getCultivation(nbt.getString("CULTIVATIONID"));
         newCultivation.readNBT(nbt.getCompound("CULTIVATION"));

@@ -66,7 +66,8 @@ public class FlyingSwordBind
         if (tag == null)
             tag = new CompoundTag();
 
-        tag.putUUID(Cultivationcraft.MODID + "bindowner", newOwner);
+        if (newOwner == null) tag.remove(Cultivationcraft.MODID + "bindowner");
+        else tag.putUUID(Cultivationcraft.MODID + "bindowner", newOwner);
 
         item.setTag(tag);
     }

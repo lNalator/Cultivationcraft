@@ -7,7 +7,6 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 
 import java.awt.*;
@@ -17,8 +16,6 @@ public class SelectableText
 {
     ResourceLocation texture = new ResourceLocation(Cultivationcraft.MODID, "textures/gui/textfield.png");
 
-    protected String selectableName;
-    protected String selectableText;
     protected ArrayList<SelectableText> selectables = new ArrayList<>();
 
     protected boolean expanded = false;
@@ -32,13 +29,18 @@ public class SelectableText
     protected int lineHeight = 0;
 
     protected ResourceLocation ID;
-    protected MutableComponent name;
-    protected MutableComponent text;
+    private final Component name;
+    private final Component text;
 
     public SelectableText(String name, String text)
     {
-        selectableName = name;
-        selectableText = text;
+        this(Component.literal(name), Component.literal(text));
+    }
+
+    public SelectableText(Component name, Component text)
+    {
+        this.name = name;
+        this.text = text;
     }
 
     public SelectableText(ResourceLocation component)
@@ -55,17 +57,11 @@ public class SelectableText
 
     public String getText()
     {
-        if (text == null)
-            return selectableText;
-
         return text.getString();
     }
 
     public String getName()
     {
-        if (name == null)
-            return selectableName;
-
         return name.getString();
     }
 

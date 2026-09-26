@@ -1,0 +1,23 @@
+{
+  "title": "Jade Ore",
+  "titles": [
+    "Green Seams in the Deep",
+    "A Miner's Guide to Jade",
+    "Imperial Green Beneath the Stone"
+  ],
+  "text": "Imperial-green jade ore occurs only in deepslate below Y=0. \n\n\nDeposits follow the underground iron distribution and form connected veins of at least five blocks.\n\nUse an iron pickaxe or better to collect jade chunks and a little experience. Fortune increases chunk yields; Silk Touch preserves the ore block.",
+  "category": [
+    "Nature",
+    "Ores"
+  ],
+  "loot_weights": {
+    "village": 1,
+    "common": 4,
+    "rare": 2,
+    "stronghold": 3,
+    "end_city": 0
+  },
+  "chest_weights": {
+    "minecraft:chests/abandoned_mineshaft": 200
+  }
+}

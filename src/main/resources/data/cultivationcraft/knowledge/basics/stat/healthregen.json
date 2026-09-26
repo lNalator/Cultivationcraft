@@ -1,0 +1,11 @@
+{
+  "title": "Health Regen",
+  "text": "The amount of health recovered a second by the character (consumes stamina)",
+  "translation_key": "cultivationcraft.stat.healthregen",
+  "category": [
+    "Cultivation Menu",
+    "Stats"
+  ],
+  "unlocked_by_default": true,
+  "cultivation_type": 1
+}

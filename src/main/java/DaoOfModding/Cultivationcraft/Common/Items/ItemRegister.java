@@ -5,6 +5,7 @@ import DaoOfModding.Cultivationcraft.Common.Blocks.BlockRegister;
 import DaoOfModding.Cultivationcraft.Common.Items.ProceduralPlantItem;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -17,6 +18,14 @@ public class ItemRegister {
     public static final RegistryObject<Item> PROCEDURAL_PLANT_ITEM =
             ITEMS.register("procedural_plant", () -> new ProceduralPlantItem(BlockRegister.PROCEDURAL_PLANT.get(), new Item.Properties()));
 
+
+    public static final RegistryObject<Item> ALCHEMY_PILL = ITEMS.register("alchemy_pill", () -> new AlchemyPillItem(new Item.Properties()));
+    public static final RegistryObject<Item> JADE_SLIP = ITEMS.register("jade_slip", () -> new JadeSlipItem(new Item.Properties()));
+    public static final RegistryObject<Item> ALCHEMY_REMNANTS = ITEMS.register("alchemy_remnants", () -> new Item(new Item.Properties()));
+    public static final RegistryObject<Item> JADE_CHUNK = ITEMS.register("jade_chunk",
+            () -> new Item(new Item.Properties().tab(CreativeModeTab.TAB_MATERIALS)));
+    public static final RegistryObject<Item> SPIRIT_STONE = ITEMS.register("spirit_stone",
+            () -> new SpiritStoneItem(new Item.Properties().tab(CreativeModeTab.TAB_MATERIALS)));
 
     public static void init(IEventBus bus) {
         ITEMS.register(bus);

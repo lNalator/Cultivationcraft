@@ -1,0 +1,17 @@
+{
+  "title": "{pill}",
+  "titles": [
+    "The Morning Dew Method",
+    "A Small Spring Formula",
+    "{pill}: Recipe"
+  ],
+  "text": "A starter pill that restores Qi gradually, with a Qi Restoration status.",
+  "recipe": "cultivationcraft:dewdrop",
+  "loot_weights": {
+    "village": 1,
+    "common": 4,
+    "rare": 2,
+    "stronghold": 3,
+    "end_city": 0.05
+  }
+}

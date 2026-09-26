@@ -1,0 +1,11 @@
+{
+  "title": "Lung Capacity",
+  "text": "The maximum lung capacity of the character",
+  "translation_key": "cultivationcraft.stat.lungcapacity",
+  "category": [
+    "Cultivation Menu",
+    "Stats"
+  ],
+  "unlocked_by_default": true,
+  "cultivation_type": 1
+}

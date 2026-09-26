@@ -1,0 +1,16 @@
+{
+  "type": "cultivationcraft:jade_slip",
+  "conditions": [
+    {
+      "condition": "minecraft:alternative",
+      "terms": [
+        {
+          "condition": "forge:loot_table_id",
+          "loot_table_id": "minecraft:chests/end_city_treasure"
+        }
+      ]
+    }
+  ],
+  "pool": "end_city",
+  "chance": 0.9
+}

@@ -22,6 +22,7 @@ import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.FluidTags;
 
 public class ProceduralPlantPatchFeature extends Feature<NoneFeatureConfiguration> {
 
@@ -52,7 +53,7 @@ public class ProceduralPlantPatchFeature extends Feature<NoneFeatureConfiguratio
 
             BlockPos base = origin.offset(dx, dy, dz);
 
-            BlockPos pos = findSurfaceAirAboveSolid(level, base);
+            BlockPos pos = findSurfacePlacement(level, base);
             if (pos == null && isNether) {
                 pos = findUndergroundPlacementNear(level, base);
             }
@@ -62,7 +63,7 @@ public class ProceduralPlantPatchFeature extends Feature<NoneFeatureConfiguratio
             int rx = Math.floorDiv(pos.getX(), regionSize);
             int rz = Math.floorDiv(pos.getZ(), regionSize);
             BlockPos regionPos = new BlockPos(rx, 0, rz);
-            String elemKey = chooseElementKeyForPatch(server, rng);
+            String elemKey = level.getFluidState(pos).is(FluidTags.WATER) ? "water" : chooseElementKeyForPatch(server, rng);
             int id = pickRandomIdByElementStable(catalog, elemKey, server.getSeed(), regionPos);
             if (id < 0) {
                 id = Seeds.forPos(server.getSeed(), regionPos, 0xC0FFEE).nextInt(Math.max(1, catalog.size()));
@@ -78,7 +79,7 @@ public class ProceduralPlantPatchFeature extends Feature<NoneFeatureConfiguratio
                 if (cave != null) pos = cave; else continue;
             }
 
-            if (!level.isEmptyBlock(pos)) continue; // must place into air
+            if (!level.isEmptyBlock(pos) && !level.getBlockState(pos).is(Blocks.WATER)) continue;
 
             if (!ProceduralPlantElementConditions.canSpawn(server, level, pos, g.qiElement())) continue;
 
@@ -110,14 +111,14 @@ public class ProceduralPlantPatchFeature extends Feature<NoneFeatureConfiguratio
                 BlockPos p = pos.offset(ox, oy, oz);
 
                 // Re-adjust to surface for non-earth plants; earth stays underground
-                BlockPos pp = isEarth ? adjustToCaveAir(level, p) : findSurfaceAirAboveSolid(level, p);
+                BlockPos pp = isEarth ? adjustToCaveAir(level, p) : findSurfacePlacement(level, p);
                 if (!isEarth && pp == null && isNether) {
                     pp = findUndergroundPlacementNear(level, p);
                 }
                 if (pp == null) continue;
                 if (!ProceduralPlantElementConditions.canSpawn(server, level, pp, g.qiElement())) continue;
 
-                if (level.isEmptyBlock(pp)) {
+                if (level.isEmptyBlock(pp) || level.getBlockState(pp).is(Blocks.WATER)) {
                     int initGrowth = switch (patchTier) {
                         case 3 -> 1000 + rng.nextInt(9000);      // 1000..9999 (Tier 3)
                         case 2 -> 100 + rng.nextInt(900);       // 100..999  (Tier 2)
@@ -130,7 +131,8 @@ public class ProceduralPlantPatchFeature extends Feature<NoneFeatureConfiguratio
                             .defaultBlockState()
                             .setValue(ProceduralPlantBlock.SPECIES, id)
                             .setValue(ProceduralPlantBlock.TIER, tier)
-                            .setValue(ProceduralPlantBlock.HOST_QI, host);
+                            .setValue(ProceduralPlantBlock.HOST_QI, host)
+                            .setValue(ProceduralPlantBlock.WATERLOGGED, level.getFluidState(pp).is(FluidTags.WATER));
 
                     level.setBlock(pp, state, 2);
                     // Pre-growth: set BE dynamic spiritual growth; Tier 3 hosts pick up Qi on load.
@@ -175,7 +177,7 @@ public class ProceduralPlantPatchFeature extends Feature<NoneFeatureConfiguratio
         return ids.get(srng.nextInt(ids.size()));
     }
 
-    private BlockPos findSurfaceAirAboveSolid(WorldGenLevel level, BlockPos start) {
+    private BlockPos findSurfacePlacement(WorldGenLevel level, BlockPos start) {
         MutableBlockPos m = new MutableBlockPos(start.getX(), start.getY(), start.getZ());
         // walk down some steps to find ground
         for (int i = 0; i < 64 && m.getY() > level.getMinBuildHeight(); i++) {
@@ -184,6 +186,16 @@ public class ProceduralPlantPatchFeature extends Feature<NoneFeatureConfiguratio
                 while (!level.isEmptyBlock(m.above())) {
                     m.move(Direction.UP);
                     if (m.getY() >= level.getMaxBuildHeight()) return null;
+                }
+                // The top water block is plantable only with solid ground immediately
+                // beneath it: this accepts one-block pools and rejects deeper columns.
+                if (level.getBlockState(m).is(Blocks.WATER) && level.getFluidState(m).isSource()) {
+                    BlockPos floor = m.below();
+                    BlockState ground = level.getBlockState(floor);
+                    if (ground.isFaceSturdy(level, floor, Direction.UP)
+                            && net.minecraft.world.level.block.Block.isFaceFull(ground.getCollisionShape(level, floor), Direction.UP))
+                        return m.immutable();
+                    return null;
                 }
                 BlockPos place = m.above();
                 BlockState below = level.getBlockState(place.below());

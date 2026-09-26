@@ -20,9 +20,40 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.event.TickEvent;
+import net.minecraft.util.Mth;
+import DaoOfModding.Cultivationcraft.Common.Qi.Cultivation.FoundationEstablishmentCultivation;
+import DaoOfModding.Cultivationcraft.Common.Qi.Cultivation.QiCondenserCultivation;
+import DaoOfModding.Cultivationcraft.Common.Qi.Cultivation.CoreFormingCultivation;
 
 public class DivineSenseTechnique extends Technique
 {
+    public static final ResourceLocation DETECTION_RADIUS = new ResourceLocation(Cultivationcraft.MODID,
+            "cultivationcraft.tstat.divinesense_radius");
+    public static final ResourceLocation MAX_HIGHLIGHTS = new ResourceLocation(Cultivationcraft.MODID,
+            "cultivationcraft.tstat.divinesense_max_highlights");
+
+    public record SenseProfile(int radius, int maxHighlights, double peakOpacity) {}
+
+    public static SenseProfile getSenseProfile(Player player) {
+        var cultivation = CultivatorStats.getCultivatorStats(player).getCultivation();
+        int minorStage = Mth.clamp(cultivation.getStage(), 1, Math.max(1, cultivation.getMaxStage())) - 1;
+        // Realm entry bonuses are deliberately larger than the gains within a realm.
+        if (cultivation instanceof CoreFormingCultivation)
+            return new SenseProfile(192 + minorStage * 8, 128 + minorStage * 8, 0.94 + minorStage * 0.005);
+        if (cultivation instanceof QiCondenserCultivation)
+            return new SenseProfile(64 + minorStage * 4, 64 + minorStage * 4, 0.85 + minorStage * 0.01);
+        if (cultivation instanceof FoundationEstablishmentCultivation)
+            return new SenseProfile(16 + minorStage * 2, 30 + minorStage * 2, 0.75 + minorStage * 0.02);
+        return new SenseProfile(16, 30, 0.75);
+    }
+
+    @Override
+    public double getTechniqueStat(ResourceLocation stat, Player player) {
+        if (DETECTION_RADIUS.equals(stat)) return getSenseProfile(player).radius();
+        if (MAX_HIGHLIGHTS.equals(stat)) return getSenseProfile(player).maxHighlights();
+        return super.getTechniqueStat(stat, player);
+    }
+
     public DivineSenseTechnique()
     {
         super();
@@ -38,6 +69,8 @@ public class DivineSenseTechnique extends Technique
 
         stats.setStat(StatIDs.staminaDrain, 0.05f);
         addTechniqueStat(DefaultTechniqueStatIDs.qiCost, 1f);
+        addTechniqueStat(DETECTION_RADIUS, 16);
+        addTechniqueStat(MAX_HIGHLIGHTS, 30);
 
         effects.add(MobEffects.NIGHT_VISION);
     }
@@ -48,8 +81,7 @@ public class DivineSenseTechnique extends Technique
         if (PlayerUtils.isClientPlayerCharacter(event.player))
             Renderer.QiSourcesVisible = true;
 
-        if (event.player.getFoodData().getFoodLevel() == 0)
-            this.deactivate(event.player);
+        // Resource depletion is decided on the server, not from a stale client reserve.
     }
 
     @Override
@@ -60,10 +92,15 @@ public class DivineSenseTechnique extends Technique
         if (CultivatorStats.getCultivatorStats(event.player).getCultivationType() == CultivationTypes.QI_CONDENSER)
         {
             if (!CultivatorStats.getCultivatorStats(event.player).getCultivation().consumeQi(event.player, getTechniqueStat(DefaultTechniqueStatIDs.qiCost, event.player) / 20f))
+            {
                 this.deactivate(event.player);
+                DaoOfModding.Cultivationcraft.Network.PacketHandler.sendCultivatorTechniquesToClient(event.player);
+            }
         }
-        else if (event.player.getFoodData().getFoodLevel() == 0)
+        else if (event.player.getFoodData().getFoodLevel() == 0) {
             this.deactivate(event.player);
+            DaoOfModding.Cultivationcraft.Network.PacketHandler.sendCultivatorTechniquesToClient(event.player);
+        }
     }
 
     @Override

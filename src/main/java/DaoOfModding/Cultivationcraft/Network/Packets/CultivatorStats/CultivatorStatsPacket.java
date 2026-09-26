@@ -1,6 +1,5 @@
 package DaoOfModding.Cultivationcraft.Network.Packets.CultivatorStats;
 
-import DaoOfModding.Cultivationcraft.Client.GUI.HelpItems;
 import DaoOfModding.Cultivationcraft.Common.Capabilities.CultivatorStats.CultivatorStats;
 import DaoOfModding.Cultivationcraft.Common.Capabilities.CultivatorStats.ICultivatorStats;
 import DaoOfModding.Cultivationcraft.Common.Qi.BodyParts.PlayerHealthManager;
@@ -85,6 +84,5 @@ public class CultivatorStatsPacket extends Packet
         CultivatorStats.getCultivatorStats(player).readNBT(cultStats.writeNBT());
 
         PlayerHealthManager.updateFoodStats(player);
-        HelpItems.updateText();
     }
 }

@@ -1,0 +1,17 @@
+{
+  "title": "{pill}",
+  "titles": [
+    "The Lingering Breath Method",
+    "Dew Along the Meridians",
+    "{pill}: Recipe"
+  ],
+  "text": "A Foundation cultivation pill that temporarily improves Qi absorption, with a Qi Absorption status.",
+  "recipe": "cultivationcraft:foundation_absorption",
+  "loot_weights": {
+    "village": 0.25,
+    "common": 3,
+    "rare": 4,
+    "stronghold": 5,
+    "end_city": 0.1
+  }
+}

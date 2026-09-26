@@ -22,6 +22,7 @@ public class DefaultTechniqueStatIDs
     public static void init()
     {
         addReversedNegativeStat(qiCost);
+        addReversedNegativeStat(staminaCost);
     }
 
     public static void addReversedNegativeStat(ResourceLocation stat)

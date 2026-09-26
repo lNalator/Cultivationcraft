@@ -1,0 +1,11 @@
+{
+  "title": "Size",
+  "text": "The extra amount this character's total size is increased by",
+  "translation_key": "cultivationcraft.stat.size",
+  "category": [
+    "Cultivation Menu",
+    "Stats"
+  ],
+  "unlocked_by_default": true,
+  "cultivation_type": 1
+}

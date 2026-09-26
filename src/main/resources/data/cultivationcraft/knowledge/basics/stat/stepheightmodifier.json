@@ -1,0 +1,11 @@
+{
+  "title": "Step Height",
+  "text": "The maximum height this player can step over",
+  "translation_key": "cultivationcraft.stat.stepheightmodifier",
+  "category": [
+    "Cultivation Menu",
+    "Stats"
+  ],
+  "unlocked_by_default": true,
+  "cultivation_type": 1
+}

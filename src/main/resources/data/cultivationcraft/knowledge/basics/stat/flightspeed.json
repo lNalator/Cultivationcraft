@@ -1,0 +1,11 @@
+{
+  "title": "Flight Speed",
+  "text": "The amount of blocks this character moves per tick whilst flying",
+  "translation_key": "cultivationcraft.stat.flightspeed",
+  "category": [
+    "Cultivation Menu",
+    "Stats"
+  ],
+  "unlocked_by_default": true,
+  "cultivation_type": 1
+}

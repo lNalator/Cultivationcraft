@@ -1,0 +1,11 @@
+{
+  "title": "Max HP",
+  "text": "The maximum health of the character (each point represents half a heart)",
+  "translation_key": "cultivationcraft.stat.maxhp",
+  "category": [
+    "Cultivation Menu",
+    "Stats"
+  ],
+  "unlocked_by_default": true,
+  "cultivation_type": 1
+}
