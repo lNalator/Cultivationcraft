@@ -1,0 +1,49 @@
+package lNalator.Cultivationcraft.Common.Qi.Cultivation;
+
+import lNalator.Cultivationcraft.Client.GUI.Screens.CultivationTypeScreens.FoundationEstablishmentScreen;
+import lNalator.Cultivationcraft.Common.Advancements.CultivationAdvancements;
+import lNalator.Cultivationcraft.Common.Advancements.Triggers.BreakthroughTrigger;
+import lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.CultivatorStats;
+import lNalator.Cultivationcraft.Common.Qi.Techniques.PassiveTechniques.CultivationPassives.FoundationPassive;
+import lNalator.Cultivationcraft.Cultivationcraft;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.storage.loot.LootContext;
+
+public class FoundationEstablishmentCultivation extends CultivationType {
+
+    public FoundationEstablishmentCultivation() {
+        this(1);
+    }
+
+    public FoundationEstablishmentCultivation(int cultivationStage) {
+        super(cultivationStage);
+
+        passive = new FoundationPassive();
+        techLevel = 100;
+        maxedTechsToBreakthrough = 3;
+        maxStage = 5;
+        screen = new FoundationEstablishmentScreen();
+        tribulation = new Tribulation(maxStage, 10, 0.2f);
+
+        advancements.add(new QiCondenserCultivation(1));
+
+        ID = new ResourceLocation(Cultivationcraft.MODID, "cultivation.foundation");
+    }
+
+    @Override
+    public void breakthrough(Player player, String conditionals) {
+        if (stage < maxStage) {
+            FoundationEstablishmentCultivation newCultivation = new FoundationEstablishmentCultivation(stage + 1);
+
+            newCultivation.setPreviousCultivation(this);
+
+            CultivatorStats.getCultivatorStats(player).setCultivation(newCultivation);
+
+            if (player instanceof ServerPlayer) {
+                CultivationAdvancements.HAS_BROKENTROUGH.trigger((ServerPlayer) player, false);
+            }
+        }
+    }
+}
