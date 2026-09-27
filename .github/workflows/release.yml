@@ -1,0 +1,104 @@
+name: Build and release
+
+on:
+  push:
+    branches: [master]
+
+permissions:
+  contents: write
+
+# Serialize releases so two pushes cannot publish the same version together.
+concurrency:
+  group: release-master
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: Cultivationcraft
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          path: Cultivationcraft
+          persist-credentials: false
+
+      # CurseForge dependencies are for players; compilation still needs MLM's API.
+      - name: Check out the supported MLM Animator sources
+        uses: actions/checkout@v5
+        with:
+          repository: DaoOfModding/MultilLimbedModel
+          ref: 76e63999e2bdb87543b64b8446eedd2daa8fbfae
+          path: MultilLimbedModel
+          persist-credentials: false
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v5
+
+      - name: Configure MLM Animator and build the mod
+        run: |
+          cp .github/mlmanimator-settings.gradle ../MultilLimbedModel/settings.gradle
+          bash ./gradlew clean build --no-daemon --console=plain
+
+      - name: Prepare a release for a new version
+        id: release
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const fs = require('fs');
+            const root = 'Cultivationcraft';
+            const properties = fs.readFileSync(`${root}/gradle.properties`, 'utf8');
+            const version = properties.match(/^mod_version\s*=\s*(\S+)\s*$/m)?.[1];
+            if (!version || !/^\d+\.\d+\.\d+(?:-[A-Za-z0-9.-]+)?$/.test(version)) {
+              throw new Error('Set a valid mod_version in gradle.properties.');
+            }
+            const tag = `v${version}`;
+            try {
+              const { data } = await github.rest.repos.getReleaseByTag({ ...context.repo, tag });
+              if (data.draft) throw new Error(`${tag} has an unfinished draft. Review it before retrying.`);
+              core.info(`${tag} is already published. Bump mod_version for the next release.`);
+              return;
+            } catch (error) {
+              if (error.status !== 404) throw error;
+            }
+            // Never attach a new build to a pre-existing tag from a different commit.
+            try {
+              await github.rest.git.getRef({ ...context.repo, ref: `tags/${tag}` });
+              throw new Error(`${tag} already exists without a release. Review the tag before retrying.`);
+            } catch (error) {
+              if (error.status !== 404) throw error;
+            }
+            const lines = fs.readFileSync(`${root}/CHANGELOG.md`, 'utf8').split(/\r?\n/);
+            const start = lines.findIndex(line => line.startsWith(`## [${version}]`));
+            if (start < 0) throw new Error(`Add ## [${version}] to CHANGELOG.md.`);
+            const end = lines.findIndex((line, index) => index > start && line.startsWith('## '));
+            const notes = lines.slice(start + 1, end < 0 ? undefined : end).join('\n').trim();
+            if (!notes) throw new Error(`The changelog for ${version} is empty.`);
+            const jar = `${root}/build/libs/cultivationcraft-${version}.jar`;
+            const bytes = fs.readFileSync(jar);
+            if (!bytes.length) throw new Error('The release jar is empty.');
+            const checksum = require('crypto').createHash('sha256').update(bytes).digest('hex');
+            fs.writeFileSync(`${jar}.sha256`, `${checksum}  cultivationcraft-${version}.jar\n`);
+            fs.writeFileSync(`${root}/build/RELEASE_NOTES.md`, `${notes}\n`);
+            core.setOutput('version', version);
+            core.setOutput('publish', 'true');
+
+      - name: Create the version tag and publish the release
+        if: steps.release.outputs.publish == 'true'
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: v${{ steps.release.outputs.version }}
+          target_commitish: ${{ github.sha }}
+          name: CultivationCraft ${{ steps.release.outputs.version }}
+          body_path: Cultivationcraft/build/RELEASE_NOTES.md
+          prerelease: ${{ contains(steps.release.outputs.version, '-') }}
+          fail_on_unmatched_files: true
+          files: |
+            Cultivationcraft/build/libs/cultivationcraft-${{ steps.release.outputs.version }}.jar
+            Cultivationcraft/build/libs/cultivationcraft-${{ steps.release.outputs.version }}.jar.sha256

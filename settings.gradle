@@ -6,4 +6,18 @@ pluginManagement {
     }
 }
 
-includeBuild("../MultilLimbedModel")
+rootProject.name = 'cultivationcraft'
+
+// Keep MLM Animator's own packages and ownership. An explicit substitution also
+// supports the lowercase Maven group used by the upstream source checkout.
+def mlmSourceDir = file(providers.gradleProperty('mlmSourceDir').getOrElse('../MultilLimbedModel'))
+if (!new File(mlmSourceDir, 'build.gradle').isFile()) {
+    throw new GradleException('MLM Animator sources are required. Check out DaoOfModding/MultilLimbedModel '
+            + 'beside this project, or pass -PmlmSourceDir=/path/to/MultilLimbedModel. '
+            + 'The release workflow checks out the supported revision automatically.')
+}
+includeBuild(mlmSourceDir) {
+    dependencySubstitution {
+        substitute module('DaoOfModding.mlmanimator:mlmanimator') using project(':')
+    }
+}

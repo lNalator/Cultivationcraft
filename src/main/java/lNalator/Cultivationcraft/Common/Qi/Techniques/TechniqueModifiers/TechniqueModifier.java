@@ -105,7 +105,8 @@ public class TechniqueModifier {
         if (tech instanceof QiBarrierTechnique) {
             PoseHandler.getPlayerPoseHandler(owner.getUUID()).resize(size);
         } else if (tech instanceof ItemEnhanceTechnique) {
-            PoseHandler.getPlayerPoseHandler(owner.getUUID()).getPlayerModel().scaleItem(new Vec3(itemSize, itemSize, itemSize));
+            // TODO : Release 0.2.2 version of mlmAnimator.
+            // PoseHandler.getPlayerPoseHandler(owner.getUUID()).getPlayerModel().scaleItem(new Vec3(itemSize, itemSize, itemSize));
         }
     }
 

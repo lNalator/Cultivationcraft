@@ -1,0 +1,10 @@
+// Build settings for the pinned upstream MLM Animator checkout in CI.
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        maven { url = 'https://maven.minecraftforge.net/' }
+        mavenCentral()
+    }
+}
+
+rootProject.name = 'mlmanimator'
