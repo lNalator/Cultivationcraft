@@ -18,7 +18,7 @@
     "qi_sight_use": {
       "trigger": "cultivationcraft:techuse",
       "conditions": {
-        "techid": "DaoOfModding.Cultivationcraft.Common.Qi.Techniques.DivineSenseTechnique",
+        "techid": "lNalator.Cultivationcraft.Common.Qi.Techniques.DivineSenseTechnique",
         "conditional": 0
       }
     }

@@ -18,7 +18,7 @@
     "mediate_in_qi": {
       "trigger": "cultivationcraft:techuse",
       "conditions": {
-        "techid": "DaoOfModding.Cultivationcraft.Common.Qi.Techniques.MeditateTechnique",
+        "techid": "lNalator.Cultivationcraft.Common.Qi.Techniques.MeditateTechnique",
         "conditional": 1
       }
     }
