@@ -5,10 +5,7 @@ import lNalator.Cultivationcraft.Common.Blocks.Plants.world.PlantGenome;
 import lNalator.Cultivationcraft.Common.Blocks.Plants.world.PlantGenomes;
 import lNalator.Cultivationcraft.Common.Blocks.Plants.world.ProceduralPlantElementConditions;
 import lNalator.Cultivationcraft.Common.Capabilities.ChunkQiSources.ChunkQiSources;
-import lNalator.Cultivationcraft.Common.Capabilities.ChunkQiSources.IChunkQiSources;
 import lNalator.Cultivationcraft.Common.Config;
-import lNalator.Cultivationcraft.Common.Qi.QiSource;
-import lNalator.Cultivationcraft.Common.Qi.QiSourceConfig;
 import lNalator.Cultivationcraft.Network.PacketHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -101,6 +98,10 @@ public class ProceduralPlantBlock extends BushBlock implements BonemealableBlock
             return;
         }
 
+        if (plant.getSpiritualGrowth() >= ProceduralPlantBlockEntity.MAX_SPIRITUAL_GROWTH) {
+            return;
+        }
+
         PlantGenome genome = PlantGenomes.getById(level, state.getValue(SPECIES));
         int currentTier = plant.getTier();
 
@@ -148,8 +149,6 @@ public class ProceduralPlantBlock extends BushBlock implements BonemealableBlock
 
         if (!newState.equals(state)) {
             level.setBlock(pos, newState, Block.UPDATE_CLIENTS);
-        } else {
-            level.sendBlockUpdated(pos, state, state, Block.UPDATE_CLIENTS);
         }
 
         if (shouldHostQi && genome != null) {
@@ -237,46 +236,23 @@ public class ProceduralPlantBlock extends BushBlock implements BonemealableBlock
             workingState = level.getBlockState(pos);
         }
 
-        if (workingState.getValue(HOST_QI) && genome != null) {
-            IChunkQiSources chunk = ChunkQiSources.getChunkQiSources(server.getChunkAt(pos));
-            QiSource source;
+        if (workingState.getValue(HOST_QI) && genome != null
+                && level.getBlockEntity(pos) instanceof ProceduralPlantBlockEntity plant) {
             if (stack.hasTag() && stack.getTag().contains("QiHostData")) {
-                var nbt = stack.getTag().getCompound("QiHostData");
-                nbt.putLong("pos", pos.asLong());
-                source = QiSource.DeserializeNBT(nbt);
-            } else {
-                source = new QiSource(pos, QiSourceConfig.generateRandomSize(), genome.qiElement(), QiSourceConfig.generateRandomQiStorage(), QiSourceConfig.generateRandomQiRegen());
+                plant.setQiHostData(stack.getTag().getCompound("QiHostData"));
             }
-            chunk.getQiSources().add(source);
-            if (level.getBlockEntity(pos) instanceof ProceduralPlantBlockEntity plant) {
-                plant.setQiHostData(source.SerializeNBT());
-            }
-            PacketHandler.sendChunkQiSourcesToClient(server.getChunkAt(pos));
+            plant.attachQiSourceIfMissing(server, genome.qiElement());
         }
     }
 
     @Override
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
-        if (!level.isClientSide && state.getBlock() != newState.getBlock()) {
-            if (state.hasProperty(HOST_QI) && state.getValue(HOST_QI)) {
-                ServerLevel server = (ServerLevel) level;
-                var sources = ChunkQiSources.getQiSourcesInRange(server, new Vec3(pos.getX(), pos.getY(), pos.getZ()), 2);
-                if (!sources.isEmpty()) {
-                    QiSource closest = null;
-                    double best = Double.MAX_VALUE;
-                    for (var s : sources) {
-                        double d = new Vec3(pos.getX(), pos.getY(), pos.getZ()).subtract(s.getPos().getX(), s.getPos().getY(), s.getPos().getZ()).length();
-                        if (d < best) {
-                            best = d;
-                            closest = s;
-                        }
-                    }
-                    if (closest != null) {
-                        var chunk = ChunkQiSources.getChunkQiSources(server.getChunkAt(closest.getPos()));
-                        chunk.getQiSources().remove(closest);
-                        PacketHandler.sendChunkQiSourcesToClient(server.getChunkAt(closest.getPos()));
-                    }
-                }
+        if (level instanceof ServerLevel server && state.getBlock() != newState.getBlock()) {
+            var chunk = server.getChunkSource().getChunkNow(pos.getX() >> 4, pos.getZ() >> 4);
+            if (chunk != null && ChunkQiSources.getChunkQiSources(chunk).getQiSources()
+                    .removeIf(source -> source.isPlantOwned() && source.getPos().equals(pos))) {
+                chunk.setUnsaved(true);
+                PacketHandler.sendChunkQiSourcesToClient(chunk);
             }
         }
         super.onRemove(state, level, pos, newState, isMoving);
@@ -298,9 +274,9 @@ public class ProceduralPlantBlock extends BushBlock implements BonemealableBlock
         }
         float best = 0.0f;
         for (var source : sources) {
-            float bonus = 4.0f * tier;
+            float bonus = (float) Config.Server.procPlantGrowthBoostQiAny() * tier;
             if (genome != null && source.getElement().equals(genome.qiElement())) {
-                bonus *= 1.5f;
+                bonus = (float) Config.Server.procPlantGrowthBoostQiMatch() * tier;
             }
             if (bonus > best) {
                 best = bonus;
@@ -315,15 +291,18 @@ public class ProceduralPlantBlock extends BushBlock implements BonemealableBlock
             if (otherPos.equals(pos)) {
                 continue;
             }
-            BlockState otherState = level.getBlockState(otherPos);
+            var chunk = level.getChunkSource().getChunkNow(otherPos.getX() >> 4, otherPos.getZ() >> 4);
+            if (chunk == null) {
+                continue;
+            }
+            BlockState otherState = chunk.getBlockState(otherPos);
             if (otherState.getBlock() instanceof ProceduralPlantBlock) {
                 int otherTier = otherState.hasProperty(TIER) ? otherState.getValue(TIER) : 1;
-                BlockEntity neighbor = level.getBlockEntity(otherPos);
-                if (neighbor instanceof ProceduralPlantBlockEntity otherPlant) {
-                    otherTier = otherPlant.getTier();
-                }
                 if (otherTier > highest) {
                     highest = otherTier;
+                    if (highest == 3) {
+                        return highest;
+                    }
                 }
             }
         }

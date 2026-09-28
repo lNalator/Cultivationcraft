@@ -8,13 +8,8 @@ public record PlantGenome(
         int stemVariant, // index into stem texture catalog
         int foliageVariant, // index into foliage texture catalog
         int fruitVariant, // index into fruit texture catalog; -1 = none
-        int maxAge, // growth stages (e.g., 3 or 7)
-        float growthChance, // per random tick when conditions met
-        int heightPixels, // for hitbox/shape choice if you like
-        boolean prefersShade, // growth rule example
-        boolean spawnsInCold, // worldgen rule example
         ResourceLocation qiElement, // element type
-        int tier // 1..3 rarity tier (3 = max)
+        int tier // default growth tier for command-given specimens; placed plants derive tier from growth
         ) {
 
 }

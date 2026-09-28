@@ -80,9 +80,16 @@ public class PlantCatalogSyncPacket extends Packet {
     public void handle(Supplier<NetworkEvent.Context> supplier) {
         var ctx = supplier.get();
         ctx.enqueueWork(() -> {
-            ClientPlantCatalog.clear();
+            var catalog = new java.util.HashMap<Integer, ClientPlantCatalog.Entry>();
             for (Entry e : entries) {
-                ClientPlantCatalog.put(e.id, e.name, e.color, e.element, e.tier, e.stemVariant, e.foliageVariant, e.fruitVariant);
+                catalog.put(e.id, new ClientPlantCatalog.Entry(e.name, e.color, e.element, e.tier,
+                        e.stemVariant, e.foliageVariant, e.fruitVariant));
+            }
+            ClientPlantCatalog.replace(catalog);
+            // Chunks built before catalog arrival must refresh their species geometry and tint.
+            var client = Minecraft.getInstance();
+            if (client.level != null) {
+                client.levelRenderer.allChanged();
             }
         });
         ctx.setPacketHandled(true);

@@ -245,6 +245,7 @@ public class PlantCatalogCommands {
             src.sendFailure(Component.literal("Unknown plant id: " + id));
             return 0;
         }
+        host = host && entry.genome.tier() >= 3;
         ItemStack stack = makePlantStack(entry, host, count);
         boolean added = player.getInventory().add(stack);
         if (!added) {
@@ -275,6 +276,7 @@ public class PlantCatalogCommands {
             return 0;
         }
         PlantCatalogSavedData.Entry entry = list.get((int) (Math.random() * list.size()));
+        host = host && entry.genome.tier() >= 3;
         ItemStack stack = makePlantStack(entry, host, count);
         boolean added = player.getInventory().add(stack);
         if (!added) {
@@ -288,6 +290,11 @@ public class PlantCatalogCommands {
         ItemStack stack = new ItemStack(ItemRegister.PROCEDURAL_PLANT_ITEM.get(), count);
         var bst = stack.getOrCreateTagElement("BlockStateTag");
         bst.putString("species", Integer.toString(entry.id));
+        int tier = entry.genome.tier();
+        host = host && tier >= 3;
+        int growth = tier >= 3 ? 1000 : tier == 2 ? 100 : 0;
+        stack.getOrCreateTag().putInt("SpiritualGrowth", growth);
+        bst.putString("tier", Integer.toString(tier));
         if (host) {
             bst.putString("host_qi", "true");
         }

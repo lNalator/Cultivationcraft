@@ -14,6 +14,7 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.capabilities.Capability;
@@ -261,20 +262,27 @@ public class ChunkQiSources implements IChunkQiSources {
     public static List<QiSource> getQiSourcesInRange(Level level, Vec3 position, int range) {
         ArrayList<QiSource> sources = new ArrayList<QiSource>();
 
-        int searchRange = (range + QiSourceConfig.MaxSize) / 16 + 1;
+        double reach = (double) range + QiSourceConfig.MaxSize;
+        int minX = net.minecraft.util.Mth.floor((position.x - reach) / 16.0);
+        int maxX = net.minecraft.util.Mth.floor((position.x + reach) / 16.0);
+        int minZ = net.minecraft.util.Mth.floor((position.z - reach) / 16.0);
+        int maxZ = net.minecraft.util.Mth.floor((position.z + reach) / 16.0);
 
-        ChunkPos test = new ChunkPos(new BlockPos(position));
-
-        // Loop through each chunk within possible range
-        for (int x = -searchRange; x <= searchRange; x++) {
-            for (int z = -searchRange; z <= searchRange; z++) {
-                List<QiSource> possibleSources = getChunkQiSources(level.getChunk(test.x + x, test.z + z)).getQiSources();
+        for (int x = minX; x <= maxX; x++) {
+            for (int z = minZ; z <= maxZ; z++) {
+                // Never load or wait for a chunk as a side effect of sensing Qi.
+                ChunkAccess access = level instanceof net.minecraft.server.level.ServerLevel server
+                        ? server.getChunkSource().getChunkNow(x, z)
+                        : level.getChunk(x, z, ChunkStatus.FULL, false);
+                if (!(access instanceof LevelChunk loadedChunk)) {
+                    continue;
+                }
+                List<QiSource> possibleSources = getChunkQiSources(loadedChunk).getQiSources();
 
                 // Check each source in the chunk to see if it is within range
                 for (QiSource source : possibleSources) {
-                    double distance = position.subtract(source.getPos().getX(), source.getPos().getY(), source.getPos().getZ()).length();
-
-                    if (distance < range + source.getSize()) {
+                    double sourceReach = (double) range + source.getSize();
+                    if (position.distanceToSqr(source.getPos().getX(), source.getPos().getY(), source.getPos().getZ()) < sourceReach * sourceReach) {
                         sources.add(source);
                     }
                 }

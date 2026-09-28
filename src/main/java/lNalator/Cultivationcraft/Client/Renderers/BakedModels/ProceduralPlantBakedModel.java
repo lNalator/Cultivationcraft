@@ -40,6 +40,7 @@ public class ProceduralPlantBakedModel implements BakedModel {
     private final Map<Integer, List<BakedQuad>> foliageCache = new ConcurrentHashMap<>();
     private final Map<Integer, List<BakedQuad>> fruitCache = new ConcurrentHashMap<>();
 
+    private final Map<Integer, List<BakedQuad>> combinedCache = new ConcurrentHashMap<>();
     private final ItemOverrides overrides;
 
     public ProceduralPlantBakedModel(BakedModel baseModel) {
@@ -69,13 +70,16 @@ public class ProceduralPlantBakedModel implements BakedModel {
             return templateQuads;
         }
 
-        List<BakedQuad> result = new ArrayList<>(16);
-        result.addAll(getStemLayer(entry.stemVariant));
-        result.addAll(getFoliageLayer(entry.foliageVariant));
-        if (entry.fruitVariant != PlantVisuals.NO_FRUIT) {
+        int fruitChoices = PlantVisuals.fruitVariantCount() + 1;
+        int key = (entry.stemVariant * PlantVisuals.foliageVariantCount() + entry.foliageVariant) * fruitChoices
+                + entry.fruitVariant + 1;
+        return combinedCache.computeIfAbsent(key, ignored -> {
+            List<BakedQuad> result = new ArrayList<>(16);
+            result.addAll(getStemLayer(entry.stemVariant));
+            result.addAll(getFoliageLayer(entry.foliageVariant));
             result.addAll(getFruitLayer(entry.fruitVariant));
-        }
-        return List.copyOf(result);
+            return List.copyOf(result);
+        });
     }
 
     private List<BakedQuad> getStemLayer(int variant) {

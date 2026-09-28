@@ -6,7 +6,6 @@ import lNalator.Cultivationcraft.Common.Blocks.Plants.world.PlantGenomes;
 import lNalator.Cultivationcraft.Common.Capabilities.ChunkQiSources.ChunkQiSources;
 import lNalator.Cultivationcraft.Common.Qi.QiSource;
 import lNalator.Cultivationcraft.Common.Qi.QiSourceConfig;
-import lNalator.Cultivationcraft.Network.PacketHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -27,7 +26,8 @@ public class ProceduralPlantBlockEntity extends BlockEntity implements Nameable 
     private static final int TIER_TWO_GROWTH = 100;
     private static final int TIER_THREE_GROWTH = 1000;
 
-    private CompoundTag qiHostData; // Serialized QiSource data
+    private CompoundTag qiHostData; // Saved fallback while the chunk source is not attached
+    private QiSource liveQiSource;
     private int spiritualGrowth; // dynamic growth stat that drives tier/qi changes
 
     public ProceduralPlantBlockEntity(BlockPos pos, BlockState state) {
@@ -52,17 +52,22 @@ public class ProceduralPlantBlockEntity extends BlockEntity implements Nameable 
         if (level instanceof ServerLevel server) {
             BlockState state = getBlockState();
             server.sendBlockUpdated(worldPosition, state, state, Block.UPDATE_CLIENTS);
-            server.getChunkSource().blockChanged(worldPosition);
         }
     }
 
     public void setQiHostData(CompoundTag tag) {
         this.qiHostData = tag == null ? null : tag.copy();
+        this.liveQiSource = null;
         markUpdated();
     }
 
     public CompoundTag getQiHostData() {
-        return qiHostData == null ? null : qiHostData.copy();
+        return liveQiSource != null ? liveQiSource.SerializeNBT() : qiHostData == null ? null : qiHostData.copy();
+    }
+
+    // Proto-chunks persist this entity on promotion; generation must not notify the live level.
+    public void initializeWorldgenGrowth(int growth) {
+        spiritualGrowth = Mth.clamp(growth, 0, MAX_SPIRITUAL_GROWTH);
     }
 
     public int getSpiritualGrowth() {
@@ -131,20 +136,41 @@ public class ProceduralPlantBlockEntity extends BlockEntity implements Nameable 
         return getTier();
     }
 
-    public void attachQiSourceIfMissing(ServerLevel srv, net.minecraft.resources.ResourceLocation element) {
+    public void attachQiSourceIfMissing(ServerLevel server, net.minecraft.resources.ResourceLocation element) {
+        if (getTier() < 3 || !(getBlockState().getBlock() instanceof ProceduralPlantBlock)) {
+            return;
+        }
+        var chunk = server.getChunkSource().getChunkNow(worldPosition.getX() >> 4, worldPosition.getZ() >> 4);
+        if (chunk == null) {
+            return;
+        }
+        var capability = ChunkQiSources.getChunkQiSources(chunk);
+        var sources = capability.getQiSources();
+        // Reuse the authoritative chunk source when loading; never add a second one.
+        for (var source : sources) {
+            if (source.isPlantOwned() && source.getPos().equals(worldPosition)) {
+                liveQiSource = source;
+                return;
+            }
+        }
         if (qiHostData != null) {
-            return;
+            var restored = qiHostData.copy();
+            restored.putLong("pos", worldPosition.asLong());
+            liveQiSource = QiSource.DeserializeNBT(restored);
+        } else {
+            liveQiSource = new QiSource(worldPosition, QiSourceConfig.generateRandomSize(), element,
+                    QiSourceConfig.generateRandomQiStorage(), QiSourceConfig.generateRandomQiRegen());
         }
-        var state = getBlockState();
-        if (!(state.getBlock() instanceof ProceduralPlantBlock)) {
-            return;
+        liveQiSource.setPlantOwned();
+        sources.add(liveQiSource);
+        qiHostData = liveQiSource.SerializeNBT();
+        chunk.setUnsaved(true);
+        setChanged();
+        // ChunkEvent.Load initializes capability identity and sends the initial snapshot.
+        if (capability.getChunkPos() != null) {
+            lNalator.Cultivationcraft.Common.CommonListeners.checkQiSourceIsTicking(capability);
+            // New sources start dirty; the chunk tick sends one snapshot for all additions.
         }
-        var source = new QiSource(worldPosition, QiSourceConfig.generateRandomSize(), element, QiSourceConfig.generateRandomQiStorage(), QiSourceConfig.generateRandomQiRegen());
-        var cap = ChunkQiSources.getChunkQiSources(srv.getChunkAt(worldPosition));
-        cap.getQiSources().add(source);
-        this.qiHostData = source.SerializeNBT();
-        markUpdated();
-        PacketHandler.sendChunkQiSourcesToClient(srv.getChunkAt(worldPosition));
     }
 
     @Override
@@ -170,32 +196,19 @@ public class ProceduralPlantBlockEntity extends BlockEntity implements Nameable 
             return;
         }
 
-        // Only create once: if no stored data (worldgen), create and persist one now
-        if (qiHostData == null) {
-            if (!state.hasProperty(ProceduralPlantBlock.SPECIES)) {
-                return;
-            }
-            int species = state.getValue(ProceduralPlantBlock.SPECIES);
-            var srv = (ServerLevel) level;
-            var genome = PlantGenomes.getById(srv, species);
-            if (genome == null) {
-                return;
-            }
-
-            var source = new QiSource(worldPosition, QiSourceConfig.generateRandomSize(), genome.qiElement(), QiSourceConfig.generateRandomQiStorage(), QiSourceConfig.generateRandomQiRegen());
-            var cap = ChunkQiSources.getChunkQiSources(srv.getChunkAt(worldPosition));
-            cap.getQiSources().add(source);
-            this.qiHostData = source.SerializeNBT();
-            markUpdated();
-            PacketHandler.sendChunkQiSourcesToClient(srv.getChunkAt(worldPosition));
+        var server = (ServerLevel) level;
+        var genome = PlantGenomes.getById(server, state.getValue(ProceduralPlantBlock.SPECIES));
+        if (genome != null) {
+            attachQiSourceIfMissing(server, genome.qiElement());
         }
     }
 
     @Override
     protected void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);
-        if (qiHostData != null) {
-            tag.put("QiHostData", qiHostData);
+        CompoundTag source = getQiHostData();
+        if (source != null) {
+            tag.put("QiHostData", source);
         }
         tag.putInt("SpiritualGrowth", spiritualGrowth);
     }
@@ -203,6 +216,7 @@ public class ProceduralPlantBlockEntity extends BlockEntity implements Nameable 
     @Override
     public void load(CompoundTag tag) {
         super.load(tag);
+        liveQiSource = null;
         if (tag.contains("QiHostData")) {
             this.qiHostData = tag.getCompound("QiHostData"); 
         }else {
@@ -223,7 +237,8 @@ public class ProceduralPlantBlockEntity extends BlockEntity implements Nameable 
     @Override
     public CompoundTag getUpdateTag() {
         CompoundTag tag = new CompoundTag();
-        saveAdditional(tag);
+        // Rendering needs growth, not the full source reserve/absorber list.
+        tag.putInt("SpiritualGrowth", spiritualGrowth);
         return tag;
     }
 

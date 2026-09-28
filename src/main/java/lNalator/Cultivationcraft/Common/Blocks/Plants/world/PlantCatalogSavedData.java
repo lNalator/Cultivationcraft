@@ -2,6 +2,10 @@ package lNalator.Cultivationcraft.Common.Blocks.Plants.world;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
+import net.minecraft.server.MinecraftServer;
 
 import lNalator.Cultivationcraft.Common.Config;
 import lNalator.Cultivationcraft.Common.Qi.Elements.Elements;
@@ -36,17 +40,40 @@ public class PlantCatalogSavedData extends SavedData {
         }
     }
 
-    private final List<Entry> entries = new ArrayList<>();
+    private static final Map<MinecraftServer, PlantCatalogSavedData> CATALOGS = new ConcurrentHashMap<>();
+    private List<Entry> entries = new ArrayList<>();
+    private Map<Integer, Entry> byId = Map.of();
+    private Map<ResourceLocation, List<Entry>> byElement = Map.of();
+
+    private void freeze() {
+        entries = List.copyOf(entries);
+        Map<Integer, Entry> ids = new HashMap<>();
+        Map<ResourceLocation, List<Entry>> elements = new HashMap<>();
+        for (Entry entry : entries) {
+            if (entry.id < 0 || entry.id > 63 || ids.put(entry.id, entry) != null) {
+                throw new IllegalArgumentException("Invalid or duplicate plant species ID: " + entry.id);
+            }
+            elements.computeIfAbsent(entry.genome.qiElement(), key -> new ArrayList<>()).add(entry);
+        }
+        elements.replaceAll((key, value) -> List.copyOf(value));
+        byId = Map.copyOf(ids);
+        byElement = Map.copyOf(elements);
+    }
+
+    public List<Entry> entriesForElement(ResourceLocation element) {
+        return byElement.getOrDefault(element, List.of());
+    }
+
+    public static void clear(MinecraftServer server) {
+        CATALOGS.remove(server);
+    }
 
     public List<Entry> entries() {
         return entries;
     }
 
     public Entry getById(int id) {
-        if (id < 0 || id >= entries.size()) {
-            return null;
-        }
-        return entries.get(id);
+        return byId.get(id);
     }
 
     public int size() {
@@ -64,11 +91,6 @@ public class PlantCatalogSavedData extends SavedData {
             ct.putInt("stemVariant", e.genome.stemVariant());
             ct.putInt("foliageVariant", e.genome.foliageVariant());
             ct.putInt("fruitVariant", e.genome.fruitVariant());
-            ct.putInt("maxAge", e.genome.maxAge());
-            ct.putFloat("growthChance", e.genome.growthChance());
-            ct.putInt("height", e.genome.heightPixels());
-            ct.putBoolean("prefersShade", e.genome.prefersShade());
-            ct.putBoolean("spawnsInCold", e.genome.spawnsInCold());
             ct.putString("element", e.genome.qiElement().toString());
             ct.putInt("tier", e.genome.tier());
             ct.putString("name", e.displayName);
@@ -102,22 +124,23 @@ public class PlantCatalogSavedData extends SavedData {
                     stemVariant,
                     foliageVariant,
                     fruitVariant,
-                    ct.getInt("maxAge"),
-                    ct.getFloat("growthChance"),
-                    ct.getInt("height"),
-                    ct.getBoolean("prefersShade"),
-                    ct.getBoolean("spawnsInCold"),
                     new net.minecraft.resources.ResourceLocation(ct.getString("element")),
                     ct.getInt("tier")
             );
             String name = ct.getString("name");
             data.entries.add(new Entry(id, g, name));
         }
+        data.freeze();
         return data;
     }
 
     public static PlantCatalogSavedData getOrCreate(ServerLevel level, int desiredSize) {
-        return level.getDataStorage().computeIfAbsent(PlantCatalogSavedData::load, () -> create(level, desiredSize), DATA_NAME);
+        // Level load initializes this before chunk generation; workers only read the frozen catalog.
+        return CATALOGS.computeIfAbsent(level.getServer(), server -> {
+            ServerLevel overworld = server.overworld();
+            return overworld.getDataStorage().computeIfAbsent(PlantCatalogSavedData::load,
+                    () -> create(overworld, desiredSize), DATA_NAME);
+        });
     }
 
     private static PlantCatalogSavedData create(ServerLevel level, int desiredSize) {
@@ -138,7 +161,7 @@ public class PlantCatalogSavedData extends SavedData {
         int E = core.size();
         // Ensure at least 6 per element (3 T1, 2 T2, 1 T3)
         int minRequired = 6 * E;
-        int size = Math.max(minRequired, desiredSize);
+        int size = Mth.clamp(desiredSize, minRequired + 1, 64);
         int idCounter = 0;
 
         // Decide base counts per element and tier
@@ -153,17 +176,15 @@ public class PlantCatalogSavedData extends SavedData {
 
         // Fill remaining with none-element (bias to T1)
         while (data.entries.size() < size) {
-            int tier = 1;
-            int roll = rng.nextInt(10);
-            if (roll < 1) {
-                tier = 3;
-            } else if (roll < 3) {
-                tier = 2; // 10% chance to be T2+, heavier bias to T1
-
-                        }idCounter = addOne(level, rng, data, none, tier, idCounter);
+            int roll = rng.nextInt(100);
+            int tier3 = Config.Server.procPlantTier3ChancePercent();
+            int tier2 = Math.min(100 - tier3, Config.Server.procPlantTier2ChancePercent());
+            int tier = roll < tier3 ? 3 : roll < tier3 + tier2 ? 2 : 1;
+            idCounter = addOne(level, rng, data, none, tier, idCounter);
         }
 
         data.setDirty();
+        data.freeze();
         return data;
     }
 
@@ -192,31 +213,6 @@ public class PlantCatalogSavedData extends SavedData {
         float bri = Mth.clamp(hsb[2] + (rng.nextFloat() - 0.5f) * 0.2f, 0f, 1f);
         int color = java.awt.Color.HSBtoRGB((hsb[0] + hueJitter + 1f) % 1f, sat, bri) & 0xFFFFFF;
 
-        int ageMin = Config.Server.procPlantAgeMin();
-        int ageMax = Config.Server.procPlantAgeMax();
-        if (ageMax < ageMin) {
-            ageMax = ageMin;
-        }
-        int maxAge = ageMin + rng.nextInt(Math.max(1, (ageMax - ageMin + 1)));
-
-        double gMin = Config.Server.procPlantGrowthMin();
-        double gMax = Config.Server.procPlantGrowthMax();
-        if (gMax < gMin) {
-            gMax = gMin;
-        }
-        float growthChance = (float) (gMin + rng.nextDouble() * (gMax - gMin));
-
-        int hMin = Config.Server.procPlantHeightMin();
-        int hMax = Config.Server.procPlantHeightMax();
-        if (hMax < hMin) {
-            hMax = hMin;
-        }
-        int height = hMin + rng.nextInt(Math.max(1, (hMax - hMin + 1)));
-        boolean prefersShade = rng.nextBoolean();
-
-        // Derive spawn preferences from element
-        boolean cold = isColdFavored(element);
-
         int stemVariant = rng.nextInt(Math.max(1, PlantVisuals.stemVariantCount()));
         int foliageVariant = rng.nextInt(Math.max(1, PlantVisuals.foliageVariantCount()));
         int fruitVariant = PlantVisuals.NO_FRUIT;
@@ -225,26 +221,10 @@ public class PlantCatalogSavedData extends SavedData {
             fruitVariant = rng.nextInt(fruitCount);
         }
 
-        PlantGenome genome = new PlantGenome(id, color, stemVariant, foliageVariant, fruitVariant, maxAge, growthChance, height, prefersShade, cold, element, tier);
+        PlantGenome genome = new PlantGenome(id, color, stemVariant, foliageVariant, fruitVariant, element, tier);
         String name = generateName(rng, genome);
         data.entries.add(new Entry(id, genome, name));
         return id + 1;
-    }
-
-    private static boolean isColdFavored(ResourceLocation element) {
-        var el = Elements.getElement(element);
-        if (el == null) {
-            return false;
-        }
-        String path = element.getPath();
-        // favor cold for water/ice/wind-like
-        if (path.contains("water") || path.contains("ice") || path.contains("wind")) {
-            return true;
-        }
-        if (path.contains("fire")) {
-            return false;
-        }
-        return false;
     }
 
     private static String generateName(RandomSource rng, PlantGenome g) {

@@ -9,15 +9,14 @@ public class Config {
         protected static final ForgeConfigSpec.ConfigValue<Boolean> qiSourceElementalEffects;
         private static ForgeConfigSpec.IntValue procPlantCatalogSize;
         private static ForgeConfigSpec.IntValue procPlantRegionSizeChunks;
-        private static ForgeConfigSpec.IntValue procPlantAgeMin;
-        private static ForgeConfigSpec.IntValue procPlantAgeMax;
-        private static ForgeConfigSpec.DoubleValue procPlantGrowthMin;
-        private static ForgeConfigSpec.DoubleValue procPlantGrowthMax;
-        private static ForgeConfigSpec.IntValue procPlantHeightMin;
-        private static ForgeConfigSpec.IntValue procPlantHeightMax;
         private static ForgeConfigSpec.IntValue procPlantTier3ChancePercent;
         private static ForgeConfigSpec.IntValue procPlantTier2ChancePercent;
         private static ForgeConfigSpec.IntValue procPlantPatchCapT1;
+        private static ForgeConfigSpec.IntValue procPlantPatchAttempts;
+        private static ForgeConfigSpec.IntValue procPlantPlacementBudget;
+        private static ForgeConfigSpec.IntValue procPlantCaveScanSteps;
+        private static ForgeConfigSpec.DoubleValue procPlantPatchTier2Percent;
+        private static ForgeConfigSpec.DoubleValue procPlantPatchTier3Percent;
         private static ForgeConfigSpec.DoubleValue procPlantGrowthBoostQiAny;
         private static ForgeConfigSpec.DoubleValue procPlantGrowthBoostQiMatch;
         private static ForgeConfigSpec.IntValue procPlantQiGrowthRadius;
@@ -44,39 +43,33 @@ public class Config {
             builder.push("Procedural Plants");
             builder.push("catalog");
             procPlantCatalogSize = builder.comment("Number of plant entries generated per world")
-                    .defineInRange("catalog_size", 50, 1, 256);
+                    .defineInRange("catalog_size", 50, 43, 64);
             procPlantRegionSizeChunks = builder.comment("Region size in chunks used to map world positions to a catalog entry")
                     .defineInRange("region_size_chunks", 8, 1, 64);
             builder.pop();
-            builder.push("genome");
-            procPlantAgeMin = builder.comment("Minimum maxAge for plants")
-                    .defineInRange("age_min", 3, 1, 10);
-            procPlantAgeMax = builder.comment("Maximum maxAge for plants")
-                    .defineInRange("age_max", 5, 1, 15);
-            procPlantGrowthMin = builder.comment("Minimum per-tick growth chance")
-                    .defineInRange("growth_chance_min", 0.05D, 0.0D, 1.0D);
-            procPlantGrowthMax = builder.comment("Maximum per-tick growth chance")
-                    .defineInRange("growth_chance_max", 0.15D, 0.0D, 1.0D);
-            procPlantHeightMin = builder.comment("Minimum visual height in pixels")
-                    .defineInRange("height_min", 10, 1, 64);
-            procPlantHeightMax = builder.comment("Maximum visual height in pixels")
-                    .defineInRange("height_max", 22, 1, 64);
-            builder.pop();
             builder.push("catalog_tiers");
-            procPlantTier3ChancePercent = builder.comment("Percent chance of tier 3 (epic) entries in catalog")
+            procPlantTier3ChancePercent = builder.comment("Percent chance of tier 3 neutral catalog entries; elemental entries have guaranteed tier coverage")
                     .defineInRange("tier3_percent", 5, 0, 100);
-            procPlantTier2ChancePercent = builder.comment("Percent chance of tier 2 (rare) entries in catalog; rest are tier 1")
+            procPlantTier2ChancePercent = builder.comment("Percent chance of tier 2 neutral catalog entries; remaining entries are tier 1")
                     .defineInRange("tier2_percent", 25, 0, 100);
             builder.pop();
             builder.push("patches");
             procPlantPatchCapT1 = builder.comment("Max plants placed per patch for tier 1")
-                    .defineInRange("patch_cap_t1", 3, 1, 16);
+                    .defineInRange("patch_cap_t1", 12, 1, 16);
+            procPlantPatchAttempts = builder.comment("Maximum patch centers tried per feature invocation")
+                    .defineInRange("patch_attempts", 10, 1, 16);
+            procPlantPlacementBudget = builder.comment("Maximum individual plant placement attempts across all patches in one invocation")
+                    .defineInRange("placement_budget", 48, 1, 128);
+            procPlantCaveScanSteps = builder.comment("Maximum downward steps when finding a cave or Nether patch center")
+                    .defineInRange("cave_scan_steps", 32, 1, 64);
+            procPlantPatchTier2Percent = builder.defineInRange("patch_tier2_percent", 5.0D, 0.0D, 100.0D);
+            procPlantPatchTier3Percent = builder.defineInRange("patch_tier3_percent", 0.5D, 0.0D, 100.0D);
             builder.pop();
             builder.push("growth");
-            procPlantGrowthBoostQiAny = builder.comment("Growth multiplier when any Qi Source is nearby")
-                    .defineInRange("growth_boost_qi_any", 1.2D, 1.0D, 10.0D);
-            procPlantGrowthBoostQiMatch = builder.comment("Growth multiplier when matching-element Qi Source is nearby")
-                    .defineInRange("growth_boost_qi_match", 1.8D, 1.0D, 10.0D);
+            procPlantGrowthBoostQiAny = builder.comment("Additional growth per plant tier when any Qi Source is nearby")
+                    .defineInRange("growth_boost_qi_any", 4.0D, 0.0D, 10.0D);
+            procPlantGrowthBoostQiMatch = builder.comment("Additional growth per plant tier when a matching Qi Source is nearby")
+                    .defineInRange("growth_boost_qi_match", 6.0D, 0.0D, 10.0D);
             procPlantQiGrowthRadius = builder.comment("Radius (blocks) to search for Qi Sources to boost growth")
                     .defineInRange("qi_growth_radius", 16, 1, 128);
             builder.pop();
@@ -111,30 +104,6 @@ public class Config {
             return procPlantRegionSizeChunks.get();
         }
 
-        public static int procPlantAgeMin() {
-            return procPlantAgeMin.get();
-        }
-
-        public static int procPlantAgeMax() {
-            return procPlantAgeMax.get();
-        }
-
-        public static double procPlantGrowthMin() {
-            return procPlantGrowthMin.get();
-        }
-
-        public static double procPlantGrowthMax() {
-            return procPlantGrowthMax.get();
-        }
-
-        public static int procPlantHeightMin() {
-            return procPlantHeightMin.get();
-        }
-
-        public static int procPlantHeightMax() {
-            return procPlantHeightMax.get();
-        }
-
         public static int procPlantTier3ChancePercent() {
             return procPlantTier3ChancePercent.get();
         }
@@ -142,6 +111,12 @@ public class Config {
         public static int procPlantTier2ChancePercent() {
             return procPlantTier2ChancePercent.get();
         }
+
+        public static int procPlantPatchAttempts() { return procPlantPatchAttempts.get(); }
+        public static int procPlantPlacementBudget() { return procPlantPlacementBudget.get(); }
+        public static int procPlantCaveScanSteps() { return procPlantCaveScanSteps.get(); }
+        public static double procPlantPatchTier2Percent() { return procPlantPatchTier2Percent.get(); }
+        public static double procPlantPatchTier3Percent() { return procPlantPatchTier3Percent.get(); }
 
         public static int procPlantPatchCapT1() {
             return procPlantPatchCapT1.get();
