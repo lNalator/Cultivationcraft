@@ -27,34 +27,39 @@ public final class ProceduralPlantElementConditions {
     }
 
     public static boolean canSpawn(ServerLevel server, LevelAccessor level, BlockPos pos, ResourceLocation element) {
+        return canSpawn(server, level, pos, element, null);
+    }
+
+    public static boolean canSpawn(ServerLevel server, LevelAccessor level, BlockPos pos, ResourceLocation element,
+            java.util.Map<Long, BlockState> environment) {
         if (level.getFluidState(pos).is(FluidTags.WATER)
                 && (!Elements.waterElement.equals(element) || level.getFluidState(pos.above()).is(FluidTags.WATER))) {
             return false;
         }
-        String key = elementKey(element);
-        if (key.contains("none")) {
+        ResourceLocation key = element;
+        if (Elements.noElement.equals(key)) {
             return noneSpawn(level, pos);
         }
-        if (key.contains("fire")) {
+        if (Elements.fireElement.equals(key)) {
             return fireSpawn(server, level, pos);
         }
-        if (key.contains("earth")) {
+        if (Elements.earthElement.equals(key)) {
             return earthSpawn(level, pos);
         }
-        if (key.contains("ice")) {
+        if (Elements.iceElement.equals(key)) {
             return iceSpawn(level, pos);
         }
-        if (key.contains("wind")) {
+        if (Elements.windElement.equals(key)) {
             return windSpawn(level, pos);
         }
-        if (key.contains("lightning")) {
+        if (Elements.lightningElement.equals(key)) {
             return lightningSpawn(level, pos);
         }
-        if (key.contains("wood")) {
-            return woodSpawn(level, pos);
+        if (Elements.woodElement.equals(key)) {
+            return woodSpawn(level, pos, environment);
         }
-        if (key.contains("water")) {
-            return waterSpawn(level, pos);
+        if (Elements.waterElement.equals(key)) {
+            return waterSpawn(level, pos, environment);
         }
         return true;
     }
@@ -66,29 +71,29 @@ public final class ProceduralPlantElementConditions {
         if (genome == null) {
             return 1.0f;
         }
-        String key = elementKey(genome.qiElement());
-        if (key.contains("none")) {
+        ResourceLocation key = genome.qiElement();
+        if (Elements.noElement.equals(key)) {
             return noneGrowth(level, pos);
         }
-        if (key.contains("fire")) {
+        if (Elements.fireElement.equals(key)) {
             return fireGrowth(level, pos);
         }
-        if (key.contains("earth")) {
+        if (Elements.earthElement.equals(key)) {
             return earthGrowth(level, pos);
         }
-        if (key.contains("ice")) {
+        if (Elements.iceElement.equals(key)) {
             return iceGrowth(level, pos);
         }
-        if (key.contains("wind")) {
+        if (Elements.windElement.equals(key)) {
             return windGrowth(level, pos);
         }
-        if (key.contains("lightning")) {
+        if (Elements.lightningElement.equals(key)) {
             return lightningGrowth(level, pos);
         }
-        if (key.contains("wood")) {
+        if (Elements.woodElement.equals(key)) {
             return woodGrowth(level, pos);
         }
-        if (key.contains("water")) {
+        if (Elements.waterElement.equals(key)) {
             return waterGrowth(level, pos);
         }
         return 1.0f;
@@ -96,10 +101,6 @@ public final class ProceduralPlantElementConditions {
 
     public static boolean canGenerateQiInWater(LevelAccessor level, BlockPos pos, ResourceLocation element) {
         return !level.getFluidState(pos).is(FluidTags.WATER) || Elements.waterElement.equals(element);
-    }
-
-    private static String elementKey(ResourceLocation element) {
-        return element == null ? "" : element.getPath().toLowerCase();
     }
 
     private static boolean fireSpawn(ServerLevel server, LevelAccessor level, BlockPos pos) {
@@ -134,21 +135,21 @@ public final class ProceduralPlantElementConditions {
         return isOpenArea(level, pos, 1) && pos.getY() > 130;
     }
 
-    private static boolean woodSpawn(LevelAccessor level, BlockPos pos) {
+    private static boolean woodSpawn(LevelAccessor level, BlockPos pos, java.util.Map<Long, BlockState> environment) {
         String biome = biomeKey(level, pos);
         if (!(biome.contains("forest") || biome.contains("jungle") || biome.contains("dark_forest"))) {
             return false;
         }
-        return nearWood(level, pos, WOOD_RADIUS);
+        return nearWood(level, pos, WOOD_RADIUS, environment);
     }
 
-    private static boolean waterSpawn(LevelAccessor level, BlockPos pos) {
+    private static boolean waterSpawn(LevelAccessor level, BlockPos pos, java.util.Map<Long, BlockState> environment) {
         BlockState below = level.getBlockState(pos.below());
         boolean ground = isWaterGround(below);
         if (!ground || !below.isFaceSturdy(level, pos.below(), Direction.UP)) {
             return false;
         }
-        return nearWater(level, pos, WATER_RADIUS - 1);
+        return nearWater(level, pos, WATER_RADIUS - 1, environment);
     }
 
     private static boolean noneSpawn(LevelAccessor level, BlockPos pos) {
@@ -218,7 +219,7 @@ public final class ProceduralPlantElementConditions {
     }
 
     private static float woodGrowth(Level level, BlockPos pos) {
-        if (nearWood(level, pos, WOOD_RADIUS)) {
+        if (nearWood(level, pos, WOOD_RADIUS, null)) {
             return 1.35f;
         }
         String biome = biomeKey(level, pos);
@@ -229,7 +230,7 @@ public final class ProceduralPlantElementConditions {
     }
 
     private static float waterGrowth(Level level, BlockPos pos) {
-        if (nearWater(level, pos, WATER_RADIUS)) {
+        if (nearWater(level, pos, WATER_RADIUS, null)) {
             return 1.35f;
         }
         BlockState below = level.getBlockState(pos.below());
@@ -274,7 +275,7 @@ public final class ProceduralPlantElementConditions {
         for (int dx = -clearance; dx <= clearance; dx++) {
             for (int dz = -clearance; dz <= clearance; dz++) {
                 cursor.set(pos.getX() + dx, pos.getY() + 1, pos.getZ() + dz);
-                if (!level.isEmptyBlock(cursor)) {
+                if (!nearbyState(level, cursor, null).isAir()) {
                     solid++;
                     if (solid > 2) {
                         return false;
@@ -285,13 +286,13 @@ public final class ProceduralPlantElementConditions {
         return true;
     }
 
-    private static boolean nearWater(LevelAccessor level, BlockPos center, int radius) {
+    private static boolean nearWater(LevelAccessor level, BlockPos center, int radius, java.util.Map<Long, BlockState> environment) {
         MutableBlockPos cursor = new MutableBlockPos();
         for (int dx = -radius; dx <= radius; dx++) {
             for (int dz = -radius; dz <= radius; dz++) {
                 for (int dy = -1; dy <= 1; dy++) {
                     cursor.set(center.getX() + dx, center.getY() + dy, center.getZ() + dz);
-                    FluidState fluid = level.getFluidState(cursor);
+                    FluidState fluid = nearbyState(level, cursor, environment).getFluidState();
                     if (fluid.is(FluidTags.WATER)) {
                         return true;
                     }
@@ -301,13 +302,13 @@ public final class ProceduralPlantElementConditions {
         return false;
     }
 
-    private static boolean nearWood(LevelAccessor level, BlockPos center, int radius) {
+    private static boolean nearWood(LevelAccessor level, BlockPos center, int radius, java.util.Map<Long, BlockState> environment) {
         MutableBlockPos cursor = new MutableBlockPos();
         for (int dx = -radius; dx <= radius; dx++) {
             for (int dz = -radius; dz <= radius; dz++) {
                 for (int dy = -1; dy <= 1; dy++) {
                     cursor.set(center.getX() + dx, center.getY() + dy, center.getZ() + dz);
-                    BlockState state = level.getBlockState(cursor);
+                    BlockState state = nearbyState(level, cursor, environment);
                     if (state.is(BlockTags.LOGS) || state.is(BlockTags.LEAVES) || state.is(BlockTags.SAPLINGS) || state.is(BlockTags.FLOWERS)) {
                         return true;
                     }
@@ -315,6 +316,16 @@ public final class ProceduralPlantElementConditions {
             }
         }
         return false;
+    }
+
+    private static BlockState nearbyState(LevelAccessor level, BlockPos pos, java.util.Map<Long, BlockState> cache) {
+        // WorldGenRegion reads remain local; live growth must not bring neighboring chunks into memory.
+        if (level instanceof ServerLevel server) {
+            var chunk = server.getChunkSource().getChunkNow(pos.getX() >> 4, pos.getZ() >> 4);
+            return chunk == null ? Blocks.AIR.defaultBlockState() : chunk.getBlockState(pos);
+        }
+        return cache == null ? level.getBlockState(pos)
+                : cache.computeIfAbsent(pos.asLong(), key -> level.getBlockState(pos));
     }
 
     private static String biomeKey(LevelAccessor level, BlockPos pos) {

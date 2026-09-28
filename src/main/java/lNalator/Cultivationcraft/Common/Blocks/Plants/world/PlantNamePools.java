@@ -9,8 +9,6 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.util.thread.EffectiveSide;
-import net.minecraftforge.server.ServerLifecycleHooks;
 import net.minecraft.util.RandomSource;
 
 import java.io.InputStreamReader;
@@ -25,7 +23,7 @@ import java.util.*;
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
 public final class PlantNamePools {
 
-    private static final Map<ResourceLocation, NamePool> POOLS = new HashMap<>();
+    private static volatile Map<ResourceLocation, NamePool> pools = Map.of();
     private static final NamePool DEFAULT = new NamePool(
             List.of("Dusky", "Luminous", "Bitter", "Verdant", "Crimson", "Azure", "Gleaming", "Mellow", "Stormy", "Silent"),
             List.of("Bramble", "Bloom", "Spore", "Thorn", "Petal", "Reed", "Fern", "Moss", "Sedge", "Vetch"),
@@ -46,7 +44,7 @@ public final class PlantNamePools {
     }
 
     private static void load(ResourceManager manager) {
-        POOLS.clear();
+        Map<ResourceLocation, NamePool> loaded = new HashMap<>();
         var gson = new Gson();
         String base = "plant_names"; // folder under data/<ns>/plant_names
         for (var resLoc : manager.listResources(base, s -> s.toString().endsWith(".json")).keySet()) {
@@ -68,12 +66,14 @@ public final class PlantNamePools {
                         String path = resLoc.getPath();
                         String file = path.substring(path.lastIndexOf('/') + 1, path.length() - ".json".length());
                         ResourceLocation key = new ResourceLocation("cultivationcraft", file);
-                        POOLS.put(key, new NamePool(p, c, s));
+                        loaded.put(key, new NamePool(List.copyOf(p), List.copyOf(c), List.copyOf(s)));
                     }
                 }
-            } catch (Exception ignored) {
+            } catch (Exception error) {
+                lNalator.Cultivationcraft.Cultivationcraft.LOGGER.warn("Could not load plant name pool {}", resLoc, error);
             }
         }
+        pools = Map.copyOf(loaded);
     }
 
     private static List<String> toList(JsonElement elem) {
@@ -86,7 +86,8 @@ public final class PlantNamePools {
     }
 
     public static String pickName(RandomSource rng, ResourceLocation element) {
-        NamePool pool = POOLS.getOrDefault(element, DEFAULT);
+        var snapshot = pools;
+        NamePool pool = snapshot.getOrDefault(element, snapshot.getOrDefault(new ResourceLocation("cultivationcraft", "default"), DEFAULT));
         String p = pool.prefixes().get(rng.nextInt(pool.prefixes().size()));
         String c = pool.cores().get(rng.nextInt(pool.cores().size()));
         String s = pool.suffixes().get(rng.nextInt(pool.suffixes().size()));

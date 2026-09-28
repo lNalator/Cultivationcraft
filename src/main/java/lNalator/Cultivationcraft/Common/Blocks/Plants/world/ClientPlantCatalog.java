@@ -1,6 +1,5 @@
 package lNalator.Cultivationcraft.Common.Blocks.Plants.world;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -8,7 +7,7 @@ import java.util.Map;
  */
 public final class ClientPlantCatalog {
 
-    private static final Map<Integer, Entry> ENTRIES = new HashMap<>();
+    private static volatile Map<Integer, Entry> entries = Map.of();
 
     public static class Entry {
 
@@ -32,14 +31,14 @@ public final class ClientPlantCatalog {
     }
 
     public static void clear() {
-        ENTRIES.clear();
+        entries = Map.of();
     }
 
-    public static void put(int id, String name, int color, String element, int tier, int stemVariant, int foliageVariant, int fruitVariant) {
-        ENTRIES.put(id, new Entry(name, color, element, tier, stemVariant, foliageVariant, fruitVariant));
+    public static void replace(Map<Integer, Entry> catalog) {
+        entries = Map.copyOf(catalog);
     }
 
     public static Entry get(int id) {
-        return ENTRIES.get(id);
+        return entries.get(id);
     }
 }

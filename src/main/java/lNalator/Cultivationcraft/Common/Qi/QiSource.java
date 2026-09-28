@@ -30,6 +30,15 @@ public class QiSource {
     protected double previousCurrent = 0;
 
     protected boolean toUpdate = true;
+    private boolean plantOwned;
+
+    public boolean isPlantOwned() {
+        return plantOwned;
+    }
+
+    public void setPlantOwned() {
+        plantOwned = true;
+    }
 
     public static final int minSpawnTime = 30;
     public static final int maxSpawnTime = 10;
@@ -170,6 +179,7 @@ public class QiSource {
         CompoundTag nbt = new CompoundTag();
 
         nbt.putLong("pos", pos.asLong());
+        nbt.putBoolean("plantOwned", plantOwned);
         nbt.putInt("range", range);
         nbt.putString("element", Element.toString());
         nbt.putDouble("qimax", qiMax);
@@ -207,6 +217,7 @@ public class QiSource {
         }
 
         QiSource newSource = new QiSource(newPos, size, element, qiMax, qiCurrent, qiRegen);
+        newSource.plantOwned = nbt.getBoolean("plantOwned");
         newSource.currentAbsorbing = absorbing;
 
         return newSource;

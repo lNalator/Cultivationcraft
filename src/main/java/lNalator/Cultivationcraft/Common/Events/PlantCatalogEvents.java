@@ -12,6 +12,18 @@ import net.minecraftforge.fml.common.Mod;
 public class PlantCatalogEvents {
 
     @SubscribeEvent
+    public static void onLevelLoad(net.minecraftforge.event.level.LevelEvent.Load event) {
+        if (event.getLevel() instanceof ServerLevel level && level.dimension() == net.minecraft.world.level.Level.OVERWORLD) {
+            PlantCatalogSavedData.getOrCreate(level, lNalator.Cultivationcraft.Common.Config.Server.procPlantCatalogSize());
+        }
+    }
+
+    @SubscribeEvent
+    public static void onServerStopped(net.minecraftforge.event.server.ServerStoppedEvent event) {
+        PlantCatalogSavedData.clear(event.getServer());
+    }
+
+    @SubscribeEvent
     public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer sp)) {
             return;

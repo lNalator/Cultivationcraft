@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.4.1] - WIP - Optimization and Refactoring
+
+### Performance
+
+- Qi-source searches now inspect only loaded chunks without loading, generating, or waiting for neighboring chunks. Search bounds were tightened, and distance checks avoid unnecessary allocations and square roots.
+- Reworked spiritual-plant generation with cached surface heights and environmental checks, bounded cave searches, and configurable patch and placement budgets. Nether plants search below the bedrock roof; shallow-water placement still requires solid ground immediately beneath the water.
+- Plants at maximum spiritual growth skip growth calculations. Neighbor searches stop once a tier 3 plant is found, and redundant block updates were reduced.
+- Reduced plant synchronization payloads and grouped new Qi-source updates through the existing chunk tick.
+- Cached complete layered plant models to avoid repeatedly assembling the same geometry during rendering.
+
+### Refactoring and fixes
+
+- Shared one persistent plant catalog across dimensions, initialized before world generation, with immutable entries and direct species/element lookup indexes.
+- Client catalog and name-pool updates now replace immutable snapshots. Plant rendering refreshes when catalog data arrives, and the client catalog clears on disconnect.
+- Plants now preserve their current Qi-source reserve when harvested and replanted. Source ownership prevents removing an unrelated nearby source, and newly attached sources are registered for ticking.
+- Command-given plants now receive spiritual growth matching their catalog tier; only tier 3 specimens can be given stored Qi-source data.
+- Limited catalog size to the block's supported species range while retaining neutral plants. Activated patch-size, growth-bonus, and catalog-tier settings; zero elemental spawn multipliers disable every plant tier.
+- Removed unused genome traits, configuration fields, and placement helpers. Plant names now honor the configurable default name pool and report loading errors.
+
 ## [0.4.0] - Spiritual Plants, Alchemy and Knowledge
 
 CultivationCraft begins its standalone development under **lNalator**, with the original owner's approval. Thanks to Bababaa, the original creator. 
