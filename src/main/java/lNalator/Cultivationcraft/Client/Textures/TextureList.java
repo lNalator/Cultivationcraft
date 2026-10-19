@@ -1,7 +1,7 @@
 package lNalator.Cultivationcraft.Client.Textures;
 
 import lNalator.Cultivationcraft.Cultivationcraft;
-import DaoOfModding.mlmanimator.Client.Models.TextureHandler;
+import lNalator.mlmanimator.Client.Models.TextureHandler;
 import net.minecraft.client.model.geom.builders.UVPair;
 import net.minecraft.resources.ResourceLocation;
 

@@ -298,6 +298,11 @@ public class BodyModifications implements IBodyModifications {
     }
 
     public void copy(IBodyModifications mod) {
+        // Only rebuild the player model when the forged body itself has changed.
+        // Progress and selection syncs arrive every few ticks while meditating, and
+        // rebuilding the model on each of them froze the client mid-pose.
+        boolean bodyChanged = !modifications.equals(mod.getModifications()) || !options.equals(mod.getModificationOptions());
+
         setSelection(mod.getSelection());
         modifications = (HashMap<String, BodyPart>) mod.getModifications().clone();
         options = (HashMap<String, HashMap<String, BodyPartOption>>) mod.getModificationOptions().clone();
@@ -308,7 +313,9 @@ public class BodyModifications implements IBodyModifications {
         questProgress = mod.getQuestProgress();
         health = mod.getHealth();
 
-        setUpdated(false);
+        if (bodyChanged) {
+            setUpdated(false);
+        }
     }
 
     // Return a specified players BodyModifications

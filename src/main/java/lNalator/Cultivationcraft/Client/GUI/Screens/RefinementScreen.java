@@ -1,7 +1,10 @@
 package lNalator.Cultivationcraft.Client.GUI.Screens;
 
 import lNalator.Cultivationcraft.Client.GUI.ScreenTabControl;
+import lNalator.Cultivationcraft.Common.Capabilities.CultivatorTechniques.CultivatorTechniques;
+import lNalator.Cultivationcraft.Common.Capabilities.CultivatorTechniques.ICultivatorTechniques;
 import lNalator.Cultivationcraft.Common.Containers.RefinementContainer;
+import lNalator.Cultivationcraft.Common.Qi.Techniques.MeditateTechnique;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -10,13 +13,22 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.FormattedCharSequence;
 
 import java.awt.*;
 
 public class RefinementScreen extends AbstractContainerScreen<RefinementContainer> {
 
-    protected static final int PROGRESS_BAR_X_POS = 84;
-    protected static final int PROGRESS_BAR_Y_POS = 77;
+    // The original 256x178 layout sits in the shared panel offset by EXTRA_X / TOP_Y,
+    // with the inventory pushed down by EXTRA_Y to fit a full-width status line
+    protected static final int EXTRA_X = (GenericTabScreen.PANEL_WIDTH - 256) / 2;
+    protected static final int EXTRA_Y = GenericTabScreen.PANEL_HEIGHT - 178;
+    protected static final int TOP_Y = EXTRA_Y / 2;
+    // Status line, relative to the panel
+    protected static final int STATUS_Y = 98;
+
+    protected static final int PROGRESS_BAR_X_POS = 84 + EXTRA_X;
+    protected static final int PROGRESS_BAR_Y_POS = 77 + TOP_Y;
 
     protected static final int PROGRESS_BAR_X_SIZE = 89;
     protected static final int PROGRESS_BAR_Y_SIZE = 4;
@@ -29,15 +41,17 @@ public class RefinementScreen extends AbstractContainerScreen<RefinementContaine
     public RefinementScreen(RefinementContainer container, Inventory playerInv, Component title) {
         super(container, playerInv, title);
 
-        imageWidth = 256;
-        imageHeight = 178;
+        imageWidth = GenericTabScreen.PANEL_WIDTH;
+        imageHeight = GenericTabScreen.PANEL_HEIGHT;
     }
 
     @Override
     protected void init() {
         super.init();
 
-        this.leftPos += 41;
+        // Slots are positioned for the original panel: shift them into the enlarged one
+        this.leftPos += 41 + EXTRA_X;
+        this.topPos += EXTRA_Y;
         tab = lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.CultivatorStats
                 .getCultivatorStats(Minecraft.getInstance().player).getCultivationType()
                 == lNalator.Cultivationcraft.Common.Qi.CultivationTypes.BODY_CULTIVATOR ? 4 : 2;
@@ -69,19 +83,19 @@ public class RefinementScreen extends AbstractContainerScreen<RefinementContaine
     @Override
     protected void renderLabels(PoseStack PoseStack, int mouseX, int mouseY) {
         final float PLAYER_LABEL_XPOS = 8;
-        final float PLAYER_LABEL_DISTANCE_FROM_BOTTOM = (96 - 2);
+        final float PLAYER_LABEL_YPOS = 178 - 94;
 
-        final float BAG_LABEL_YPOS = 24;
+        final float BAG_LABEL_YPOS = 24 + TOP_Y - EXTRA_Y;
 
-        final float PROGRESS_LABEL_XPOS = 42;
-        final float PROGRESS_LABEL_YPOS = 64;
+        // Label coordinates start at the shifted slot origin, convert panel coordinates back to them
+        final int panelToLabelX = -(41 + EXTRA_X);
+        final int panelToLabelY = -EXTRA_Y;
 
         String testString = Component.translatable("cultivationcraft.gui.refinement").getString();
 
-        float BAG_LABEL_XPOS = (imageHeight / 2.0F) - font.width(testString) / 2.0F;
+        float BAG_LABEL_XPOS = (178 / 2.0F) - font.width(testString) / 2.0F;
         font.draw(PoseStack, testString, BAG_LABEL_XPOS, BAG_LABEL_YPOS, Color.darkGray.getRGB());
 
-        float PLAYER_LABEL_YPOS = imageHeight - PLAYER_LABEL_DISTANCE_FROM_BOTTOM;
         font.draw(PoseStack, this.playerInventoryTitle.getString(),
                 PLAYER_LABEL_XPOS, PLAYER_LABEL_YPOS, Color.darkGray.getRGB());
 
@@ -95,7 +109,31 @@ public class RefinementScreen extends AbstractContainerScreen<RefinementContaine
             progress = Component.translatable("cultivationcraft.gui.remaining", (int) menu.getRemainingSeconds()).getString();
         }
 
-        font.draw(PoseStack, progress, PROGRESS_LABEL_XPOS, PROGRESS_LABEL_YPOS, Color.darkGray.getRGB());
+        int color = Color.darkGray.getRGB();
+
+        // Refining needs Meditate equipped (see RefinementProcessor), say so instead of a silent stall
+        if (!menu.slots.get(menu.slots.size() - 1).getItem().isEmpty() && !hasMeditate()) {
+            progress = Component.translatable("cultivationcraft.refinement.needs_meditate").getString();
+            color = Color.red.getRGB();
+        }
+
+        // Full-width status line between the progress bar and the inventory, centered and wrapped
+        final int margin = 8;
+        float y = STATUS_Y + panelToLabelY;
+        for (FormattedCharSequence line : font.split(Component.literal(progress), imageWidth - margin * 2)) {
+            font.draw(PoseStack, line, panelToLabelX + (imageWidth - font.width(line)) / 2.0F, y, color);
+            y += font.lineHeight;
+        }
+    }
+
+    protected static boolean hasMeditate() {
+        ICultivatorTechniques techs = CultivatorTechniques.getCultivatorTechniques(Minecraft.getInstance().player);
+        for (int i = 0; i < CultivatorTechniques.numberOfTechniques; i++) {
+            if (techs.getTechnique(i) instanceof MeditateTechnique) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -107,7 +145,10 @@ public class RefinementScreen extends AbstractContainerScreen<RefinementContaine
 
         int edgeSpacingX = (this.width - this.imageWidth) / 2;
         int edgeSpacingY = (this.height - this.imageHeight) / 2;
-        this.blit(PoseStack, edgeSpacingX, edgeSpacingY, 0, 0, this.imageWidth, this.imageHeight);
+        // Original overlay: top part (slot, bar) in place, inventory part pushed down by EXTRA_Y
+        final int split = 90;
+        this.blit(PoseStack, edgeSpacingX + EXTRA_X, edgeSpacingY + TOP_Y, 0, 0, 256, split);
+        this.blit(PoseStack, edgeSpacingX + EXTRA_X, edgeSpacingY + split + EXTRA_Y, 0, split, 256, 178 - split);
 
         // Draw the progress bar based on refinement progress
         float progress = menu.getRefinementProgress() * PROGRESS_BAR_X_SIZE;
@@ -131,12 +172,7 @@ public class RefinementScreen extends AbstractContainerScreen<RefinementContaine
         int edgeSpacingX = (this.width - this.imageWidth) / 2;
         int edgeSpacingY = (this.height - this.imageHeight) / 2;
 
-        ScreenTabControl.drawTabs(PoseStack, edgeSpacingX, edgeSpacingY, this);
-
-        this.blit(PoseStack, edgeSpacingX, edgeSpacingY, 0, 0, this.imageWidth, this.imageHeight);
-
-        ScreenTabControl.highlightTabs(PoseStack, tab, mouseX, mouseY, edgeSpacingX, edgeSpacingY, this);
-        ScreenTabControl.tabText(PoseStack, edgeSpacingX, edgeSpacingY, this.font);
+        GenericTabScreen.drawPanel(PoseStack, this, tab, mouseX, mouseY, edgeSpacingX, edgeSpacingY);
     }
 
     protected static final ResourceLocation TEXTURE = new ResourceLocation(Cultivationcraft.MODID, "textures/gui/refinement.png");

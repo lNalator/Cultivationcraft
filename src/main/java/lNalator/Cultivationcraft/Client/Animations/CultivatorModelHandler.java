@@ -4,13 +4,13 @@ import lNalator.Cultivationcraft.Client.Textures.TextureList;
 import lNalator.Cultivationcraft.Common.Qi.Stats.BodyPartStatControl;
 import lNalator.Cultivationcraft.Common.Qi.Stats.PlayerStatModifications;
 import lNalator.Cultivationcraft.Common.Qi.Stats.StatIDs;
-import DaoOfModding.mlmanimator.Client.AnimationFramework.AnimationSpeedCalculator;
-import DaoOfModding.mlmanimator.Client.Models.Quads.Quad;
-import DaoOfModding.mlmanimator.Client.Poses.Arm;
-import DaoOfModding.mlmanimator.Client.Poses.PlayerPose;
-import DaoOfModding.mlmanimator.Client.Poses.PlayerPoseHandler;
-import DaoOfModding.mlmanimator.Client.Poses.PoseHandler;
-import DaoOfModding.mlmanimator.Client.Models.*;
+import lNalator.mlmanimator.Client.AnimationFramework.AnimationSpeedCalculator;
+import lNalator.mlmanimator.Client.Models.Quads.Quad;
+import lNalator.mlmanimator.Client.Poses.Arm;
+import lNalator.mlmanimator.Client.Poses.PlayerPose;
+import lNalator.mlmanimator.Client.Poses.PlayerPoseHandler;
+import lNalator.mlmanimator.Client.Poses.PoseHandler;
+import lNalator.mlmanimator.Client.Models.*;
 import lNalator.Cultivationcraft.Common.Capabilities.BodyModifications.BodyModifications;
 import lNalator.Cultivationcraft.Common.Capabilities.BodyModifications.IBodyModifications;
 import lNalator.Cultivationcraft.Common.Qi.BodyParts.BodyPart;
@@ -90,11 +90,15 @@ public class CultivatorModelHandler {
             handler.lock();
 
             // Resize the new body and the handler to be the correct size
-            float size = stats.getStat(StatIDs.size);
-            float width = stats.getStat(StatIDs.width);
+            // The size and width stats are offsets from the default size (0 = normal size), so add them to 1.
+            // Using them directly gave a 0 scale for a normal player, and MLM then divides by it (0/0 = NaN),
+            // which made the eye height NaN and froze the client in the crosshair raycast.
+            float size = Math.max(0.1f, 1 + stats.getStat(StatIDs.size));
+            float width = Math.max(0.1f, size + stats.getStat(StatIDs.width));
+            Vec3 resize = new Vec3(width, size, width);
 
-            handler.resize(new Vec3(size + width, size, size + width));
-            newModel.getBody().addToResizeForThisAndChildren(new Vec3(size + width, size, size + width));
+            handler.resize(resize);
+            newModel.getBody().addToResizeForThisAndChildren(resize);
 
             // Ensure the head is looking in the correct direction
             newModel.getViewPoint().getModelPart().xRot = handler.getPlayerModel().getViewPoint().getModelPart().xRot;

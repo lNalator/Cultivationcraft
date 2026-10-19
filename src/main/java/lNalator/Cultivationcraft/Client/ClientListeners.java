@@ -1,8 +1,8 @@
 package lNalator.Cultivationcraft.Client;
 
-import DaoOfModding.mlmanimator.Client.MultiLimbedRenderer;
-import DaoOfModding.mlmanimator.Client.Poses.PlayerPoseHandler;
-import DaoOfModding.mlmanimator.Client.Poses.PoseHandler;
+import lNalator.mlmanimator.Client.MultiLimbedRenderer;
+import lNalator.mlmanimator.Client.Poses.PlayerPoseHandler;
+import lNalator.mlmanimator.Client.Poses.PoseHandler;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import lNalator.Cultivationcraft.StaminaHandler;
 import lNalator.Cultivationcraft.Client.Animations.CultivatorModelHandler;

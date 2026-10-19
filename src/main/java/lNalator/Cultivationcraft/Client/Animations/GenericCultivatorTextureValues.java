@@ -1,8 +1,8 @@
 package lNalator.Cultivationcraft.Client.Animations;
 
 import lNalator.Cultivationcraft.Client.Textures.TextureList;
-import DaoOfModding.mlmanimator.Client.Models.ExtendableModelRenderer;
-import DaoOfModding.mlmanimator.Client.Models.GenericTextureValues;
+import lNalator.mlmanimator.Client.Models.ExtendableModelRenderer;
+import lNalator.mlmanimator.Client.Models.GenericTextureValues;
 import net.minecraft.client.model.geom.builders.UVPair;
 
 public class GenericCultivatorTextureValues {

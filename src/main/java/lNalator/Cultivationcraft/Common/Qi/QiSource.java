@@ -94,6 +94,11 @@ public class QiSource {
     public BlockPos getRandomPos() {
         Vec3 randomPos;
 
+        // A non-positive size would never satisfy the loop below
+        if (getSize() <= 0) {
+            return pos;
+        }
+
         do {
             randomPos = new Vec3((Math.random() * getSize() * 2) - getSize(), Math.random() * getSize() * 2 - getSize(), Math.random() * getSize() * 2 - getSize());
         } while (randomPos.length() > getSize());

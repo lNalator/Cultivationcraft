@@ -1,10 +1,10 @@
 package lNalator.Cultivationcraft.Client.Animations;
 
-import DaoOfModding.mlmanimator.Client.AnimationFramework.AnimationBuilder;
-import DaoOfModding.mlmanimator.Client.AnimationFramework.AnimationSpeedCalculator;
-import DaoOfModding.mlmanimator.Client.Models.GenericLimbNames;
-import DaoOfModding.mlmanimator.Client.Poses.GenericPoses;
-import DaoOfModding.mlmanimator.Client.Poses.PlayerPose;
+import lNalator.mlmanimator.Client.AnimationFramework.AnimationBuilder;
+import lNalator.mlmanimator.Client.AnimationFramework.AnimationSpeedCalculator;
+import lNalator.mlmanimator.Client.Models.GenericLimbNames;
+import lNalator.mlmanimator.Client.Poses.GenericPoses;
+import lNalator.mlmanimator.Client.Poses.PlayerPose;
 import net.minecraft.world.phys.Vec3;
 
 public class GenericQiPoses {

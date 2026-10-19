@@ -2,8 +2,8 @@ package lNalator.Cultivationcraft.Common.Qi.Techniques.QiCondenserTechniques;
 
 import lNalator.Cultivationcraft.Client.Physics;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.Technique;
-import DaoOfModding.mlmanimator.Client.Models.GenericLimbNames;
-import DaoOfModding.mlmanimator.Client.Poses.GenericPoses;
+import lNalator.mlmanimator.Client.Models.GenericLimbNames;
+import lNalator.mlmanimator.Client.Poses.GenericPoses;
 import lNalator.Cultivationcraft.Client.Animations.GenericQiPoses;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.CultivatorStats;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.ICultivatorStats;

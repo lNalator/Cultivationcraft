@@ -40,6 +40,9 @@ import static org.lwjgl.glfw.GLFW.*;
 public class KeybindingControl {
 
     public static KeyMapping[] keyBindings;
+    // One key per skill hotbar slot, unbound by default (set in Controls > Cultivation)
+    public static KeyMapping[] techniqueKeys;
+    protected static boolean[] techniqueKeyHeld;
 
     protected static boolean usePressed = false;
 
@@ -60,6 +63,26 @@ public class KeybindingControl {
 
         event.register(keyBindings[0]);
         event.register(keyBindings[3]);
+
+        techniqueKeys = new KeyMapping[CultivatorTechniques.numberOfTechniques];
+        techniqueKeyHeld = new boolean[CultivatorTechniques.numberOfTechniques];
+        for (int i = 0; i < techniqueKeys.length; i++) {
+            techniqueKeys[i] = new KeyMapping("Technique " + (i + 1), InputConstants.UNKNOWN.getValue(), "Cultivation");
+            event.register(techniqueKeys[i]);
+        }
+    }
+
+    // Use the technique of a slot directly through its dedicated key, whichever hotbar is active
+    public static void handleTechniqueKeys() {
+        for (int i = 0; i < techniqueKeys.length; i++) {
+            if (techniqueKeys[i].isDown()) {
+                techniqueKeyHeld[i] = true;
+                SkillHotbarOverlay.useSkill(i, true);
+            } else if (techniqueKeyHeld[i]) {
+                techniqueKeyHeld[i] = false;
+                SkillHotbarOverlay.useSkill(i, false);
+            }
+        }
     }
 
     public static boolean chatOpen() {
@@ -390,6 +413,7 @@ public class KeybindingControl {
 
             handleHotbarKeybinds();
             handleHotbarInteracts();
+            handleTechniqueKeys();
             //handleMovementOverrides();
             handleSkillKeyPresses();
 

@@ -124,6 +124,7 @@ repositories {
     // flatDir {
     //     dir 'libs'
     // }
+    mavenLocal()
     maven {
         url "https://cursemaven.com"
         content {
@@ -138,7 +139,7 @@ dependencies {
     // that the dep is a ForgeGradle 'patcher' dependency, and its patches will be applied.
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
     minecraft 'net.minecraftforge:forge:1.19.2-43.1.52'
-    implementation 'DaoOfModding.mlmanimator:mlmanimator:0.2.2'
+    implementation 'lnalator.mlmanimator:mlmanimator:0.2.2'
     // The source dependency includes item scaling absent from the older CurseForge jar.
     // settings.gradle substitutes the MLM Animator checkout; CI pins its upstream commit.
     implementation fg.deobf("curse.maven:ironchest-228756:3966365")

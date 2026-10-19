@@ -1,11 +1,13 @@
 package lNalator.Cultivationcraft.Client.GUI;
 
+import lNalator.Cultivationcraft.Client.KeybindingControl;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorTechniques.CultivatorTechniques;
 import lNalator.Cultivationcraft.Common.Qi.TechniqueControl;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.Technique;
 import lNalator.Cultivationcraft.Network.ClientPacketHandler;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiComponent;
@@ -67,6 +69,7 @@ public class SkillHotbarOverlay {
         TechniqueIcons.renderIcons(stack, scaledWidth + 3 - 83, scaledHeight + 3 - 30, gui, 20);
         TechniqueIcons.highlightActive(stack, scaledWidth + 3 - 83, scaledHeight + 3 - 30, gui, 20);
         TechniqueIcons.showCooldowns(stack, scaledWidth + 3 - 83, scaledHeight + 3 - 30, gui, 20);
+        renderKeyLabels(stack, scaledWidth + 3 - 83, scaledHeight + 3 - 30, gui.getBlitOffset());
 
         // Reset the Z layer to its original value
         gui.setBlitOffset(blitOffset);
@@ -78,15 +81,45 @@ public class SkillHotbarOverlay {
             return;
         }
 
-        Technique tech = CultivatorTechniques.getCultivatorTechniques(Minecraft.getInstance().player).getTechnique(skillSelected);
+        useSkill(skillSelected, keyDown);
+    }
+
+    // Use the technique in the given slot (from the use button or the slot's dedicated key)
+    public static void useSkill(int slot, boolean keyDown) {
+        Technique tech = CultivatorTechniques.getCultivatorTechniques(Minecraft.getInstance().player).getTechnique(slot);
 
         if (tech != null && (tech.getType() != Technique.useType.Channel || !(tech.isActive() && keyDown))) // Send message to server to use this skill
         {
-            ClientPacketHandler.sendTechniqueUseToServer(skillSelected, keyDown);
+            ClientPacketHandler.sendTechniqueUseToServer(slot, keyDown);
         }
 
         if (tech != null & !keyDown && tech.getType() != Technique.useType.Channel) {
             tech.deactivate(Minecraft.getInstance().player);
+        }
+    }
+
+    // Draw the bound key of each slot in the top-left corner of its icon (visible even behind the item hotbar)
+    protected static void renderKeyLabels(PoseStack stack, int xpos, int ypos, int z) {
+        if (KeybindingControl.techniqueKeys == null) {
+            return;
+        }
+
+        for (int i = 0; i < KeybindingControl.techniqueKeys.length; i++) {
+            KeyMapping key = KeybindingControl.techniqueKeys[i];
+
+            if (key.isUnbound()) {
+                continue;
+            }
+
+            // ponytail: long key names ("Left Shift") are cut to 3 chars
+            String label = key.getTranslatedKeyMessage().getString();
+            label = label.substring(0, Math.min(3, label.length()));
+
+            stack.pushPose();
+            stack.translate(xpos + i * 20 - 2, ypos - 2, z + 1);
+            stack.scale(0.5F, 0.5F, 1F);
+            Minecraft.getInstance().font.drawShadow(stack, label, 0, 0, 0xFFFFFF);
+            stack.popPose();
         }
     }
 

@@ -12,8 +12,8 @@ import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueStats.DefaultTech
 import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueStats.TechniqueStatModification;
 import lNalator.Cultivationcraft.Network.ClientPacketHandler;
 import lNalator.Cultivationcraft.StaminaHandler;
-import DaoOfModding.mlmanimator.Client.Poses.PoseHandler;
-import DaoOfModding.mlmanimator.Client.Poses.PlayerPose;
+import lNalator.mlmanimator.Client.Poses.PoseHandler;
+import lNalator.mlmanimator.Client.Poses.PlayerPose;
 import lNalator.Cultivationcraft.Common.Qi.Elements.Elements;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import com.mojang.blaze3d.platform.GlStateManager;

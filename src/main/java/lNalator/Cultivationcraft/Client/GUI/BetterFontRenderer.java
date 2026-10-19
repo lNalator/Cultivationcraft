@@ -77,6 +77,8 @@ public class BetterFontRenderer {
 
         while (string.length() > 0) {
             String lineString = font.plainSubstrByWidth(string, width);
+            // Always consume at least one char, otherwise a width smaller than a char loops forever
+            if (lineString.isEmpty()) lineString = string.substring(0, 1);
 
             if (lineString.length() < string.length() && !string.substring(lineString.length()).startsWith(" ") && lineString.lastIndexOf(" ") > -1) {
                 lineString = lineString.substring(0, lineString.lastIndexOf(" "));
@@ -96,6 +98,8 @@ public class BetterFontRenderer {
 
         while (skipped < heightToSkip && string.length() > 0) {
             String lineString = font.plainSubstrByWidth(string, width);
+            // Always consume at least one char, otherwise a width smaller than a char loops forever
+            if (lineString.isEmpty()) lineString = string.substring(0, 1);
 
             if (lineString.length() < string.length() && !string.substring(lineString.length()).startsWith(" ") && lineString.lastIndexOf(" ") > -1) {
                 lineString = lineString.substring(0, lineString.lastIndexOf(" "));
@@ -125,6 +129,8 @@ public class BetterFontRenderer {
             }
 
             String lineString = font.plainSubstrByWidth(string, width);
+            // Always consume at least one char, otherwise a width smaller than a char loops forever
+            if (lineString.isEmpty()) lineString = string.substring(0, 1);
 
             // Ensure the line string ends with a whole word
             // Don't bother adjusting the lineString if it contains everything string does or string starts with a space
@@ -150,6 +156,8 @@ public class BetterFontRenderer {
 
         while (string.length() > 0) {
             String lineString = font.plainSubstrByWidth(string, width);
+            // Always consume at least one char, otherwise a width smaller than a char loops forever
+            if (lineString.isEmpty()) lineString = string.substring(0, 1);
 
             font.draw(stack, lineString, x, y + line, color);
 

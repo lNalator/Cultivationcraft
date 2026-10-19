@@ -13,7 +13,8 @@ import javax.annotation.Nonnull;
 
 public class RefinementContainer extends BasicContainer {
 
-    public static final int REFINEMENT_SLOT_Y = 43;
+    // Relative to the inventory, which RefinementScreen pushes 15px further down than this slot to fit the status line
+    public static final int REFINEMENT_SLOT_Y = 28;
     public static final int REFINEMENT_SLOT_X = 80;
 
     protected final RefinementItemHandler itemStackHandler;

@@ -6,7 +6,7 @@ import lNalator.Cultivationcraft.Common.Qi.Effects.Wind;
 import lNalator.Cultivationcraft.Common.Qi.Effects.WindInstance;
 import lNalator.Cultivationcraft.Common.Qi.Elements.Elements;
 import lNalator.Cultivationcraft.Network.PacketHandler;
-import DaoOfModding.mlmanimator.Client.Poses.PoseHandler;
+import lNalator.mlmanimator.Client.Poses.PoseHandler;
 import com.mojang.math.Vector3f;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.resources.ResourceLocation;

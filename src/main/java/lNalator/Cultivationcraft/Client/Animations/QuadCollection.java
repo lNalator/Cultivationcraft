@@ -1,6 +1,6 @@
 package lNalator.Cultivationcraft.Client.Animations;
 
-import DaoOfModding.mlmanimator.Client.Models.Quads.Quad;
+import lNalator.mlmanimator.Client.Models.Quads.Quad;
 
 import java.util.ArrayList;
 

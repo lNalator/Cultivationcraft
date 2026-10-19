@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.4.2] - WIP - Optimization and Refactoring
+
+### Fixes
+
+- Fixed a client freeze when selecting a body forge (Qi Sight) as a body cultivator: a normal-sized player got a zero model scale, which produced a NaN eye height and hung the crosshair raycast.
+- Fixed text wrapping looping forever when the available width is narrower than a single character.
+- Fixed Qi sources with a non-positive size hanging the world tick when picking a random position.
+- External blood tick packets are now processed on the server thread instead of the network thread.
+- The server now rejects technique-use packets with an out-of-range slot.
+
+### New features and changes
+
+- Added "Technique 1" to "Technique 9" key bindings (Controls > Cultivation, unbound by default). Each key uses the technique in the matching skill hotbar slot without switching away from the item hotbar; the bound key is shown on the slot's icon.
+- Refinement now requires meditation: placing an item in the refinement slot starts Meditate (it must be equipped on the skill hotbar), and the player cannot move while refining. Finishing or removing the item stands the player up; turning Meditate off cancels and returns the item to the inventory.
+- The refinement page shows a warning when Meditate is not equipped, on a full-width status line that also displays the remaining time.
+- Every cultivation menu page now uses a larger 296 × 208 panel, with the tabs at the same position on each page.
+
 ## [0.4.1] - WIP - Optimization and Refactoring
 
 ### Performance

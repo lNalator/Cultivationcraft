@@ -14,8 +14,8 @@ import lNalator.Cultivationcraft.Common.Qi.Techniques.QiCondenserTechniques.QiBa
 import lNalator.Cultivationcraft.Common.Qi.Techniques.Technique;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import lNalator.Cultivationcraft.Network.PacketHandler;
-import DaoOfModding.mlmanimator.Client.Poses.PlayerPose;
-import DaoOfModding.mlmanimator.Client.Poses.PoseHandler;
+import lNalator.mlmanimator.Client.Poses.PlayerPose;
+import lNalator.mlmanimator.Client.Poses.PoseHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;

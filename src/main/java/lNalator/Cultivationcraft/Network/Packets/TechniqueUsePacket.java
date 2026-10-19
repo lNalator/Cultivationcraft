@@ -55,7 +55,7 @@ public class TechniqueUsePacket extends Packet {
         }
 
         // Check to ensure that the packet has valid data values
-        if (slotNumber < 0) {
+        if (slotNumber < 0 || slotNumber >= CultivatorTechniques.numberOfTechniques) {
             Cultivationcraft.LOGGER.warn("TechniqueUsePacket was invalid: " + this.toString());
             return;
         }

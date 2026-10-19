@@ -56,7 +56,7 @@ public class ExternalBloodTickPacket extends Packet {
         ctx.setPacketHandled(true);
 
         if (sideReceived.isServer()) {
-            processPacket(ctx.getSender());
+            ctx.enqueueWork(() -> processPacket(ctx.getSender()));
         } else {
             Cultivationcraft.LOGGER.warn("Client sent external blood tick message");
         }

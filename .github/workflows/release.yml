@@ -29,7 +29,7 @@ jobs:
       - name: Check out the supported MLM Animator sources
         uses: actions/checkout@v5
         with:
-          repository: DaoOfModding/MultilLimbedModel
+          repository: lNalator/MultilLimbedModel
           ref: 76e63999e2bdb87543b64b8446eedd2daa8fbfae
           path: MultilLimbedModel
           persist-credentials: false
@@ -37,7 +37,7 @@ jobs:
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: "17"
 
       - uses: gradle/actions/setup-gradle@v5
 

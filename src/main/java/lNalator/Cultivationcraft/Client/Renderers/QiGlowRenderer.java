@@ -4,7 +4,7 @@ import lNalator.Cultivationcraft.Common.PlayerUtils;
 import lNalator.Cultivationcraft.Common.Qi.Elements.Element;
 import lNalator.Cultivationcraft.Common.Qi.Elements.Elements;
 import lNalator.Cultivationcraft.Common.Register;
-import DaoOfModding.mlmanimator.Client.MultiLimbedRenderer;
+import lNalator.mlmanimator.Client.MultiLimbedRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.OutlineBufferSource;
 import net.minecraft.world.entity.Entity;

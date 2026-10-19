@@ -13,7 +13,7 @@ import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueStats.DefaultTech
 import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueStats.TechniqueStatModification;
 import lNalator.Cultivationcraft.Common.Reflection;
 import lNalator.Cultivationcraft.Cultivationcraft;
-import DaoOfModding.mlmanimator.Client.Poses.PoseHandler;
+import lNalator.mlmanimator.Client.Poses.PoseHandler;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;

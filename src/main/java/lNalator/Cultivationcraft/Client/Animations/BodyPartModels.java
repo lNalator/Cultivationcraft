@@ -2,10 +2,10 @@ package lNalator.Cultivationcraft.Client.Animations;
 
 import lNalator.Cultivationcraft.Client.Textures.TextureList;
 import lNalator.Cultivationcraft.Common.Qi.BodyParts.BodyPartNames;
-import DaoOfModding.mlmanimator.Client.Models.*;
-import DaoOfModding.mlmanimator.Client.Models.Quads.Quad;
-import DaoOfModding.mlmanimator.Client.Models.Quads.QuadLinkage;
-import DaoOfModding.mlmanimator.Client.Poses.PoseHandler;
+import lNalator.mlmanimator.Client.Models.*;
+import lNalator.mlmanimator.Client.Models.Quads.Quad;
+import lNalator.mlmanimator.Client.Models.Quads.QuadLinkage;
+import lNalator.mlmanimator.Client.Poses.PoseHandler;
 import com.mojang.math.Vector4f;
 import net.minecraft.client.model.geom.builders.UVPair;
 import net.minecraft.core.Direction;

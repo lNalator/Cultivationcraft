@@ -169,9 +169,10 @@ public class MeditateTechnique extends MovementOverrideTechnique {
 
                 modifications.addProgress(toAdd);
 
-                // Update the client progress
-                //if (event.side == LogicalSide.SERVER && ServerListeners.tick % 20 == 0)
-                PacketHandler.sendBodyModificationsToClient(event.player);
+                // Update the client progress twice a second rather than every tick
+                if (event.player.tickCount % 10 == 0) {
+                    PacketHandler.sendBodyModificationsToClient(event.player);
+                }
             }
         }
     }

@@ -2,7 +2,7 @@ package lNalator.Cultivationcraft.Client.Renderers;
 
 import lNalator.Cultivationcraft.Common.Qi.BodyParts.Blood.Blood;
 import lNalator.Cultivationcraft.Common.Qi.BodyParts.PlayerHealthManager;
-import DaoOfModding.mlmanimator.Client.Poses.PoseHandler;
+import lNalator.mlmanimator.Client.Poses.PoseHandler;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;

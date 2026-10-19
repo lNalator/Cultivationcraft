@@ -1,7 +1,7 @@
 package lNalator.Cultivationcraft.Client.Animations;
 
-import DaoOfModding.mlmanimator.Client.AnimationFramework.resizeModule;
-import DaoOfModding.mlmanimator.Client.Models.defaultResizeModule;
+import lNalator.mlmanimator.Client.AnimationFramework.resizeModule;
+import lNalator.mlmanimator.Client.Models.defaultResizeModule;
 import net.minecraft.world.phys.Vec3;
 
 public class teethResizeModule extends defaultResizeModule {
