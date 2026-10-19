@@ -8,8 +8,9 @@ pluginManagement {
 
 rootProject.name = 'cultivationcraft'
 
-// Keep MLM Animator's own packages and ownership. An explicit substitution also
-// supports the lowercase Maven group used by the upstream source checkout.
+// Keep MLM Animator's own packages and ownership. Maven coordinates are
+// case-sensitive: this must match the lowercase group in MLM's build.gradle and
+// the dependency in this project's build.gradle, or the substitution is skipped.
 def mlmSourceDir = file(providers.gradleProperty('mlmSourceDir').getOrElse('../MultilLimbedModel'))
 if (!new File(mlmSourceDir, 'build.gradle').isFile()) {
     throw new GradleException('MLM Animator sources are required. Check out lNalator/MultilLimbedModel '
@@ -18,6 +19,6 @@ if (!new File(mlmSourceDir, 'build.gradle').isFile()) {
 }
 includeBuild(mlmSourceDir) {
     dependencySubstitution {
-        substitute module('lNalator.mlmanimator:mlmanimator') using project(':')
+        substitute module('lnalator.mlmanimator:mlmanimator') using project(':')
     }
 }
