@@ -30,7 +30,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: lNalator/MultilLimbedModel
-          ref: 76e63999e2bdb87543b64b8446eedd2daa8fbfae
+          ref: v0.2.2
           path: MultilLimbedModel
           persist-credentials: false
 
