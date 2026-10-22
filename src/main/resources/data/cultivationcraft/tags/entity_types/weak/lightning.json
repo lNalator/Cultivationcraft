@@ -1,0 +1,22 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:axolotl",
+    "minecraft:bat",
+    "minecraft:bee",
+    "minecraft:cod",
+    "minecraft:dolphin",
+    "minecraft:drowned",
+    "minecraft:elder_guardian",
+    "minecraft:ghast",
+    "minecraft:glow_squid",
+    "minecraft:guardian",
+    "minecraft:iron_golem",
+    "minecraft:phantom",
+    "minecraft:pufferfish",
+    "minecraft:salmon",
+    "minecraft:squid",
+    "minecraft:tropical_fish",
+    "minecraft:vex"
+  ]
+}

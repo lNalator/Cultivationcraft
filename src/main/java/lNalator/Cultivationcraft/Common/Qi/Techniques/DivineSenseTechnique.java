@@ -87,6 +87,7 @@ public class DivineSenseTechnique extends Technique {
     public void tickClient(TickEvent.PlayerTickEvent event) {
         if (PlayerUtils.isClientPlayerCharacter(event.player)) {
             Renderer.QiSourcesVisible = true;
+            Renderer.QiSenseRadius = getTechniqueStat(DETECTION_RADIUS, event.player);
         }
 
         // Resource depletion is decided on the server, not from a stale client reserve.

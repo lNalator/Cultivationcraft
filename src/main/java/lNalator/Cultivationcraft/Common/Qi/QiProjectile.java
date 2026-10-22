@@ -174,7 +174,7 @@ public class QiProjectile extends AbstractHurtingProjectile {
         BlockState blockstate = this.level.getBlockState(hit.getBlockPos());
         blockstate.onProjectileHit(this.level, blockstate, hit, this);
 
-        Elements.getElement(getElement()).effectBlock(this.level, hit.getBlockPos());
+        Elements.getElement(getElement()).effectBlock(this.level, hit.getBlockPos(), damage);
 
         // Destroy this projectile if it hits a block
         if (!survive) {

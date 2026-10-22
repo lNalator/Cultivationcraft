@@ -82,6 +82,11 @@ public class MeditateTechnique extends MovementOverrideTechnique {
             // If meditating in a Qi Source, increase the quest by 1 second
             if (sources.size() > 0) {
                 QuestHandler.progressQuest(event.player, Quest.QI_SOURCE_MEDITATION, 1.0 / 20.0);
+
+                // Qi overflow (Aura unlock): meditating in a source with full Qi
+                if (event.player.getFoodData() instanceof QiFoodStats food && food.getTrueFoodLevel() >= food.getMaxFood()) {
+                    QuestHandler.progressQuest(event.player, Quest.QI_OVERFLOW, 1.0 / 20.0);
+                }
             }
 
             for (QiSource source : sources) {

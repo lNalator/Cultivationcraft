@@ -1,6 +1,7 @@
 package lNalator.Cultivationcraft.Network.Packets;
 
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorTechniques.CultivatorTechniques;
+import lNalator.Cultivationcraft.Common.Qi.Elements.ElementalStates;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.Technique;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import lNalator.Cultivationcraft.Network.PacketHandler;
@@ -65,6 +66,11 @@ public class TechniqueUsePacket extends Packet {
 
     // Process received packet on the Server
     protected void processPacket(ServerPlayer sender) {
+        // A frozen cultivator cannot use techniques
+        if (ElementalStates.has(sender, ElementalStates.FROZEN)) {
+            return;
+        }
+
         // Send the key press to the technique used
         Technique tech = CultivatorTechniques.getCultivatorTechniques(sender).getTechnique(slotNumber);
 

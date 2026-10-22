@@ -35,7 +35,7 @@ public class BlockRegister {
      */
 
     public static final RegistryObject<FrozenBlock> FROZEN_BLOCK = registerBlock("frozen_block",
-            () -> new FrozenBlock(BlockBehaviour.Properties.copy(Blocks.ICE).strength(-1.0F, 3600000.0F).noOcclusion()));
+            () -> new FrozenBlock(BlockBehaviour.Properties.copy(Blocks.ICE).strength(0.5F, 3600000.0F).noOcclusion()));
     public static RegistryObject<BlockEntityType<FrozenBlockEntity>> FROZEN_BLOCK_ENTITY = BLOCK_ENTITIES.register("frozen_block_entity",
             () -> BlockEntityType.Builder.of(
                     FrozenBlockEntity::new,

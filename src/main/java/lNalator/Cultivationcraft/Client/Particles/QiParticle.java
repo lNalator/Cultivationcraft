@@ -63,7 +63,8 @@ public class QiParticle extends TextureSheetParticle {
 
         // Convert seconds into ticks
         this.lifetime = lifespan;
-        this.alpha = 0.5F;
+        // More visible than before (was 0.5)
+        this.alpha = 0.7F;
 
         xd = velocityX;
         yd = velocityY;
@@ -104,7 +105,7 @@ public class QiParticle extends TextureSheetParticle {
     @Override
     public void render(VertexConsumer buffer, Camera renderInfo, float partialTicks) {
         // Don't render particles if they are not visible
-        if (!Renderer.QiSourcesVisible) {
+        if (!Renderer.QiSourcesVisible || renderInfo.getPosition().distanceToSqr(x, y, z) > 16 * Renderer.QiSenseRadius * Renderer.QiSenseRadius) {
             return;
         }
 
@@ -171,6 +172,8 @@ public class QiParticle extends TextureSheetParticle {
 
             if (source == null && target != null) {
                 particle.scale(0.5f * (float) target.getBoundingBox().getSize());
+            } else if (source != null) {
+                particle.scale(1.5f);
             }
 
             return particle;

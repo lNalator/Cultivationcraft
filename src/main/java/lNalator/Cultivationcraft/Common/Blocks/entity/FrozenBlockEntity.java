@@ -4,7 +4,11 @@ import lNalator.Cultivationcraft.Common.Blocks.BlockRegister;
 import lNalator.Cultivationcraft.Common.Blocks.custom.FrozenBlock;
 import lNalator.Cultivationcraft.Common.Blocks.util.TickableBlockEntity;
 import lNalator.Cultivationcraft.Cultivationcraft;
+import lNalator.Cultivationcraft.Common.Capabilities.ChunkQiSources.ChunkQiSources;
+import lNalator.Cultivationcraft.Common.Qi.Elements.Elements;
+import lNalator.Cultivationcraft.Common.Qi.QiSource;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.protocol.Packet;
@@ -21,7 +25,8 @@ import org.jetbrains.annotations.NotNull;
 public class FrozenBlockEntity extends BlockEntity implements TickableBlockEntity {
 
     protected int FREEZE_PROGRESS_TICKS = 0;
-    protected int FREEZE_DURATION_TICKS;
+    // Stored here rather than in the block state, where a 0-1000 property multiplied the block's states
+    protected int FREEZE_DURATION_TICKS = 50;
     protected ItemStack itemStack;
     protected BlockPos blockPos;
     protected BlockState oldBlockState;
@@ -42,10 +47,6 @@ public class FrozenBlockEntity extends BlockEntity implements TickableBlockEntit
         Property<Boolean> isSecondBlock = (Property<Boolean>) ((FrozenBlock) blockState.getBlock()).getStateDefinition().getProperty("is_second_block");
         assert isSecondBlock != null;
         this.isSecondBlock = blockState.getValue(isSecondBlock);
-
-        Property<Integer> freezeDurationTicks = (Property<Integer>) ((FrozenBlock) blockState.getBlock()).getStateDefinition().getProperty("freeze_duration_ticks");
-        assert freezeDurationTicks != null;
-        this.FREEZE_DURATION_TICKS = blockState.getValue(freezeDurationTicks);
     }
 
     public FrozenBlockEntity(BlockPos blockPos, BlockState blockState, BlockState oldBlockState, BlockEntity oldBlockEntity, CompoundTag oldBlockEntityData, boolean isSecondBlock) {
@@ -64,16 +65,17 @@ public class FrozenBlockEntity extends BlockEntity implements TickableBlockEntit
 
         CompoundTag cultivationCraftData = nbt.getCompound(Cultivationcraft.MODID);
         FREEZE_PROGRESS_TICKS = cultivationCraftData.getInt("unfreezeTicks");
+        if (cultivationCraftData.contains("freezeDuration")) {
+            FREEZE_DURATION_TICKS = cultivationCraftData.getInt("freezeDuration");
+        }
 
         this.oldBlockState = NbtUtils.readBlockState(cultivationCraftData.getCompound("FrozenBlockState"));
         this.blockPos = NbtUtils.readBlockPos(cultivationCraftData.getCompound("FrozenBlockPos"));
         this.itemStack = new ItemStack(this.oldBlockState.getBlock().asItem());
         this.isSecondBlock = cultivationCraftData.getBoolean("isSecondBlock");
 
-        if (cultivationCraftData.hasUUID("FrozenBlockEntity")) {
-            this.oldBlockEntity = loadStatic(this.blockPos, this.oldBlockState, cultivationCraftData);
-            this.oldBlockEntityData = cultivationCraftData.getCompound("FrozenBlockEntityData");
-        }
+        // The original block entity's data (container contents...) is the only copy while frozen
+        this.oldBlockEntityData = cultivationCraftData.contains("FrozenBlockEntityData") ? cultivationCraftData.getCompound("FrozenBlockEntityData") : null;
     }
 
     @Override
@@ -82,13 +84,13 @@ public class FrozenBlockEntity extends BlockEntity implements TickableBlockEntit
 
         var cultivationCraftData = new CompoundTag();
         cultivationCraftData.putInt("unfreezeTicks", FREEZE_PROGRESS_TICKS);
+        cultivationCraftData.putInt("freezeDuration", FREEZE_DURATION_TICKS);
 
         cultivationCraftData.put("FrozenBlockState", NbtUtils.writeBlockState(oldBlockState));
         cultivationCraftData.put("FrozenBlockPos", NbtUtils.writeBlockPos(blockPos));
         cultivationCraftData.putBoolean("isSecondBlock", isSecondBlock);
 
-        if (oldBlockEntity != null) {
-            cultivationCraftData.put("FrozenBlockEntity", oldBlockEntity.getPersistentData());
+        if (oldBlockEntityData != null) {
             cultivationCraftData.put("FrozenBlockEntityData", oldBlockEntityData);
         }
         nbt.put(Cultivationcraft.MODID, cultivationCraftData);
@@ -111,6 +113,18 @@ public class FrozenBlockEntity extends BlockEntity implements TickableBlockEntit
         this.oldBlockState = oldBlockState;
         this.oldBlockEntity = oldBlockEntity;
         this.oldBlockEntityData = oldBlockEntityData;
+        setChanged();
+    }
+
+    public void setDuration(int duration) {
+        FREEZE_DURATION_TICKS = duration;
+        setChanged();
+    }
+
+    // A new freeze on an already frozen block extends it to at least the new duration
+    public void refresh(int duration) {
+        FREEZE_DURATION_TICKS = Math.max(FREEZE_DURATION_TICKS - FREEZE_PROGRESS_TICKS, duration);
+        FREEZE_PROGRESS_TICKS = 0;
         setChanged();
     }
 
@@ -144,11 +158,17 @@ public class FrozenBlockEntity extends BlockEntity implements TickableBlockEntit
         Level world = this.getLevel();
         if (world != null && this.oldBlockState != null && this.blockPos != null) {
             // Revert the block to its previous state
-            world.setBlockAndUpdate(this.blockPos, this.oldBlockState);
-            if (oldBlockEntity != null) {
-                BlockEntity unFrozenEntity = this.oldBlockEntity;
-                unFrozenEntity.deserializeNBT(oldBlockEntityData);
-                world.setBlockEntity(unFrozenEntity);
+            CompoundTag data = oldBlockEntityData;
+            BlockPos pos = this.blockPos;
+            world.setBlockAndUpdate(pos, this.oldBlockState);
+
+            // Restore the saved data into the block entity the original block just created
+            if (data != null) {
+                BlockEntity restored = world.getBlockEntity(pos);
+                if (restored != null) {
+                    restored.load(data);
+                    restored.setChanged();
+                }
             }
 
             if (connectedEntity != null) {
@@ -157,12 +177,28 @@ public class FrozenBlockEntity extends BlockEntity implements TickableBlockEntit
         }
     }
 
+    protected static boolean iceSourceNearby(Level level, BlockPos pos) {
+        for (QiSource source : ChunkQiSources.getQiSourcesInRange(level, Vec3.atCenterOf(pos), 0)) {
+            if (Elements.iceElement.equals(source.getElement())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     @Override
     public void tick(Level level, BlockPos blockPos, BlockState blockState, BlockEntity blockEntity) {
         if (level.isClientSide()) {
             return;
         }
         this.FREEZE_PROGRESS_TICKS++;
+
+        // Frozen water stays frozen while an Ice Qi source reaches it (design D7)
+        if (FREEZE_PROGRESS_TICKS % 40 == 0 && oldBlockState.is(Blocks.WATER) && iceSourceNearby(level, blockPos)) {
+            FREEZE_PROGRESS_TICKS = 0;
+        }
+
         if (this.FREEZE_PROGRESS_TICKS >= FREEZE_DURATION_TICKS) {
             this.thawBlock();
             this.FREEZE_PROGRESS_TICKS = 0;

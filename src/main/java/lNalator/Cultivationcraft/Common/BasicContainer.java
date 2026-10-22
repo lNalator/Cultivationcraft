@@ -33,7 +33,7 @@ public class BasicContainer extends AbstractContainerMenu {
         super(type, windowId);
     }
 
-    public void addPlayerInventory(Inventory playerInv) {
+    public void addPlayerInventory(@Nonnull Inventory playerInv) {
 
         // Add the players hotbar to the gui - the [xpos, ypos] location of each item
         for (int x = 0; x < HOTBAR_SLOT_COUNT; x++) {
@@ -61,7 +61,7 @@ public class BasicContainer extends AbstractContainerMenu {
 
     @Override
     // What happens when an item is SHIFT-clicked in this container
-    public ItemStack quickMoveStack(Player player, int sourceSlotIndex) {
+    public ItemStack quickMoveStack(@Nonnull Player player, int sourceSlotIndex) {
         return ItemStack.EMPTY;
     }
 }

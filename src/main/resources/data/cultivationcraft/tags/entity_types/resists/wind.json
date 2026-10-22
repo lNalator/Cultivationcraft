@@ -1,0 +1,15 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:bat",
+    "minecraft:bee",
+    "minecraft:enderman",
+    "minecraft:ghast",
+    "minecraft:hoglin",
+    "minecraft:iron_golem",
+    "minecraft:phantom",
+    "minecraft:ravager",
+    "minecraft:vex",
+    "minecraft:warden"
+  ]
+}

@@ -33,6 +33,8 @@ public class Renderer
     protected static final animatedTexture healthOrb = new animatedTexture(new ResourceLocation(Cultivationcraft.MODID, "textures/gui/healthorb.png"));
 
     public static boolean QiSourcesVisible = false;
+    // Qi particles are only shown within 4x the Divine Sense detection radius
+    public static double QiSenseRadius = 16;
 
     public static void render(float partialTick)
     {
@@ -93,8 +95,9 @@ public class Renderer
     public static void renderHP()
     {
         float health = genericClientFunctions.getPlayer().getHealth();
-        float maxHealth = BodyPartStatControl.getStats(genericClientFunctions.getPlayer()).getStat(StatIDs.maxHP);
-        float healthPercent = health/maxHealth;
+        // Use the real max health (attribute) so the orb scales with it like the qi orb, instead of overflowing above the reservoir
+        float maxHealth = Math.max(genericClientFunctions.getPlayer().getMaxHealth(), BodyPartStatControl.getStats(genericClientFunctions.getPlayer()).getStat(StatIDs.maxHP));
+        float healthPercent = maxHealth > 0 ? Math.max(0, Math.min(1, health/maxHealth)) : 0;
 
         int scaledWidth = Minecraft.getInstance().getWindow().getGuiScaledWidth();
         int scaledHeight = Minecraft.getInstance().getWindow().getGuiScaledHeight();
@@ -104,6 +107,15 @@ public class Renderer
 
         RenderSystem.setShaderColor(colour.x(), colour.y(), colour.z(), 0.7f);
         blood.getOrbFilling().render((int)(scaledWidth * 0.1), (int)(scaledHeight - (10 + 40 * healthPercent)), 40, (int)(40 * healthPercent), healthPercent);
+
+        // Absorption hearts (golden apple...) as a yellow layer in front, like saturation on the stamina orb
+        float absorption = genericClientFunctions.getPlayer().getAbsorptionAmount();
+        if (absorption > 0 && maxHealth > 0)
+        {
+            float absorptionPercent = Math.min(1, absorption / maxHealth);
+            RenderSystem.setShaderColor(1.0F, 0.85F, 0.1F, 0.6f);
+            blood.getOrbFilling().render((int)(scaledWidth * 0.1), (int)(scaledHeight - (10 + 40 * absorptionPercent)), 40, (int)(40 * absorptionPercent), absorptionPercent);
+        }
 
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         healthOrb.render((int)(scaledWidth * 0.1), scaledHeight - 50, 40, 40);

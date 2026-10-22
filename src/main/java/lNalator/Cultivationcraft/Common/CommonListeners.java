@@ -130,6 +130,7 @@ public class CommonListeners {
     public static void onRegisterCommandEvent(RegisterCommandsEvent event) {
         CommandDispatcher<CommandSourceStack> commandDispatcher = event.getDispatcher();
         BodyforgeCommand.register(commandDispatcher);
+        lNalator.Cultivationcraft.Common.Commands.CultiDevCommand.register(commandDispatcher);
     }
 
     @SubscribeEvent

@@ -73,8 +73,8 @@ public class Elements {
     protected static void createElements() {
         addElement(new Element(noElement, new Color(1f, 1f, 1f), 0));
         addElement(new FireElement(fireElement, new Color(1f, 0, 0), 0.2));
-        addElement(new Element(earthElement, new Color(1f, 0.5f, 0), 0.75));
-        addElement(new Element(woodElement, new Color(0, 0.5f, 0), 0.05));
+        addElement(new EarthElement(earthElement, new Color(1f, 0.5f, 0), 0.75));
+        addElement(new WoodElement(woodElement, new Color(0, 0.5f, 0), 0.05));
         addElement(new WindElement(windElement, new Color(0, 1f, 0.25f), 0.8));
         addElement(new WaterElement(waterElement, new Color(0, 0, 1f), 0.2));
 

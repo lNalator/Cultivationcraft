@@ -1,5 +1,43 @@
 # Changelog
 
+## [0.4.3] - WIP - Elements, Aura and Freezing
+
+### Fixes
+
+- Fixed cultivation getting stuck just below the stage maximum: the breakthrough check truncated each stat level separately, so Qi split across several stats could never reach the cap.
+- Quest progress is now only computed on the server; quest progress sent by a client is ignored.
+- Fixed the Grow concept's stabilisation quest, which only progressed client-side and could never complete.
+- Fixed the "Damage absorbed" quest, which had no trigger and a mismatched translation key.
+- Frozen blocks: the freeze duration moved from the block state to the block entity (removing about 12,000 block states), multiblocks no longer drop the wrong block entity, and container contents are no longer lost when a chunk unloads while frozen.
+- Fixed players becoming unkillable with the vanilla Absorption effect (golden apple, potion): hits smaller than the absorption amount were cancelled, so the absorption hearts were never used up.
+- Fixed the technique selection list not scrolling to its last entries when the slot already holds a technique.
+
+### Elements and elemental states
+
+- Added elemental states as status effects, shared by mobs and players: Wet, Chill, Frozen, Freeze Immunity, Off Balance, Electrified, Stunned and Rooted.
+- Each element now has its own identity: Fire burns for 2 s + damage/4 (max 10 s) and melts ice and snow; Water wets, pushes lightly, puts out fire and cools lava; Ice stacks Chill and freezes at 5 stacks (2 s, halved in PvP, then 5 s of immunity); Wind pushes and unbalances; Lightning strikes the target then chains to 1-3 nearby enemies; Earth stuns and ignores 25% of armor; Wood steals 20% life, roots and grows plants.
+- Added interactions between every element and every state (49 combinations), for example Water then Ice freezes instantly, Earth shatters a frozen target for double damage, and Wind cannot push a rooted target.
+- Mobs now resist or are weak to elements through entity tags (`cultivationcraft:resists/<element>` and `cultivationcraft:weak/<element>`), editable by datapack. Fire-immune mobs take no Qi fire damage.
+- Freezing blocks: 5 s + 0.5 s per damage point (max 30 s), refreshed by new hits. Frozen blocks can be broken like the original block and drop its normal loot, containers included, without duplication. Water and lava sources freeze temporarily, and frozen water stays frozen while an Ice Qi source reaches it. Blocks in `cultivationcraft:freeze_immune` never freeze.
+
+### Techniques and concepts
+
+- Added the Aura technique, unlocked by choosing the Aura concept as a core: an elemental zone that pulses every second on nearby entities, with trainable range, damage, intensity and Qi cost. Activate it while sneaking to also affect blocks. A Wind aura deflects enemy projectiles.
+- The Aura concept no longer applies a passive area effect to other techniques (which set everything on fire) and no longer doubles their Qi cost. It is unlocked by Qi overflow (30 s meditating in a Qi source with full Qi) and stabilised by hitting entities with the aura.
+- Re-enabled Ice Walk: freezes water and lava under your feet, in a radius that grows with training; sneak to sink. Only available when Ice is your main absorbed element.
+- Core Forming stabilisation quests get harder with each stage (+50% of the base threshold per stage).
+- Elemental concepts are only learnt from the main element absorbed during Qi Condensation; their separate unlock quests are disabled.
+- New quest types: entities frozen, burning entities extinguished, lightning chain jumps, and elemental damage resisted.
+
+### Interface and tools
+
+- Added reusable toast notifications with sounds: quest completed, concept learnt, technique mastered, stage cultivation full, refinement cancelled. Each type can be turned off in `cultivationcraft-client.toml`.
+- Added the Elemental Debug Stick (creative Tools tab): right-click an entity, a block or the air to apply an element effect & damage (if applicable); sneak + right/left-click to cycle elements.
+- Added `/cultidev` (development environment, or `-Dcultivationcraft.dev=true`): set realm and stage, learn concepts, add cores, and measure quest progress per minute.
+- Absorption hearts (golden apple, potion) are shown as a yellow layer on the health orb, and as "(+X)" next to the health value.
+- Qi source particles are more visible and are only shown within four times the Divine Sense detection radius.
+- Network protocol version is now 8.
+
 ## [0.4.2] - WIP - Optimization and Refactoring
 
 ### Fixes

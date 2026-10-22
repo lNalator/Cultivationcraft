@@ -13,7 +13,7 @@ public class Quest {
     public static final ResourceLocation DAMAGE_TAKEN = new ResourceLocation(Cultivationcraft.MODID, "cultivationcraft.quest.damagetaken");
     public static final ResourceLocation DAMAGE_DEALT = new ResourceLocation(Cultivationcraft.MODID, "cultivationcraft.quest.damagedealt");
     public static final ResourceLocation DAMAGE_RESISTED = new ResourceLocation(Cultivationcraft.MODID, "cultivationcraft.quest.damageresisted");
-    public static final ResourceLocation DAMAGE_ABSORBED = new ResourceLocation(Cultivationcraft.MODID, "cultivationcraft.quest.damageabsorbbed");
+    public static final ResourceLocation DAMAGE_ABSORBED = new ResourceLocation(Cultivationcraft.MODID, "cultivationcraft.quest.damageabsorbed");
     public static final ResourceLocation EXPLOSION_DAMAGE_TAKEN = new ResourceLocation(Cultivationcraft.MODID, "cultivationcraft.quest.explosiondamagetaken");
     public static final ResourceLocation EXPLOSION_DAMAGE_DEALT = new ResourceLocation(Cultivationcraft.MODID, "cultivationcraft.quest.explosiondamagedealt");
     public static final ResourceLocation ELEMENTALY_EFFECTED = new ResourceLocation(Cultivationcraft.MODID, "cultivationcraft.quest.elementalyeffected");
@@ -29,6 +29,11 @@ public class Quest {
     public static final ResourceLocation JUMP = new ResourceLocation(Cultivationcraft.MODID, "cultivationcraft.quest.jump");
     public static final ResourceLocation HEAL = new ResourceLocation(Cultivationcraft.MODID, "cultivationcraft.quest.heal");
     public static final ResourceLocation DRAIN_STAMINA = new ResourceLocation(Cultivationcraft.MODID, "cultivationcraft.quest.drainstamina");
+    public static final ResourceLocation QI_OVERFLOW = new ResourceLocation(Cultivationcraft.MODID, "cultivationcraft.quest.qioverflow");
+    public static final ResourceLocation AURA_HIT = new ResourceLocation(Cultivationcraft.MODID, "cultivationcraft.quest.aurahit");
+    public static final ResourceLocation FREEZE_ENTITY = new ResourceLocation(Cultivationcraft.MODID, "cultivationcraft.quest.freeze");
+    public static final ResourceLocation EXTINGUISH = new ResourceLocation(Cultivationcraft.MODID, "cultivationcraft.quest.extinguish");
+    public static final ResourceLocation LIGHTNING_CHAIN = new ResourceLocation(Cultivationcraft.MODID, "cultivationcraft.quest.lightningchain");
     public static final ResourceLocation ENDER_TELEPORT = new ResourceLocation(Cultivationcraft.MODID, "cultivationcraft.quest.endertp");
 
     public final ResourceLocation mode;

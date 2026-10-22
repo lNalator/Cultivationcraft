@@ -279,6 +279,10 @@ public class Technique {
         return icon;
     }
 
+    public String getLangLocation() {
+        return langLocation;
+    }
+
     // Returns the name of this technique
     public String getName() {
         return Component.translatable(langLocation).getString();

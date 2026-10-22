@@ -39,7 +39,7 @@ public class FreezeControl {
             BlockState oldState2 = getCurrentState(level, secondBlockPos);
             BlockEntity oldEntity2 = getCurrentEntity(level, secondBlockPos);
             if (oldEntity2 != null) {
-                level.removeBlockEntity(pos);
+                level.removeBlockEntity(secondBlockPos);
             }
 
             FrozenBlockEntity freeze = null;
@@ -90,11 +90,12 @@ public class FreezeControl {
         }
 
         if (!world.isClientSide()) { //
-            BlockState FrozenBlock = setFrozenBlock(oldState, handleIsSecondBlock(oldState), duration);
+            BlockState FrozenBlock = setFrozenBlock(oldState, handleIsSecondBlock(oldState));
             world.setBlockAndUpdate(blockPos, FrozenBlock);
 
             frozen = ((FrozenBlockEntity) Objects.requireNonNull(world.getBlockEntity(blockPos)));
             frozen.setOldBlockFields(oldState, oldBlockEntity, oldBlockEntityData);
+            frozen.setDuration(duration);
         }
         return frozen;
     }
@@ -148,7 +149,7 @@ public class FreezeControl {
         return null;
     }
 
-    public static BlockState setFrozenBlock(BlockState oldBlockState, boolean isSecondBlock, int duration) {
+    public static BlockState setFrozenBlock(BlockState oldBlockState, boolean isSecondBlock) {
         BlockState frozenBlock = BlockRegister.FROZEN_BLOCK.get().defaultBlockState();
         Property<Direction> facing = oldBlockState.getBlock().getStateDefinition().getProperty("facing") != null
                 ? (Property<Direction>) oldBlockState.getBlock().getStateDefinition().getProperty("facing")
@@ -159,8 +160,6 @@ public class FreezeControl {
             frozenBlock = frozenBlock.setValue(FrozenBlock.FACING, oldBlockState.getValue(facing));
             frozenBlock = frozenBlock.setValue(FrozenBlock.IS_SECOND_BLOCK, isSecondBlock);
         }
-
-        frozenBlock = frozenBlock.setValue(FrozenBlock.FREEZE_DURATION_TICKS, duration);
 
         return frozenBlock;
     }

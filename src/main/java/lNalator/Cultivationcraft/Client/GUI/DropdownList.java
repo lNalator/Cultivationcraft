@@ -130,6 +130,7 @@ public class DropdownList {
 
     public void changeSelection(String selection) {
         selected = selection;
+        scrollOffset = Math.min(scrollOffset, maxScroll());
     }
 
     // Change the selected item based on location clicked on dropdown list
@@ -158,29 +159,21 @@ public class DropdownList {
         return false;
     }
 
+    // The open list shows every item except the selected one. The selected name is not always an item
+    // (e.g. a technique already placed in the slot is left out of the list), so count what is really shown;
+    // assuming the selected item was always hidden made the last entry unreachable.
+    protected int maxScroll() {
+        int shown = items.size() - (items.containsKey(selected) ? 1 : 0);
+        return Math.max(0, shown - MaxSize);
+    }
+
     public void scrollTo(float percent) {
-        scrollOffset = (int) ((items.size() - MaxSize) * percent);
-
-        if (scrollOffset > items.size() - MaxSize - 1) {
-            scrollOffset = items.size() - MaxSize - 1;
-        }
-
-        if (scrollOffset < 0) {
-            scrollOffset = 0;
-        }
+        scrollOffset = Math.max(0, Math.min(maxScroll(), (int) (maxScroll() * percent + 0.5f)));
     }
 
     // Scroll the scroll bar
     public void scroll(int amount) {
-        scrollOffset += amount;
-
-        if (scrollOffset > items.size() - MaxSize - 1) {
-            scrollOffset = items.size() - MaxSize - 1;
-        }
-
-        if (scrollOffset < 0) {
-            scrollOffset = 0;
-        }
+        scrollOffset = Math.max(0, Math.min(maxScroll(), scrollOffset + amount));
     }
 
     public void render(PoseStack PoseStack, int xpos, int ypos, int mouseX, int mouseY, GuiComponent gui) {
@@ -217,7 +210,7 @@ public class DropdownList {
         }
 
         // Draw the scrollbar
-        float percent = (float) scrollOffset / ((float) items.size() - (float) MaxSize - 1);
+        float percent = maxScroll() == 0 ? 0 : (float) scrollOffset / maxScroll();
         int scrollPosition = scrollBarTop + (int) ((scrollBarBottom - scrollBarTop) * percent);
 
         gui.blit(PoseStack, xpos + scrollbarXStart, ypos + scrollPosition, gui.getBlitOffset(), width * 2 + 2, closedHeight, width - scrollbarXStart, scrollBarSize, 255, 255);

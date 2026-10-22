@@ -228,6 +228,7 @@ public final class DivineSenseBlockRenderer {
     }
 
     @SubscribeEvent
+    // TODO: spiritual plant markers should shrink/grow with the plant's current Qi amount
     public static void render(RenderLevelStageEvent event) {
         if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_WEATHER) {
             return;

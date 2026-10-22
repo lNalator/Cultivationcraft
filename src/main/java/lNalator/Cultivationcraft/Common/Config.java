@@ -167,4 +167,32 @@ public class Config {
             return spawnMultNone.get();
         }
     }
+
+    public static class Client {
+
+        private static final ForgeConfigSpec.BooleanValue notifySuccess;
+        private static final ForgeConfigSpec.BooleanValue notifyProgress;
+        private static final ForgeConfigSpec.BooleanValue notifyAlert;
+
+        public static final ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
+        public static final ForgeConfigSpec spec;
+
+        static {
+            builder.push("Notifications");
+            notifySuccess = builder.comment("Show success toasts (quest completed, concept learnt...)").define("success", true);
+            notifyProgress = builder.comment("Show progress toasts (technique mastered, stage full...)").define("progress", true);
+            notifyAlert = builder.comment("Show alert toasts (refinement cancelled...)").define("alert", true);
+            builder.pop();
+
+            spec = builder.build();
+        }
+
+        public static boolean enabled(CultivationNotifier.Type type) {
+            return switch (type) {
+                case SUCCESS -> notifySuccess.get();
+                case PROGRESS -> notifyProgress.get();
+                case ALERT -> notifyAlert.get();
+            };
+        }
+    }
 }

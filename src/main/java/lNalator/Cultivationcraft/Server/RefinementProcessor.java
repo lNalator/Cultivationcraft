@@ -1,5 +1,6 @@
 package lNalator.Cultivationcraft.Server;
 
+import lNalator.Cultivationcraft.Common.CultivationNotifier;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorTechniques.CultivatorTechniques;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorTechniques.ICultivatorTechniques;
 import lNalator.Cultivationcraft.Common.Capabilities.RefinementInventory.RefinementInventoryProvider;
@@ -65,6 +66,7 @@ public final class RefinementProcessor {
                     handler.setStackInSlot(0, ItemStack.EMPTY);
                     player.getInventory().placeItemBackInInventory(stack);
                     player.containerMenu.broadcastChanges();
+                    CultivationNotifier.notify(player, CultivationNotifier.Type.ALERT, Component.translatable("cultivationcraft.notify.refinement_cancelled"), stack.getHoverName());
                     RefinementHandlers.tick(player, ItemStack.EMPTY, elapsedNanos);
                     continue;
                 }

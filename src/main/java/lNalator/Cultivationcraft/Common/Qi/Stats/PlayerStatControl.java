@@ -16,19 +16,21 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.ForgeMod;
 
 import java.util.HashMap;
+import java.util.UUID;
 
 public class PlayerStatControl {
 
     PlayerStatModifications stats = new PlayerStatModifications();
 
-    AttributeModifier healthModifier;
-    AttributeModifier movementModifier;
-    AttributeModifier armorModifier;
-    AttributeModifier armorToughnessModifier;
-    AttributeModifier swimModifier;
-    AttributeModifier attackModifier;
-    AttributeModifier rangeModifier;
-    AttributeModifier stepHeightModifier;
+    // Fixed UUIDs so each player's modifiers can be removed reliably and never stack
+    private static final UUID HEALTH_MODIFIER_UUID = UUID.fromString("84d45106-aebb-4011-bf83-de53c55c3ac5");
+    private static final UUID MOVEMENT_MODIFIER_UUID = UUID.fromString("b2051efe-8548-4173-8f32-ee0675e2de1d");
+    private static final UUID ARMOR_MODIFIER_UUID = UUID.fromString("214421c7-5f17-495c-adc5-a731716b5d7b");
+    private static final UUID ARMOR_TOUGHNESS_MODIFIER_UUID = UUID.fromString("78aeca6f-1be9-476c-9993-828637be2aaa");
+    private static final UUID SWIM_MODIFIER_UUID = UUID.fromString("781519e4-4953-48c6-93ba-3a7640422b2a");
+    private static final UUID ATTACK_MODIFIER_UUID = UUID.fromString("e44823a2-c178-4b9c-a671-9027d2a4e06d");
+    private static final UUID RANGE_MODIFIER_UUID = UUID.fromString("e120d93c-8ad1-4fc2-aab9-af933ab728e5");
+    private static final UUID STEP_HEIGHT_MODIFIER_UUID = UUID.fromString("2a4be101-0637-4ff0-a1db-51e7c1d25f60");
 
     // Setup players with the default player stats
     public PlayerStatControl() {
@@ -164,55 +166,28 @@ public class PlayerStatControl {
     }
 
     protected void applyStats(Player player) {
-        if (healthModifier != null) {
-            player.getAttribute(Attributes.MAX_HEALTH).removeModifier(healthModifier);
+        player.getAttribute(Attributes.MAX_HEALTH).removeModifier(HEALTH_MODIFIER_UUID);
+        player.getAttribute(Attributes.MOVEMENT_SPEED).removeModifier(MOVEMENT_MODIFIER_UUID);
+        player.getAttribute(Attributes.ARMOR).removeModifier(ARMOR_MODIFIER_UUID);
+        player.getAttribute(Attributes.ARMOR_TOUGHNESS).removeModifier(ARMOR_TOUGHNESS_MODIFIER_UUID);
+        player.getAttribute(ForgeMod.SWIM_SPEED.get()).removeModifier(SWIM_MODIFIER_UUID);
+        player.getAttribute(ForgeMod.REACH_DISTANCE.get()).removeModifier(RANGE_MODIFIER_UUID);
+        player.getAttribute(Attributes.ATTACK_DAMAGE).removeModifier(ATTACK_MODIFIER_UUID);
+        player.getAttribute(ForgeMod.STEP_HEIGHT_ADDITION.get()).removeModifier(STEP_HEIGHT_MODIFIER_UUID);
+
+        // Permanent so max health is saved with the player and health above 20 survives a relog
+        player.getAttribute(Attributes.MAX_HEALTH).addPermanentModifier(new AttributeModifier(HEALTH_MODIFIER_UUID, "BodyForgeHealth", stats.getStat(StatIDs.maxHP) - StatIDs.defaultMaxHP, AttributeModifier.Operation.ADDITION));
+        player.getAttribute(Attributes.MOVEMENT_SPEED).addTransientModifier(new AttributeModifier(MOVEMENT_MODIFIER_UUID, "BodyForgeMove", stats.getStat(StatIDs.movementSpeed) * getLegWeightModifier() - StatIDs.defaultMovementSpeed, AttributeModifier.Operation.ADDITION));
+        player.getAttribute(Attributes.ARMOR).addTransientModifier(new AttributeModifier(ARMOR_MODIFIER_UUID, "BodyForgeArmor", stats.getStat(StatIDs.armor), AttributeModifier.Operation.ADDITION));
+        player.getAttribute(Attributes.ARMOR_TOUGHNESS).addTransientModifier(new AttributeModifier(ARMOR_TOUGHNESS_MODIFIER_UUID, "BodyForgeArmorToughness", stats.getStat(StatIDs.armorToughness), AttributeModifier.Operation.ADDITION));
+        player.getAttribute(ForgeMod.SWIM_SPEED.get()).addTransientModifier(new AttributeModifier(SWIM_MODIFIER_UUID, "BodyForgeSwimSpeed", stats.getStat(StatIDs.swimSpeed) - StatIDs.defaultSwimSpeed, AttributeModifier.Operation.ADDITION));
+        player.getAttribute(ForgeMod.REACH_DISTANCE.get()).addTransientModifier(new AttributeModifier(RANGE_MODIFIER_UUID, "BodyForgeReach", stats.getStat(StatIDs.attackRange) - StatIDs.defaultAttackRange, AttributeModifier.Operation.ADDITION));
+        player.getAttribute(Attributes.ATTACK_DAMAGE).addTransientModifier(new AttributeModifier(ATTACK_MODIFIER_UUID, "BodyForgeAttack", stats.getStat(StatIDs.armAttackModifier) - StatIDs.defaultAttackModifier, AttributeModifier.Operation.MULTIPLY_TOTAL));
+        player.getAttribute(ForgeMod.STEP_HEIGHT_ADDITION.get()).addTransientModifier(new AttributeModifier(STEP_HEIGHT_MODIFIER_UUID, "BodyForgeStepHeight", stats.getStat(StatIDs.stepHeight), AttributeModifier.Operation.ADDITION));
+
+        if (player.getHealth() > player.getMaxHealth()) {
+            player.setHealth(player.getMaxHealth());
         }
-
-        if (movementModifier != null) {
-            player.getAttribute(Attributes.MOVEMENT_SPEED).removeModifier(movementModifier);
-        }
-
-        if (armorModifier != null) {
-            player.getAttribute(Attributes.ARMOR).removeModifier(armorModifier);
-        }
-
-        if (armorToughnessModifier != null) {
-            player.getAttribute(Attributes.ARMOR_TOUGHNESS).removeModifier(armorToughnessModifier);
-        }
-
-        if (swimModifier != null) {
-            player.getAttribute(ForgeMod.SWIM_SPEED.get()).removeModifier(swimModifier);
-        }
-
-        if (rangeModifier != null) {
-            player.getAttribute(ForgeMod.REACH_DISTANCE.get()).removeModifier(rangeModifier);
-        }
-
-        if (attackModifier != null) {
-            player.getAttribute(Attributes.ATTACK_DAMAGE).removeModifier(attackModifier);
-        }
-
-        if (stepHeightModifier != null) {
-            player.getAttribute(ForgeMod.STEP_HEIGHT_ADDITION.get()).removeModifier(stepHeightModifier);
-        }
-
-        healthModifier = new AttributeModifier("BodyForgeHealth", stats.getStat(StatIDs.maxHP) - StatIDs.defaultMaxHP, AttributeModifier.Operation.ADDITION);
-        movementModifier = new AttributeModifier("BodyForgeMove", stats.getStat(StatIDs.movementSpeed) * getLegWeightModifier() - StatIDs.defaultMovementSpeed, AttributeModifier.Operation.ADDITION);
-        armorModifier = new AttributeModifier("BodyForgeArmor", stats.getStat(StatIDs.armor), AttributeModifier.Operation.ADDITION);
-        armorToughnessModifier = new AttributeModifier("BodyForgeArmorToughness", stats.getStat(StatIDs.armorToughness), AttributeModifier.Operation.ADDITION);
-        swimModifier = new AttributeModifier("BodyForgeSwimSpeed", stats.getStat(StatIDs.swimSpeed) - StatIDs.defaultSwimSpeed, AttributeModifier.Operation.ADDITION);
-        rangeModifier = new AttributeModifier("BodyForgeReach", stats.getStat(StatIDs.attackRange) - StatIDs.defaultAttackRange, AttributeModifier.Operation.ADDITION);
-        attackModifier = new AttributeModifier("BodyForgeAttack", stats.getStat(StatIDs.armAttackModifier) - StatIDs.defaultAttackModifier, AttributeModifier.Operation.MULTIPLY_TOTAL);
-        stepHeightModifier = new AttributeModifier("BodyForgeStepHeight", stats.getStat(StatIDs.stepHeight), AttributeModifier.Operation.ADDITION);
-
-        player.getAttribute(Attributes.MAX_HEALTH).addTransientModifier(healthModifier);
-        player.getAttribute(Attributes.MOVEMENT_SPEED).addTransientModifier(movementModifier);
-        player.getAttribute(Attributes.ARMOR).addTransientModifier(armorModifier);
-        player.getAttribute(Attributes.ARMOR_TOUGHNESS).addTransientModifier(armorToughnessModifier);
-        player.getAttribute(ForgeMod.SWIM_SPEED.get()).addTransientModifier(swimModifier);
-        player.getAttribute(ForgeMod.REACH_DISTANCE.get()).addTransientModifier(rangeModifier);
-        player.getAttribute(Attributes.ATTACK_DAMAGE).addTransientModifier(attackModifier);
-        player.getAttribute(ForgeMod.STEP_HEIGHT_ADDITION.get()).addTransientModifier(stepHeightModifier);
     }
 
     // Returns a modifier based on how overweight the player is

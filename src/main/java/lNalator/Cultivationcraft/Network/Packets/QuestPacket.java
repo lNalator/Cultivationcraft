@@ -51,11 +51,8 @@ public class QuestPacket extends Packet {
         ctx.setPacketHandled(true);
 
         if (sideReceived.isServer()) {
-            if (ctx.getSender().getUUID().compareTo(player) != 0) {
-                Cultivationcraft.LOGGER.warn("Client sent quest message for other player"); 
-            }else {
-                ctx.enqueueWork(() -> processPacket());
-            }
+            // Quest progress is only ever computed on the server: a client could send any amount
+            Cultivationcraft.LOGGER.warn("Ignored quest progress sent by client " + ctx.getSender().getName().getString());
         } else {
             if (genericClientFunctions.getPlayer() == null) {
                 return; 
@@ -65,14 +62,6 @@ public class QuestPacket extends Packet {
                 ctx.enqueueWork(() -> processPacketClient());
             }
         }
-    }
-
-    // Process received packet on the Server
-    protected void processPacket() {
-        // Grab the player entity based on the read UUID
-        Player ownerEntity = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(player);
-
-        QuestHandler.progressQuest(ownerEntity, amount);
     }
 
     // Process received packet on the client

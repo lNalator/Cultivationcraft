@@ -17,7 +17,8 @@ public class GrowModifier extends TechniqueModifier {
         CATEGORY = SIZE_CATEGORY;
 
         unlockQuest = new Quest(Quest.GROWPLANT, 1);
-        stabiliseQuest = new Quest(Quest.GROW, 100000);
+        // ponytail: placeholder threshold until the per-minute measurement (design C1)
+        stabiliseQuest = new Quest(Quest.DAMAGE_ABSORBED, 1000);
 
         damageMult = 2;
         qiMult = 2;
@@ -38,9 +39,6 @@ public class GrowModifier extends TechniqueModifier {
     public void doResize(Player owner, Technique tech) {
         super.doResize(owner, tech);
 
-        if (tech instanceof QiBarrierTechnique || tech instanceof ItemEnhanceTechnique) {
-            QuestHandler.progressQuest(owner, Quest.GROW, 1);
-        }
     }
 
     // TODO: FlyingSword hitbox resizing

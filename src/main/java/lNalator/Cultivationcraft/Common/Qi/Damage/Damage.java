@@ -1,10 +1,15 @@
 package lNalator.Cultivationcraft.Common.Qi.Damage;
 
+import lNalator.Cultivationcraft.Cultivationcraft;
+import net.minecraft.core.Registry;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.entity.LivingEntity;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorTechniques.CultivatorTechniques;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorTechniques.ICultivatorTechniques;
 import lNalator.Cultivationcraft.Common.Qi.BodyParts.PlayerHealthManager;
 import lNalator.Cultivationcraft.Common.Qi.Quests.Quest;
 import lNalator.Cultivationcraft.Common.Qi.Quests.QuestHandler;
+import lNalator.Cultivationcraft.Common.Qi.Elements.ElementInteractions;
 import lNalator.Cultivationcraft.Common.Qi.Elements.Elements;
 import lNalator.Cultivationcraft.Common.Qi.Stats.BodyPartStatControl;
 import lNalator.Cultivationcraft.Common.Qi.Stats.PlayerStatModifications;
@@ -82,19 +87,54 @@ public class Damage {
         QiDamageSource source = damageSourceToQiDamageSource(event.getSource());
 
         if (source.getElement() != null && source.doStatusEffect()) {
+            // Element interactions with the target's current states (design D3), before this hit adds its own
+            ElementInteractions.Result result = ElementInteractions.apply(source.getElement(), source, event.getEntity(), event.getAmount());
+            event.setAmount(result.amount());
+
+            if (result.skipStatus()) {
+                return;
+            }
+
             Elements.getElement(source.getElement()).applyStatusEffect(source, event.getEntity(), event.getAmount());
         }
     }
 
-    // TODO: Mob resistances
     public static float damageEntity(LivingHurtEvent event) {
-        float damage = event.getAmount();
+        float damage = event.getAmount() * mobResistance(event.getEntity(), event.getSource());
 
         if (event.getSource().getEntity() != null && event.getSource().getEntity() instanceof ServerPlayer) {
             QuestHandler.damageProgress((Player) event.getSource().getEntity(), damageSourceToQiDamageSource(event.getSource()), damage);
         }
 
         return damage;
+    }
+
+    // Mob elemental resistances from entity tags (design D5), editable by datapack:
+    // cultivationcraft:resists/<element> = x0.5, cultivationcraft:weak/<element> = x1.5.
+    // Only real Qi attacks: converted vanilla damage (explosion counted as Fire...) is left alone.
+    public static float mobResistance(LivingEntity entity, DamageSource damage) {
+        if (!(damage instanceof QiDamageSource source) || source.getElement() == null) {
+            return 1;
+        }
+
+        String path = source.getElement().getPath();
+        String element = path.substring(path.lastIndexOf('.') + 1);
+
+        if (source.getElement().equals(Elements.fireElement) && entity.fireImmune()) {
+            return 0;
+        }
+
+        float multiplier = 1;
+
+        if (entity.getType().is(TagKey.create(Registry.ENTITY_TYPE_REGISTRY, new ResourceLocation(Cultivationcraft.MODID, "resists/" + element)))) {
+            multiplier *= 0.5f;
+        }
+
+        if (entity.getType().is(TagKey.create(Registry.ENTITY_TYPE_REGISTRY, new ResourceLocation(Cultivationcraft.MODID, "weak/" + element)))) {
+            multiplier *= 1.5f;
+        }
+
+        return multiplier;
     }
 
     public static boolean shouldCancel(LivingAttackEvent event) {
@@ -108,6 +148,7 @@ public class Damage {
 
         if (resistedDamage <= 0) {
             QuestHandler.progressQuest((Player) event.getEntity(), Quest.DAMAGE_RESISTED, event.getAmount());
+            QuestHandler.progressQuest((Player) event.getEntity(), Quest.DAMAGE_RESISTED, event.getAmount(), source.getElement().toString());
 
             float heal = resistedDamage * -1;
 
@@ -132,6 +173,7 @@ public class Damage {
             }
 
             QuestHandler.progressQuest((Player) event.getEntity(), Quest.DAMAGE_RESISTED, event.getAmount() - resistedDamage);
+            QuestHandler.progressQuest((Player) event.getEntity(), Quest.DAMAGE_RESISTED, event.getAmount() - resistedDamage, source.getElement().toString());
         }
 
         if (event.getSource().getEntity() != null && event.getSource().getEntity() instanceof ServerPlayer) {
@@ -179,7 +221,9 @@ public class Damage {
             amount = 0;
         }
 
-        return Math.max(amount - player.getAbsorptionAmount(), 0.0F);
+        // Absorption hearts are not subtracted here: vanilla consumes them later in actuallyHurt. Subtracting them
+        // in this preview cancelled every hit smaller than the absorption amount, so it was never used up (unkillable).
+        return amount;
     }
 
     protected static QiDamageSource damageSourceToQiDamageSource(DamageSource damage) {

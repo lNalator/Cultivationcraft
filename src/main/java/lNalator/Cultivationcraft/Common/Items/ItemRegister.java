@@ -27,6 +27,9 @@ public class ItemRegister {
     public static final RegistryObject<Item> SPIRIT_STONE = ITEMS.register("spirit_stone",
             () -> new SpiritStoneItem(new Item.Properties().tab(CreativeModeTab.TAB_MATERIALS)));
 
+    public static final RegistryObject<Item> ELEMENT_WAND = ITEMS.register("element_wand",
+            () -> new ElementWandItem(new Item.Properties().stacksTo(1).tab(CreativeModeTab.TAB_TOOLS)));
+
     public static void init(IEventBus bus) {
         ITEMS.register(bus);
     }

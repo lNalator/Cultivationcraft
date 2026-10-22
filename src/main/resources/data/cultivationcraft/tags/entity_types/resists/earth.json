@@ -1,0 +1,14 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:endermite",
+    "minecraft:hoglin",
+    "minecraft:iron_golem",
+    "minecraft:magma_cube",
+    "minecraft:ravager",
+    "minecraft:shulker",
+    "minecraft:silverfish",
+    "minecraft:slime",
+    "minecraft:warden"
+  ]
+}

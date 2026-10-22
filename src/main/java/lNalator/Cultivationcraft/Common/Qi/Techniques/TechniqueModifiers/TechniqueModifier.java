@@ -177,7 +177,9 @@ public class TechniqueModifier {
     }
 
     public boolean canLearn(Player player) {
-        if (unlockQuest == null) {
+        // Elements are learnt from the main element absorbed in Qi Condensation, and only one elemental core
+        // is allowed: their own unlock quests could never be used, so they are disabled
+        if (unlockQuest == null || CATEGORY.equals(ELEMENTAL_CATEGORY)) {
             return false;
         }
 

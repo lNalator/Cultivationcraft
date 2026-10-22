@@ -51,8 +51,10 @@ public class Element {
         return false;
     }
 
+    // TODO: bigger visual feedback (particles, sound) when an element hits an entity or a block (also effectBlock)
     public void applyStatusEffect(QiDamageSource source, Entity target, float damageAmount) {
-        if (damageAmount > 0 && effectTickChance > 0) {
+        // Every element counts for the elemental-effect quests, not only those with a block effect
+        if (damageAmount > 0 && name.compareTo(Elements.noElement) != 0) {
             if (target instanceof Player) {
                 QuestHandler.progressQuest((Player) target, Quest.ELEMENTALY_EFFECTED, 1);
                 QuestHandler.progressQuest((Player) target, Quest.ELEMENTALY_EFFECTED, 1, name.toString());
@@ -66,6 +68,11 @@ public class Element {
     }
 
     public void effectBlock(Level level, BlockPos pos) {
+    }
+
+    // Block effect with the hit's damage, for elements whose block effect scales (Ice freeze duration)
+    public void effectBlock(Level level, BlockPos pos, float damage) {
+        effectBlock(level, pos);
     }
 
     public float resistanceModifier(Player player) {

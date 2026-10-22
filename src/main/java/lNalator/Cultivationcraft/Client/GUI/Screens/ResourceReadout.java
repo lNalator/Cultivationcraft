@@ -23,7 +23,8 @@ final class ResourceReadout {
         boolean external = CultivatorStats.getCultivatorStats(player).getCultivationType() == CultivationTypes.QI_CONDENSER;
         String[] keys = {external ? "available_qi" : "available_stamina", "available_hp"};
         String[] values = {format.format(stamina),
-            format.format(player.getHealth()) + " / " + format.format(player.getMaxHealth())};
+            format.format(player.getHealth()) + " / " + format.format(player.getMaxHealth())
+                    + (player.getAbsorptionAmount() > 0 ? " (+" + format.format(player.getAbsorptionAmount()) + ")" : "")};
         for (int i = 0; i < keys.length; i++) {
             Component label = Component.translatable("cultivationcraft.gui." + keys[i]);
             font.drawShadow(pose, label, x, y + i * 14, 0xDDDDDD);

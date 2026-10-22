@@ -53,12 +53,14 @@ public class Cultivationcraft {
         modEventBus.addListener(this::registerTooltipFactories);
 
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, Config.Server.spec, "cultivationcraft.toml");
+        ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, Config.Client.spec, "cultivationcraft-client.toml");
 
         Register.init(modEventBus);
         BlockRegister.init(modEventBus);
         ItemRegister.init(modEventBus);
         lNalator.Cultivationcraft.Common.Knowledge.JadeSlipLootModifier.init(modEventBus);
         lNalator.Cultivationcraft.Common.Alchemy.AlchemyEffects.init(modEventBus);
+        lNalator.Cultivationcraft.Common.Qi.Elements.ElementalStates.init(modEventBus);
         ModWorldgen.init();
         ModBiomeModifiers.init();
         BodyPartNames.registerLungLocations();

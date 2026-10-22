@@ -10,6 +10,8 @@ import lNalator.Cultivationcraft.Common.Qi.Stats.BodyPartStatControl;
 import lNalator.Cultivationcraft.Common.Qi.Stats.StatIDs;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.Technique;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers.TechniqueModifier;
+import lNalator.Cultivationcraft.Common.Qi.Quests.Quest;
+import lNalator.Cultivationcraft.Common.Qi.Quests.QuestHandler;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueStats.DefaultTechniqueStatIDs;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueStats.TechniqueStatModification;
 import lNalator.Cultivationcraft.Cultivationcraft;
@@ -98,6 +100,9 @@ public class QiBarrierTechnique extends Technique {
 
         if (CultivatorStats.getCultivatorStats(player).getCultivation().consumeQi(player, resist / getTechniqueStat(qiToHealthRatio, player))) {
             levelUp(player, amount);
+
+            QuestHandler.progressQuest(player, Quest.DAMAGE_ABSORBED, resist);
+            QuestHandler.progressQuest(player, Quest.DAMAGE_ABSORBED, resist, source.getElement().toString());
 
             for (TechniqueModifier mod : CultivatorStats.getCultivatorStats(player).getCultivation().getModifiers()) {
                 mod.onHitTaken(player, resist, getElement(), source);

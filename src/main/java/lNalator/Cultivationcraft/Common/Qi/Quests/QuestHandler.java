@@ -1,5 +1,7 @@
 package lNalator.Cultivationcraft.Common.Qi.Quests;
 
+import lNalator.Cultivationcraft.Common.CultivationNotifier;
+import net.minecraft.network.chat.Component;
 import lNalator.Cultivationcraft.Common.Capabilities.BodyModifications.BodyModifications;
 import lNalator.Cultivationcraft.Common.Capabilities.BodyModifications.IBodyModifications;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.CultivatorStats;
@@ -113,7 +115,8 @@ public class QuestHandler {
                     stats.setConceptProgress(modifier.ID, progress);
 
                     if (modifier.hasLearnt(player)) {
-                        // TODO: Message concept has been learnt
+                        CultivationNotifier.notify(player, CultivationNotifier.Type.SUCCESS, Component.translatable("cultivationcraft.notify.concept_learnt"),
+                                Component.translatable(modifier.getID().getNamespace() + "." + modifier.getID().getPath()));
                     }
                 }
             }
@@ -121,8 +124,16 @@ public class QuestHandler {
 
         // Try to progress the Cultivation quest if it exists
         if (stats.getCultivation().getQuest() != null) {
-            if (stats.getCultivation().progressQuest(stats.getCultivation().getQuest().progress(mode, amount, extra))) {
+            Quest quest = stats.getCultivation().getQuest();
+            boolean wasComplete = stats.getCultivation().getQuestProgress() >= quest.complete;
+
+            if (stats.getCultivation().progressQuest(quest.progress(mode, amount, extra))) {
                 update = true;
+
+                if (!wasComplete && stats.getCultivation().getQuestProgress() >= quest.complete) {
+                    CultivationNotifier.notify(player, CultivationNotifier.Type.SUCCESS, Component.translatable("cultivationcraft.notify.quest_complete"),
+                            Component.literal(quest.extra == null ? "" : quest.extra + " ").append(Component.translatable(quest.mode.getPath())));
+                }
             }
         }
 

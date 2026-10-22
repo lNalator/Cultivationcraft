@@ -22,8 +22,8 @@ public class TechniqueControl {
         TechniqueControl.addTechnique(QiEmission.class);
         TechniqueControl.addTechnique(QiTransferTechnique.class);
         TechniqueControl.addTechnique(FlyingSwordFormationTechnique.class);
-        //TechniqueControl.addTechnique(IceWalkTechnique.class);
-        //TechniqueControl.addTechnique(IceAuraTechnique.class);
+        TechniqueControl.addTechnique(IceWalkTechnique.class);
+        TechniqueControl.addTechnique(AuraTechnique.class);
         TechniqueControl.addTechnique(LeapTechnique.class);
         TechniqueControl.addTechnique(BiteTechnique.class);
         TechniqueControl.addTechnique(RollTechnique.class);

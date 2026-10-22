@@ -19,6 +19,7 @@ import lNalator.Cultivationcraft.Cultivationcraft;
 import lNalator.Cultivationcraft.Network.PacketHandler;
 import lNalator.Cultivationcraft.StaminaHandler;
 import net.minecraft.nbt.CompoundTag;
+import lNalator.Cultivationcraft.Common.CultivationNotifier;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -434,8 +435,8 @@ public class CultivationType {
             currentLevel = levels == null ? 0 : levels.values().stream().mapToDouble(Double::doubleValue).sum();
         }
 
-        // Don't cultivate if already at the max
-        if (currentLevel >= techLevel) {
+        // Don't cultivate if already at the max, using the same measure as canBreakthrough
+        if (currentLevel >= techLevel || (statsCanLevel() && sumStatLevels(getPassive().getClass().toString()) >= techLevel)) {
             return Qi;
         }
 
@@ -542,14 +543,26 @@ public class CultivationType {
         return (int) qiLevel;
     }
 
+    // Sum a technique's stat levels before truncating: truncating each stat separately lost up to
+    // 1 level per stat, so a stage could stop accepting Qi while showing less than its maximum
+    protected int sumStatLevels(String tech) {
+        if (!statLevels.containsKey(tech)) {
+            return 0;
+        }
+
+        double total = 0;
+        for (double value : statLevels.get(tech).values()) {
+            total += value;
+        }
+
+        // Float accumulation can leave 299.9999 for a full 300
+        return (int) Math.floor(total + 1e-4);
+    }
+
     public int getTechLevelProgressWithoutPrevious(String tech) {
         int progress = 0;
 
-        if (statLevels.containsKey(tech)) {
-            for (double value : statLevels.get(tech).values()) {
-                progress += (int) value;
-            }
-        }
+        progress += sumStatLevels(tech);
 
         return progress;
     }
@@ -561,11 +574,7 @@ public class CultivationType {
 
         int progress = 0;
 
-        if (statLevels.containsKey(tech)) {
-            for (double value : statLevels.get(tech).values()) {
-                progress += (int) value;
-            }
-        }
+        progress += sumStatLevels(tech);
 
         if (previousCultivation != null) {
             progress += previousCultivation.getTechLevelProgress(tech);
@@ -579,11 +588,7 @@ public class CultivationType {
 
         String tech = getPassive().getClass().toString();
 
-        if (statLevels.containsKey(tech)) {
-            for (double value : statLevels.get(tech).values()) {
-                progress += (int) value;
-            }
-        }
+        progress += sumStatLevels(tech);
 
         if (previousCultivation != null) {
             progress += previousCultivation.getPassiveTechLevelProgress();
@@ -607,11 +612,17 @@ public class CultivationType {
 
         double amountToLevel = max - current;
 
-        if (amount > amountToLevel) {
+        if (amount >= amountToLevel) {
             amount = amountToLevel;
 
             if (player instanceof ServerPlayer) {
                 CultivationAdvancements.TECH_USE.trigger((ServerPlayer) player, tech.getClass().getName(), 2);
+
+                // The passive filling up means the stage's cultivation is full
+                boolean stageFull = tech.getClass() == passive.getClass();
+                CultivationNotifier.notify(player, CultivationNotifier.Type.PROGRESS,
+                        Component.translatable(stageFull ? "cultivationcraft.notify.stage_full" : "cultivationcraft.notify.technique_mastered"),
+                        stageFull ? Component.translatable(ID.toLanguageKey()) : Component.translatable(tech.getLangLocation()));
             }
         }
 

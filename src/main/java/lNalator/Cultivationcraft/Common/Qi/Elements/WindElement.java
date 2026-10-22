@@ -4,7 +4,9 @@ import lNalator.Cultivationcraft.Common.Qi.Damage.QiDamageSource;
 import lNalator.Cultivationcraft.Common.Qi.Effects.Wind;
 import lNalator.Cultivationcraft.Common.Qi.Effects.WindInstance;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 
 import java.awt.*;
@@ -24,6 +26,10 @@ public class WindElement extends Element {
 
         Vec3 direction = target.position().subtract(source.getSourcePosition()).normalize();
         Wind.addWindEffect(target, new WindInstance(direction, damageAmount * 0.025f, damageAmount / 5f));
+
+        if (damageAmount > 0 && target instanceof LivingEntity living) {
+            living.addEffect(new MobEffectInstance(ElementalStates.OFF_BALANCE.get(), 40));
+        }
 
         super.applyStatusEffect(source, target, damageAmount);
     }
