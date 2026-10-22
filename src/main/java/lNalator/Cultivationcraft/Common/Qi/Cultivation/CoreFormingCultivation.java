@@ -1,5 +1,6 @@
 package lNalator.Cultivationcraft.Common.Qi.Cultivation;
 
+import lNalator.Cultivationcraft.Common.Config;
 import lNalator.Cultivationcraft.Common.Qi.Quests.Quest;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import lNalator.Cultivationcraft.Client.GUI.Screens.ConceptScreen;
@@ -38,10 +39,10 @@ public class CoreFormingCultivation extends CultivationType
     {
         modifiers.add(mod);
 
-        // Stabilising gets harder with each stage: +50% of the base threshold per stage (design C1).
-        // Stage 1 (the elemental core) keeps the base threshold, so it is the easiest.
+        // Every core shares the same stabilisation goal for a given stage, growing by a fixed step:
+        // stage 1 (the elemental core) is the easiest. The concept only decides what is counted.
         Quest base = mod.getStabaliseQuest();
-        setQuest(new Quest(base.mode, base.complete * (1 + 0.5 * (stage - 1)), base.extra));
+        setQuest(new Quest(base.mode, Config.Server.stabiliseGoal(stage), base.extra));
     }
 
     public TechniqueModifier getFocus()

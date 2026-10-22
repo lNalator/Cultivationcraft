@@ -7,6 +7,8 @@ public class Config {
     public static class Server {
 
         protected static final ForgeConfigSpec.ConfigValue<Boolean> qiSourceElementalEffects;
+        private static final ForgeConfigSpec.IntValue stabiliseGoalBase;
+        private static final ForgeConfigSpec.IntValue stabiliseGoalStep;
         private static ForgeConfigSpec.IntValue procPlantCatalogSize;
         private static ForgeConfigSpec.IntValue procPlantRegionSizeChunks;
         private static ForgeConfigSpec.IntValue procPlantTier3ChancePercent;
@@ -38,6 +40,13 @@ public class Config {
             builder.push("First Person Rendering");
             qiSourceElementalEffects = builder.comment("Enable Qi Sources to apply their elemental effects to the world around them")
                     .define("Enable Qi Source Elemental Effects", true);
+            builder.pop();
+
+            builder.push("Core Forming");
+            stabiliseGoalBase = builder.comment("Stabilisation quest goal of the first Core Forming stage, shared by every core")
+                    .defineInRange("stabilise_goal_base", 1000, 1, 1000000);
+            stabiliseGoalStep = builder.comment("Added to the stabilisation goal at each following stage")
+                    .defineInRange("stabilise_goal_step", 500, 0, 1000000);
             builder.pop();
 
             builder.push("Procedural Plants");
@@ -86,6 +95,10 @@ public class Config {
             builder.pop();
 
             spec = builder.build();
+        }
+
+        public static int stabiliseGoal(int stage) {
+            return stabiliseGoalBase.get() + stabiliseGoalStep.get() * (stage - 1);
         }
 
         public static boolean qiSourceElementalEffectsOn() {

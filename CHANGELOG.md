@@ -1,15 +1,16 @@
 # Changelog
 
-## [0.4.4] - WIP - Type safety
+## [0.4.4] - WIP - Code cleanup, quest goals and food
 
 ### New features and changes
 
-- Qi cultivators (external path) can eat foods with potion effects (golden apples, suspicious stew, pufferfish...) to get those effects only: eating gives no Qi, and is allowed even with full Qi.
+- Core Forming stabilisation quests now share one goal per stage, whatever the core: 1000 at stage 1, then +500 per stage (5000 at stage 9). The concept only decides what is counted, which also replaces the provisional goals of Aura and Grow. Both values are in the server config (`stabilise_goal_base`, `stabilise_goal_step`); quests already in progress keep their previous goal.
+- Qi cultivators (external path) can eat foods with potion effects (golden apples, suspicious stew, pufferfish...) to get those effects only: eating gives no Qi, and is allowed even with full Qi. Other foods stay inedible.
 
 ### Refactoring
 
-- Removed 336 warnings reported by the Eclipse compiler (VS Code Java): 282 unused imports, 33 static methods called on an instance, unused local variables, an incomplete enum switch, and the deprecated `Class.newInstance()`, `Item.getFoodProperties()`, `getItemEnchantmentLevel` and `hasChunkAt` calls.
-- Removed every raw-type, unchecked and redundant-cast compiler warning. Techniques are now registered as typed factories (`Supplier<Technique>`) instead of classes created by reflection; saves stay compatible since techniques and their levels keep the same keys. `getBodyPartsOfType` is generic, and block properties are read through their typed constants.
+- Removed every raw-type, unchecked and redundant-cast compiler warning with explicit types. Techniques are now registered as typed factories (`Supplier<Technique>`) instead of classes created by reflection, and stat, focus and level lookups take the technique itself; saves stay compatible since techniques and their levels keep the same keys. `DropdownList` and `getBodyPartsOfType` are generic, and block properties are read through their typed constants.
+- Removed 336 warnings reported by the Eclipse compiler used by VS Code Java: 282 unused imports, 33 static methods called on an instance, unused local variables, an incomplete enum switch, and the deprecated `Class.newInstance()`, `Item.getFoodProperties()`, `getItemEnchantmentLevel` and `hasChunkAt` calls. The 16 remaining warnings are unavoidable Minecraft/Forge deprecations.
 
 ## [0.4.3] - WIP - Elements, Aura and Freezing
 
