@@ -1,7 +1,6 @@
 package lNalator.Cultivationcraft.Network.Packets;
 
 import lNalator.Cultivationcraft.Common.Advancements.CultivationAdvancements;
-import lNalator.Cultivationcraft.Common.Advancements.Triggers.EvolvedLimbTrigger;
 import lNalator.Cultivationcraft.Common.Capabilities.BodyModifications.BodyModifications;
 import lNalator.Cultivationcraft.Common.Capabilities.BodyModifications.IBodyModifications;
 import lNalator.Cultivationcraft.Common.Qi.BodyParts.BodyPart;
@@ -12,7 +11,6 @@ import lNalator.Cultivationcraft.Network.PacketHandler;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.network.NetworkEvent;
 

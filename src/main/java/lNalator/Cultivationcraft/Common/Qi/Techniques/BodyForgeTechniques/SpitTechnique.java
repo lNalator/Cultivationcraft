@@ -2,10 +2,7 @@ package lNalator.Cultivationcraft.Common.Qi.Techniques.BodyForgeTechniques;
 
 import lNalator.Cultivationcraft.Client.ClientListeners;
 import lNalator.Cultivationcraft.Client.Particles.Spit.SpitParticleData;
-import lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.CultivatorStats;
-import lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.ICultivatorStats;
 import lNalator.Cultivationcraft.Common.Qi.BodyParts.Lungs.Breath.Breath;
-import lNalator.Cultivationcraft.Common.Qi.CultivationTypes;
 import lNalator.Cultivationcraft.Common.Qi.Elements.Elements;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.Technique;
 import lNalator.Cultivationcraft.Cultivationcraft;
@@ -13,7 +10,6 @@ import lNalator.mlmanimator.Client.Poses.PlayerPoseHandler;
 import lNalator.mlmanimator.Client.Poses.PoseHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.TickEvent;
 

@@ -10,7 +10,8 @@ import net.minecraft.resources.ResourceLocation;
 import java.awt.*;
 import java.util.LinkedHashMap;
 
-public class DropdownList {
+// T: the type of value stored behind each displayed name
+public class DropdownList<T> {
 
     protected static final ResourceLocation TEXTURE = new ResourceLocation(Cultivationcraft.MODID, "textures/gui/dropdownlist.png");
 
@@ -33,7 +34,7 @@ public class DropdownList {
     // Map String, String = Name, Value
     // Name is what the entry displays
     // Value is the data stored in the entry
-    protected LinkedHashMap<String, Object> items = new LinkedHashMap<String, Object>();
+    protected LinkedHashMap<String, T> items = new LinkedHashMap<String, T>();
 
     protected String selected = null;
 
@@ -42,7 +43,7 @@ public class DropdownList {
     public DropdownList() {
     }
 
-    public void addItem(String name, Object value) {
+    public void addItem(String name, T value) {
         items.put(name, value);
 
         if (selected == null) {
@@ -55,7 +56,7 @@ public class DropdownList {
     }
 
     // Return the Value of the selected list entry
-    public Object getSelected() {
+    public T getSelected() {
         return items.get(selected);
     }
 
@@ -69,7 +70,7 @@ public class DropdownList {
         return true;
     }
 
-    public Object mouseClick(int mouseX, int mouseY, int buttonPressed) {
+    public T mouseClick(int mouseX, int mouseY, int buttonPressed) {
         if (isOpen) {
             return mouseClickOpen(mouseX, mouseY, buttonPressed); 
         }else {
@@ -92,7 +93,7 @@ public class DropdownList {
     }
 
     // Process mouse click. Return new selected object if an object is selected.
-    public Object mouseClickOpen(int mouseX, int mouseY, int buttonPressed) {
+    public T mouseClickOpen(int mouseX, int mouseY, int buttonPressed) {
         // Do nothing if the left button isn't pressed
         if (buttonPressed != 0) {
             return null;
@@ -182,11 +183,11 @@ public class DropdownList {
 
         // Draw the list open or closed
         if (isOpen) {
-            gui.blit(PoseStack, xpos, ypos, gui.getBlitOffset(), width + 1, 0, width, openHeight, 255, 255);
+            GuiComponent.blit(PoseStack, xpos, ypos, gui.getBlitOffset(), width + 1, 0, width, openHeight, 255, 255);
 
             drawScrollBar(PoseStack, xpos, ypos, mouseX, mouseY, gui);
         } else {
-            gui.blit(PoseStack, xpos, ypos, gui.getBlitOffset(), 0, 0, width, closedHeight, 255, 255);
+            GuiComponent.blit(PoseStack, xpos, ypos, gui.getBlitOffset(), 0, 0, width, closedHeight, 255, 255);
         }
 
         // Draw the selected item
@@ -203,9 +204,9 @@ public class DropdownList {
         // Highlight the scroll buttons if mouse is over them
         if (mouseX - xpos >= scrollbarXStart && mouseX - xpos < width) {
             if (mouseY - ypos >= 0 && mouseY - ypos < closedHeight) {
-                gui.blit(PoseStack, xpos + scrollbarXStart, ypos, gui.getBlitOffset(), width * 2 + 2, 0, width - scrollbarXStart, closedHeight, 255, 255); 
+                GuiComponent.blit(PoseStack, xpos + scrollbarXStart, ypos, gui.getBlitOffset(), width * 2 + 2, 0, width - scrollbarXStart, closedHeight, 255, 255); 
             }else if (mouseY - ypos >= scrollbarYDown && mouseY - ypos < openHeight) {
-                gui.blit(PoseStack, xpos + scrollbarXStart, ypos + scrollbarYDown, gui.getBlitOffset(), width * 2 + 2, scrollbarYDown, width - scrollbarXStart, closedHeight, 255, 255);
+                GuiComponent.blit(PoseStack, xpos + scrollbarXStart, ypos + scrollbarYDown, gui.getBlitOffset(), width * 2 + 2, scrollbarYDown, width - scrollbarXStart, closedHeight, 255, 255);
             }
         }
 
@@ -213,7 +214,7 @@ public class DropdownList {
         float percent = maxScroll() == 0 ? 0 : (float) scrollOffset / maxScroll();
         int scrollPosition = scrollBarTop + (int) ((scrollBarBottom - scrollBarTop) * percent);
 
-        gui.blit(PoseStack, xpos + scrollbarXStart, ypos + scrollPosition, gui.getBlitOffset(), width * 2 + 2, closedHeight, width - scrollbarXStart, scrollBarSize, 255, 255);
+        GuiComponent.blit(PoseStack, xpos + scrollbarXStart, ypos + scrollPosition, gui.getBlitOffset(), width * 2 + 2, closedHeight, width - scrollbarXStart, scrollBarSize, 255, 255);
     }
 
     // Draw visible list items

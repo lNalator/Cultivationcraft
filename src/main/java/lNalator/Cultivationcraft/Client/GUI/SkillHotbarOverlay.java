@@ -2,14 +2,12 @@ package lNalator.Cultivationcraft.Client.GUI;
 
 import lNalator.Cultivationcraft.Client.KeybindingControl;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorTechniques.CultivatorTechniques;
-import lNalator.Cultivationcraft.Common.Qi.TechniqueControl;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.Technique;
 import lNalator.Cultivationcraft.Network.ClientPacketHandler;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.resources.ResourceLocation;
 

@@ -1,6 +1,5 @@
 package lNalator.Cultivationcraft.Common.Capabilities.CultivatorTechniques;
 
-import lNalator.Cultivationcraft.Common.Capabilities.BodyModifications.IBodyModifications;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.Direction;
 import net.minecraftforge.common.capabilities.*;
@@ -8,7 +7,6 @@ import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class CultivatorTechniquesCapability implements ICapabilityProvider, INBTSerializable<CompoundTag> {

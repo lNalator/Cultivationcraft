@@ -1,13 +1,10 @@
 package lNalator.Cultivationcraft.Common.Capabilities.ChunkQiSources;
 
 import lNalator.Cultivationcraft.Common.Qi.QiSource;
-import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
-import net.minecraftforge.common.capabilities.Capability;
 
 import java.util.List;
 

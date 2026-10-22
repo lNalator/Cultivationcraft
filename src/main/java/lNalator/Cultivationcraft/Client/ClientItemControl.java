@@ -8,7 +8,6 @@ import lNalator.Cultivationcraft.Cultivationcraft;
 import lNalator.Cultivationcraft.Common.Register;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
 public class ClientItemControl {

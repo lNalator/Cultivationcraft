@@ -2,7 +2,6 @@ package lNalator.Cultivationcraft.Common.Qi;
 
 import lNalator.Cultivationcraft.Client.Renderers.QiSourceRenderer;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.CultivatorStats;
-import lNalator.Cultivationcraft.Common.Qi.Elements.Element;
 import lNalator.Cultivationcraft.Common.Qi.Elements.Elements;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.QiCondenserTechniques.QiEmission;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.Technique;
@@ -10,26 +9,18 @@ import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers.Techniq
 import lNalator.Cultivationcraft.Common.Register;
 import lNalator.Cultivationcraft.Server.CultivatorAttackLogic;
 import net.minecraft.core.particles.ParticleOptions;
-import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractHurtingProjectile;
-import net.minecraft.world.entity.projectile.ProjectileUtil;
-import net.minecraft.world.entity.projectile.ThrownTrident;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
-import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
 public class QiProjectile extends AbstractHurtingProjectile {

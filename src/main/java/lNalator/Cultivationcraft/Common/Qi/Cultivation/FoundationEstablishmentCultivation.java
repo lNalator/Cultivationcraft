@@ -2,14 +2,12 @@ package lNalator.Cultivationcraft.Common.Qi.Cultivation;
 
 import lNalator.Cultivationcraft.Client.GUI.Screens.CultivationTypeScreens.FoundationEstablishmentScreen;
 import lNalator.Cultivationcraft.Common.Advancements.CultivationAdvancements;
-import lNalator.Cultivationcraft.Common.Advancements.Triggers.BreakthroughTrigger;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.CultivatorStats;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.PassiveTechniques.CultivationPassives.FoundationPassive;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.storage.loot.LootContext;
 
 public class FoundationEstablishmentCultivation extends CultivationType {
 

@@ -1,14 +1,8 @@
 package lNalator.Cultivationcraft.Common.Qi.Techniques.PassiveTechniques.CultivationPassives;
 
-import lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.CultivatorStats;
-import lNalator.Cultivationcraft.Common.Qi.Cultivation.CultivationType;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.PassiveTechniques.PassiveTechnique;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueStats.DefaultCultivationStatIDs;
-import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueStats.TechniqueStatModification;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.player.Player;
 
-import java.util.Map;
 
 public class BasePassive extends PassiveTechnique {
 

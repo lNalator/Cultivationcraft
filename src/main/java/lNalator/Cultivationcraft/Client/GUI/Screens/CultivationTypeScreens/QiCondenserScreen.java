@@ -1,5 +1,6 @@
 package lNalator.Cultivationcraft.Client.GUI.Screens.CultivationTypeScreens;
 
+import net.minecraft.client.gui.GuiComponent;
 import lNalator.Cultivationcraft.Client.Textures.AlphaOverlayTexture;
 import lNalator.Cultivationcraft.Common.Qi.Cultivation.CultivationType;
 import lNalator.Cultivationcraft.Common.Qi.Cultivation.QiCondenserCultivation;
@@ -34,7 +35,7 @@ public class QiCondenserScreen extends CultivationTypeScreen {
 
         ((AlphaOverlayTexture) Minecraft.getInstance().getTextureManager().getTexture(TEXTURE)).setAlphaSize(1f - currentProgress);
 
-        screen.blit(PoseStack, xPos, yPos, screen.getBlitOffset(), 0, 0, xSize, ySize, xSize, ySize);
+        GuiComponent.blit(PoseStack, xPos, yPos, screen.getBlitOffset(), 0, 0, xSize, ySize, xSize, ySize);
 
         ResourceLocation element = ((QiCondenserCultivation) cultivation).getCurrentElementFocus();
         int percent = (int) (((QiCondenserCultivation) cultivation).getElementFocusAmount(element) * 100);

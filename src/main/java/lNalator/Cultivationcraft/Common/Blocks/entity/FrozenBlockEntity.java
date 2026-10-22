@@ -19,7 +19,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.Property;
 import org.jetbrains.annotations.NotNull;
 
 public class FrozenBlockEntity extends BlockEntity implements TickableBlockEntity {
@@ -44,9 +43,7 @@ public class FrozenBlockEntity extends BlockEntity implements TickableBlockEntit
         this.oldBlockEntityData = null;
         this.itemStack = new ItemStack(this.oldBlockState.getBlock().asItem());
 
-        Property<Boolean> isSecondBlock = (Property<Boolean>) ((FrozenBlock) blockState.getBlock()).getStateDefinition().getProperty("is_second_block");
-        assert isSecondBlock != null;
-        this.isSecondBlock = blockState.getValue(isSecondBlock);
+        this.isSecondBlock = blockState.getValue(FrozenBlock.IS_SECOND_BLOCK);
     }
 
     public FrozenBlockEntity(BlockPos blockPos, BlockState blockState, BlockState oldBlockState, BlockEntity oldBlockEntity, CompoundTag oldBlockEntityData, boolean isSecondBlock) {

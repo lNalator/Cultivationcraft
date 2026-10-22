@@ -3,7 +3,6 @@ package lNalator.Cultivationcraft.Client.GUI.Screens;
 import lNalator.Cultivationcraft.Client.GUI.GUIButton;
 import lNalator.Cultivationcraft.Client.GUI.SelectableTextField;
 import lNalator.Cultivationcraft.Client.GUI.TextField;
-import lNalator.Cultivationcraft.Common.Qi.Cultivation.CoreFormingCultivation;
 import lNalator.Cultivationcraft.Common.Qi.ExternalCultivationHandler;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers.TechniqueModifier;
 import lNalator.Cultivationcraft.Cultivationcraft;
@@ -153,7 +152,7 @@ public class ConceptScreen extends GenericTabScreen {
 
         if (selectText.getSelected() != null) {
             String name = Component.translatable(selectText.getSelected().getName()).getString();
-            font.draw(PoseStack, name, edgeSpacingX + (int) (this.xSize / 2) - (int) (font.width(name) / 2), edgeSpacingY + nameTextY, Color.darkGray.getRGB());
+            font.draw(PoseStack, name, edgeSpacingX + this.xSize / 2 - font.width(name) / 2, edgeSpacingY + nameTextY, Color.darkGray.getRGB());
 
             // Only allow the select button to be pressed if a concept is selected and not a category
             if (selectable) {

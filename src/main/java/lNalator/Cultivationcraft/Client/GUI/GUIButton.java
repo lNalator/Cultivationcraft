@@ -3,9 +3,7 @@ package lNalator.Cultivationcraft.Client.GUI;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.resources.ResourceLocation;
 
@@ -131,9 +129,9 @@ public class GUIButton {
         }
 
         // Draw the start, end and middle of the button.
-        gui.blit(PoseStack, xpos, ypos, gui.getBlitOffset(), offset, 0, baseWidth / 2, height, 255, 255);
-        gui.blit(PoseStack, xpos + baseWidth / 2, ypos, gui.getBlitOffset(), 0, 14 + offset * 2, width - baseWidth, height, 255, 255);
-        gui.blit(PoseStack, xpos + width - baseWidth / 2, ypos, gui.getBlitOffset(), offset + baseWidth / 2, 0, baseWidth / 2, height, 255, 255);
+        GuiComponent.blit(PoseStack, xpos, ypos, gui.getBlitOffset(), offset, 0, baseWidth / 2, height, 255, 255);
+        GuiComponent.blit(PoseStack, xpos + baseWidth / 2, ypos, gui.getBlitOffset(), 0, 14 + offset * 2, width - baseWidth, height, 255, 255);
+        GuiComponent.blit(PoseStack, xpos + width - baseWidth / 2, ypos, gui.getBlitOffset(), offset + baseWidth / 2, 0, baseWidth / 2, height, 255, 255);
 
         // Draw the button text
         Minecraft.getInstance().font.draw(PoseStack, name, xpos + baseWidth / 2, ypos + 2, textColor);

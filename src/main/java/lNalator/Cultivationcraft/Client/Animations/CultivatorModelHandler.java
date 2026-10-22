@@ -4,10 +4,8 @@ import lNalator.Cultivationcraft.Client.Textures.TextureList;
 import lNalator.Cultivationcraft.Common.Qi.Stats.BodyPartStatControl;
 import lNalator.Cultivationcraft.Common.Qi.Stats.PlayerStatModifications;
 import lNalator.Cultivationcraft.Common.Qi.Stats.StatIDs;
-import lNalator.mlmanimator.Client.AnimationFramework.AnimationSpeedCalculator;
 import lNalator.mlmanimator.Client.Models.Quads.Quad;
 import lNalator.mlmanimator.Client.Poses.Arm;
-import lNalator.mlmanimator.Client.Poses.PlayerPose;
 import lNalator.mlmanimator.Client.Poses.PlayerPoseHandler;
 import lNalator.mlmanimator.Client.Poses.PoseHandler;
 import lNalator.mlmanimator.Client.Models.*;
@@ -71,7 +69,6 @@ public class CultivatorModelHandler {
 
             processParts(newModel, parts, models, modifications, partLocations, handler);
 
-            PlayerPose defaultSize = new PlayerPose();
 
             // Update textures from body parts
             for (BodyPart part : parts) {

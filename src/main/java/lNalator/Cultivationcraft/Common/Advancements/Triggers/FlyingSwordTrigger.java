@@ -6,9 +6,6 @@ import net.minecraft.advancements.critereon.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.GsonHelper;
-import net.minecraft.world.level.storage.loot.LootContext;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParam;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet;
 
 public class FlyingSwordTrigger extends SimpleCriterionTrigger<FlyingSwordTrigger.Instance> {
 

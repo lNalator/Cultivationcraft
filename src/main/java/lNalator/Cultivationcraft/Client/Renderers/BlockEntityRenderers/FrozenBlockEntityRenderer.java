@@ -113,6 +113,9 @@ public class FrozenBlockEntityRenderer implements BlockEntityRenderer<FrozenBloc
                 pPoseStack.translate(0D, 0D, -1D);
             case EAST ->
                 pPoseStack.translate(-1D, 0D, 0D);
+            // Frozen blocks only take horizontal facings
+            case UP, DOWN -> {
+            }
         }
     }
 

@@ -57,7 +57,7 @@ public class SelectNewCultivationScreen extends Screen {
             selection.addSelectable(new SelectableText(advance.getID()));
         }
 
-        selection.setSize(selectTextWidth, selectTextHeight, (int) (selectTextWidth * 2));
+        selection.setSize(selectTextWidth, selectTextHeight, selectTextWidth * 2);
 
         select = new GUIButton("advance", Component.translatable("cultivationcraft.gui.advance").getString());
         select.disable();
@@ -127,7 +127,7 @@ public class SelectNewCultivationScreen extends Screen {
 
         this.blit(PoseStack, edgeSpacingX, edgeSpacingY, 0, 0, this.xSize, this.ySize);
 
-        font.draw(PoseStack, name, edgeSpacingX + (int) (this.xSize / 2) - (int) (font.width(name) / 2), edgeSpacingY + nameTextY, Color.darkGray.getRGB());
+        font.draw(PoseStack, name, edgeSpacingX + this.xSize / 2 - font.width(name) / 2, edgeSpacingY + nameTextY, Color.darkGray.getRGB());
 
         description.setPos(edgeSpacingX + descTextX, edgeSpacingY + descTextY);
         description.setSize(descTextWidth, descTextHeight);

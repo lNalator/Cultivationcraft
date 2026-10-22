@@ -27,9 +27,9 @@ import java.util.Map;
 
 public class BodyforgeScreen extends GenericTabScreen {
 
-    protected DropdownList bodyParts;
-    protected DropdownList bodySubParts;
-    protected DropdownList forgePart;
+    protected DropdownList<String> bodyParts;
+    protected DropdownList<String> bodySubParts;
+    protected DropdownList<String> forgePart;
 
     protected GUIButton forge;
     protected GUIButton cancel;
@@ -68,7 +68,6 @@ public class BodyforgeScreen extends GenericTabScreen {
     public BodyforgeScreen() {
         super(2, Component.translatable("cultivationcraft.gui.bodyforge"), new ResourceLocation(Cultivationcraft.MODID, "textures/gui/bodyforge.png"));
 
-        String Selection = BodyModifications.getBodyModifications(genericClientFunctions.getPlayer()).getSelection();
         updateBodyPartList();
 
         String forgeString = Component.translatable("cultivationcraft.gui.forge").getString();
@@ -87,7 +86,7 @@ public class BodyforgeScreen extends GenericTabScreen {
     }
 
     protected void updateBodyPartList() {
-        bodyParts = new DropdownList();
+        bodyParts = new DropdownList<String>();
 
         Player player = genericClientFunctions.getPlayer();
 
@@ -120,7 +119,7 @@ public class BodyforgeScreen extends GenericTabScreen {
     }
 
     protected void updateBodySubPartList() {
-        bodySubParts = new DropdownList();
+        bodySubParts = new DropdownList<String>();
 
         Player player = genericClientFunctions.getPlayer();
         ArrayList<String> positions = new ArrayList<String>();
@@ -150,7 +149,7 @@ public class BodyforgeScreen extends GenericTabScreen {
     }
 
     protected void updateButtons() {
-        forgePart = new DropdownList();
+        forgePart = new DropdownList<String>();
 
         Player player = genericClientFunctions.getPlayer();
 
@@ -181,7 +180,7 @@ public class BodyforgeScreen extends GenericTabScreen {
 
         // Change the selected position if a position is clicked in the dropdown list
         if (mode == 0) {
-            String changed = (String) bodyParts.mouseClick((int) mouseX - (edgeSpacingX + bodyPartListXPos), (int) mouseY - (edgeSpacingY + bodyPartListYPos), buttonPressed);
+            String changed = bodyParts.mouseClick((int) mouseX - (edgeSpacingX + bodyPartListXPos), (int) mouseY - (edgeSpacingY + bodyPartListYPos), buttonPressed);
 
             if (changed != null) {
                 partDescription.resetScroll();
@@ -386,7 +385,7 @@ public class BodyforgeScreen extends GenericTabScreen {
 
         // Render the progress bar
         IBodyModifications modifications = BodyModifications.getBodyModifications(genericClientFunctions.getPlayer());
-        float progress = (float) modifications.getProgress() / (float) BodyPartStatControl.getStats(genericClientFunctions.getPlayer()).getStat(StatIDs.qiCost);
+        float progress = (float) modifications.getProgress() / BodyPartStatControl.getStats(genericClientFunctions.getPlayer()).getStat(StatIDs.qiCost);
 
         RenderSystem.setShaderTexture(0, TEXTURE);
 
@@ -519,7 +518,7 @@ public class BodyforgeScreen extends GenericTabScreen {
         IBodyModifications modifications = BodyModifications.getBodyModifications(genericClientFunctions.getPlayer());
 
         // Check against the position selected in the drop down menu
-        String selected = ((String) bodyParts.getSelected());
+        String selected = bodyParts.getSelected();
 
         // Change the position to check to the selected part's position if one exists
         String Selection = modifications.getSelection();
@@ -541,7 +540,7 @@ public class BodyforgeScreen extends GenericTabScreen {
     }
 
     protected String getSelectedSubPosition() {
-        String selected = ((String) bodySubParts.getSelected());
+        String selected = bodySubParts.getSelected();
         if (selected == null) {
             selected = "";
         }

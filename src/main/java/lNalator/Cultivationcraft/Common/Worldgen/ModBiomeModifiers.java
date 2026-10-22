@@ -3,7 +3,6 @@ package lNalator.Cultivationcraft.Common.Worldgen;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import net.minecraft.core.HolderSet;
 import net.minecraft.data.BuiltinRegistries;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BiomeTags;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.GenerationStep;

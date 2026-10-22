@@ -3,7 +3,6 @@ package lNalator.Cultivationcraft.Common.Qi.Cultivation;
 import lNalator.Cultivationcraft.Client.GUI.Screens.CultivationTypeScreens.CultivationTypeScreen;
 import lNalator.Cultivationcraft.Client.GUI.Screens.GenericTabScreen;
 import lNalator.Cultivationcraft.Common.Advancements.CultivationAdvancements;
-import lNalator.Cultivationcraft.Common.Advancements.Triggers.BreakthroughTrigger;
 import lNalator.Cultivationcraft.Common.Capabilities.ChunkQiSources.ChunkQiSources;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.CultivatorStats;
 import lNalator.Cultivationcraft.Common.Qi.BodyParts.FoodStats.QiFoodStats;
@@ -24,7 +23,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.storage.loot.LootContext;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -465,25 +463,25 @@ public class CultivationType {
         return previousCultivation;
     }
 
-    public Double getStatLevelWithoutPrevious(Class tech, ResourceLocation stat) {
+    public Double getStatLevelWithoutPrevious(Technique tech, ResourceLocation stat) {
         Double level = 0.0;
 
-        if (statLevels.containsKey(tech.toString()) && statLevels.get(tech.toString()).containsKey(stat)) {
-            level += statLevels.get(tech.toString()).get(stat);
+        if (statLevels.containsKey(tech.getClass().toString()) && statLevels.get(tech.getClass().toString()).containsKey(stat)) {
+            level += statLevels.get(tech.getClass().toString()).get(stat);
         }
 
         return level;
     }
 
-    public Double getStatLevel(Class tech, ResourceLocation stat) {
-        if (tech.toString().compareTo(passive.getClass().toString()) == 0) {
+    public Double getStatLevel(Technique tech, ResourceLocation stat) {
+        if (tech.getClass().toString().compareTo(passive.getClass().toString()) == 0) {
             return getPassiveStatLevel(stat);
         }
 
         Double level = 0.0;
 
-        if (statLevels.containsKey(tech.toString()) && statLevels.get(tech.toString()).containsKey(stat)) {
-            level += statLevels.get(tech.toString()).get(stat);
+        if (statLevels.containsKey(tech.getClass().toString()) && statLevels.get(tech.getClass().toString()).containsKey(stat)) {
+            level += statLevels.get(tech.getClass().toString()).get(stat);
         }
 
         if (previousCultivation != null) {
@@ -531,8 +529,8 @@ public class CultivationType {
         return level;
     }
 
-    public int getTechLevelProgress(Class tech) {
-        return getTechLevelProgress(tech.toString());
+    public int getTechLevelProgress(Technique tech) {
+        return getTechLevelProgress(tech.getClass().toString());
     }
 
     public int getQiLevelProgress() {
@@ -599,7 +597,7 @@ public class CultivationType {
 
     public void levelTech(Technique tech, double amount, Player player) {
         int max = getMaxTechLevel();
-        int current = getTechLevelProgress(tech.getClass());
+        int current = getTechLevelProgress(tech);
 
         if (max == current) {
             // If this technique is maxed then trigger the appropriate achievements
@@ -626,7 +624,7 @@ public class CultivationType {
             }
         }
 
-        ResourceLocation toLevel = CultivatorStats.getCultivatorStats(player).getTechniqueFocus(tech.getClass());
+        ResourceLocation toLevel = CultivatorStats.getCultivatorStats(player).getTechniqueFocus(tech);
 
         if (toLevel == null) {
             toLevel = (ResourceLocation) tech.getTechniqueStats().toArray()[0];

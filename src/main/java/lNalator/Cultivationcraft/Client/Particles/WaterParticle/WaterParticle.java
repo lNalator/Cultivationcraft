@@ -9,7 +9,6 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-import java.util.List;
 
 public class WaterParticle extends TextureSheetParticle {
 

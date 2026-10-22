@@ -1,8 +1,6 @@
 package lNalator.Cultivationcraft.Server;
 
-import lNalator.Cultivationcraft.Client.genericClientFunctions;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorTechniques.CultivatorTechniques;
-import lNalator.Cultivationcraft.Common.Capabilities.CultivatorTechniques.ICultivatorTechniques;
 import lNalator.Cultivationcraft.Common.Qi.BodyParts.BodyPartNames;
 import lNalator.Cultivationcraft.Common.Capabilities.BodyModifications.BodyModifications;
 import lNalator.Cultivationcraft.Common.Capabilities.BodyModifications.IBodyModifications;

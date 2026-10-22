@@ -2,7 +2,6 @@ package lNalator.Cultivationcraft.Common.Qi.Techniques;
 
 import lNalator.Cultivationcraft.Common.PlayerUtils;
 import lNalator.Cultivationcraft.Common.Qi.BodyParts.BodyPartNames;
-import lNalator.Cultivationcraft.Client.ClientItemControl;
 import lNalator.Cultivationcraft.Client.Renderer;
 import lNalator.Cultivationcraft.Common.Capabilities.BodyModifications.BodyModifications;
 import lNalator.Cultivationcraft.Common.Capabilities.BodyModifications.IBodyModifications;
@@ -14,8 +13,6 @@ import lNalator.Cultivationcraft.Common.Qi.Elements.Elements;
 import lNalator.Cultivationcraft.Common.Qi.Stats.StatIDs;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueStats.DefaultTechniqueStatIDs;
 import lNalator.Cultivationcraft.Cultivationcraft;
-import net.minecraft.client.player.AbstractClientPlayer;
-import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.resources.ResourceLocation;

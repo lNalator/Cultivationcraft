@@ -1,7 +1,6 @@
 package lNalator.Cultivationcraft.Network.Packets.CultivatorStats;
 
 import lNalator.Cultivationcraft.Common.Advancements.CultivationAdvancements;
-import lNalator.Cultivationcraft.Common.Advancements.Triggers.CultivationPathTrigger;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.CultivatorStats;
 import lNalator.Cultivationcraft.Common.Qi.BodyParts.PlayerHealthManager;
 import lNalator.Cultivationcraft.Common.Qi.Cultivation.FoundationEstablishmentCultivation;
@@ -13,7 +12,6 @@ import lNalator.Cultivationcraft.Network.Packets.Packet;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.server.ServerLifecycleHooks;

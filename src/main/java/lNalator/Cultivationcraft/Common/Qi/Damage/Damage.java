@@ -204,9 +204,7 @@ public class Damage {
                 int i = (player.getEffect(MobEffects.DAMAGE_RESISTANCE).getAmplifier() + 1) * 5;
                 int j = 25 - i;
                 float f = amount * (float) j;
-                float f1 = amount;
                 amount = Math.max(f / 25.0F, 0.0F);
-                float f2 = f1 - amount;
             }
 
             if (!source.isBypassEnchantments()) {

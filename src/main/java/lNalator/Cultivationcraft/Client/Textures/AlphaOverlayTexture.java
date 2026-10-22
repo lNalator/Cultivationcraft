@@ -65,7 +65,7 @@ public class AlphaOverlayTexture extends SimpleTexture {
                 // Set the alpha value to be the lowest alpha of the two images
                 alpha = Math.min(alpha, NativeImage.getA(baseRgba));
 
-                int rgba = image.combine(alpha, NativeImage.getB(baseRgba), NativeImage.getG(baseRgba), NativeImage.getR(baseRgba));
+                int rgba = NativeImage.combine(alpha, NativeImage.getB(baseRgba), NativeImage.getG(baseRgba), NativeImage.getR(baseRgba));
 
                 if (!RenderSystem.isOnRenderThreadOrInit()) {
                     RenderSystem.recordRenderCall(()

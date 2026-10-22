@@ -1,5 +1,6 @@
 package lNalator.Cultivationcraft.Client.GUI.Screens;
 
+import java.util.function.Supplier;
 import lNalator.Cultivationcraft.Client.GUI.GUIButton;
 import lNalator.Cultivationcraft.Client.GUI.TextField;
 import lNalator.Cultivationcraft.Client.genericClientFunctions;
@@ -16,11 +17,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.network.chat.Component;
 
-import java.awt.*;
 
 public class TechniqueScreen extends GenericTabScreen {
 
-    protected DropdownList techniques;
+    protected DropdownList<Supplier<Technique>> techniques;
 
     public static int selected = 0;
 
@@ -49,22 +49,19 @@ public class TechniqueScreen extends GenericTabScreen {
     }
 
     protected void updateTechniqueList() {
-        techniques = new DropdownList();
+        techniques = new DropdownList<Supplier<Technique>>();
 
-        techniques.addItem(Component.translatable("cultivationcraft.gui.notechnique").getString(), Technique.class);
+        // "No technique" creates nothing
+        techniques.addItem(Component.translatable("cultivationcraft.gui.notechnique").getString(), () -> null);
 
         ICultivatorTechniques techList = CultivatorTechniques.getCultivatorTechniques(genericClientFunctions.getPlayer());
 
-        for (Class tech : TechniqueControl.getAvailableTechnics(genericClientFunctions.getPlayer())) {
-            try {
-                Technique technique = (Technique) (tech.newInstance());
+        for (Supplier<Technique> tech : TechniqueControl.getAvailableTechnics(genericClientFunctions.getPlayer())) {
+            Technique technique = tech.get();
 
-                // Add the technique if it is valid and either multiple copies are allowed or it isn't already set
-                if (technique.isValid(genericClientFunctions.getPlayer()) && (technique.allowMultiple() || !techList.techniqueExists(technique))) {
-                    techniques.addItem(technique.getName(), tech);
-                }
-            } catch (Exception e) {
-                Cultivationcraft.LOGGER.error(tech.getName() + " is not a Technique: " + e.getMessage());
+            // Add the technique if either multiple copies are allowed or it isn't already set
+            if (technique.allowMultiple() || !techList.techniqueExists(technique)) {
+                techniques.addItem(technique.getName(), tech);
             }
         }
 
@@ -102,18 +99,11 @@ public class TechniqueScreen extends GenericTabScreen {
     }
 
     // Change the selected technique to a new technique of the specified type
-    public void changeTechnique(Class newTech) {
+    public void changeTechnique(Supplier<Technique> newTech) {
         ICultivatorTechniques techs = CultivatorTechniques.getCultivatorTechniques(genericClientFunctions.getPlayer());
 
-        Technique newTechnique = null;
-
-        try {
-            if (newTech != Technique.class) {
-                newTechnique = (Technique) newTech.newInstance();
-            }
-        } catch (Exception e) {
-            Cultivationcraft.LOGGER.warn("Error assigning technique: " + e);
-        }
+        // Null for "No technique"
+        Technique newTechnique = newTech.get();
 
         if (newTechnique != null && !newTechnique.allowMultiple()) {
             if (techs.techniqueExists(newTechnique)) {
@@ -145,7 +135,7 @@ public class TechniqueScreen extends GenericTabScreen {
         int edgeSpacingX = (this.width - this.xSize) / 2;
         int edgeSpacingY = (this.height - this.ySize) / 2;
 
-        Class changed = (Class) techniques.mouseClick((int) mouseX - (edgeSpacingX + techniqueXPos), (int) mouseY - (edgeSpacingY + techniqueYPos), buttonPressed);
+        Supplier<Technique> changed = techniques.mouseClick((int) mouseX - (edgeSpacingX + techniqueXPos), (int) mouseY - (edgeSpacingY + techniqueYPos), buttonPressed);
 
         // If the technique has been changed send that change to the server
         if (changed != null) {

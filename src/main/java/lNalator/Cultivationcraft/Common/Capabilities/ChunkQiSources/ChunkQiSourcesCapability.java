@@ -1,6 +1,5 @@
 package lNalator.Cultivationcraft.Common.Capabilities.ChunkQiSources;
 
-import lNalator.Cultivationcraft.Common.Capabilities.BodyModifications.IBodyModifications;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.Direction;
 import net.minecraftforge.common.capabilities.*;

@@ -1,15 +1,10 @@
 package lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats;
 
+import lNalator.Cultivationcraft.Common.Qi.Techniques.Technique;
 import lNalator.Cultivationcraft.Common.Qi.Cultivation.CultivationType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.HitResult;
-import net.minecraft.world.phys.Vec3;
-import net.minecraft.client.multiplayer.ClientLevel;
 
-import java.util.HashMap;
-import java.util.UUID;
 
 public interface ICultivatorStats {
 
@@ -21,7 +16,7 @@ public interface ICultivatorStats {
 
     public void setCultivation(CultivationType newCultivation);
 
-    public ResourceLocation getTechniqueFocus(Class tech);
+    public ResourceLocation getTechniqueFocus(Technique tech);
 
     public void setTechniqueFocus(String tech, ResourceLocation focus);
 

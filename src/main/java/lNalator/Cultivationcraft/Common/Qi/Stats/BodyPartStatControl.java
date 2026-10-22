@@ -2,8 +2,6 @@ package lNalator.Cultivationcraft.Common.Qi.Stats;
 
 import lNalator.Cultivationcraft.Common.Qi.BodyParts.Blood.Blood;
 import lNalator.Cultivationcraft.Common.Qi.BodyParts.PlayerHealthManager;
-import lNalator.Cultivationcraft.Common.Qi.Stats.PlayerStatControl;
-import lNalator.Cultivationcraft.Common.Qi.Stats.PlayerStatModifications;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 

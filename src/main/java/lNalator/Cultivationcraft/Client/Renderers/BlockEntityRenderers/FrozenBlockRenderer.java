@@ -1,10 +1,5 @@
 package lNalator.Cultivationcraft.Client.Renderers.BlockEntityRenderers;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
 
 /*
 public class FrozenBlockRenderer implements BlockEntityRenderer<FrozenBlockEntity>

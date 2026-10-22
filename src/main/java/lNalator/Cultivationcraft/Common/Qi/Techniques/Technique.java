@@ -1,5 +1,6 @@
 package lNalator.Cultivationcraft.Common.Qi.Techniques;
 
+import lNalator.Cultivationcraft.Common.Qi.TechniqueControl;
 import lNalator.Cultivationcraft.Client.genericClientFunctions;
 import lNalator.Cultivationcraft.Common.Advancements.CultivationAdvancements;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.CultivatorStats;
@@ -11,7 +12,6 @@ import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers.Techniq
 import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueStats.DefaultTechniqueStatIDs;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueStats.TechniqueStatModification;
 import lNalator.Cultivationcraft.Network.ClientPacketHandler;
-import lNalator.Cultivationcraft.StaminaHandler;
 import lNalator.mlmanimator.Client.Poses.PoseHandler;
 import lNalator.mlmanimator.Client.Poses.PlayerPose;
 import lNalator.Cultivationcraft.Common.Qi.Elements.Elements;
@@ -22,7 +22,6 @@ import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
-import com.mojang.math.Vector3f;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -39,7 +38,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
-import net.minecraftforge.event.entity.player.AttackEntityEvent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -199,7 +197,7 @@ public class Technique {
         if (canLevel) {
             for (Map.Entry<ResourceLocation, TechniqueStatModification> modification : statChangesPerLevel.entrySet()) {
                 if (modification.getValue() != null) {
-                    int statLevel = (int) (double) cultivation.getStatLevel(this.getClass(), modification.getKey());
+                    int statLevel = (int) (double) cultivation.getStatLevel(this, modification.getKey());
                     defaultStat += modification.getValue().getStatChange(stat) * statLevel;
                 }
             }
@@ -435,7 +433,6 @@ public class Technique {
     }
 
     public static Technique readBuffer(FriendlyByteBuf buffer) {
-        Technique newTech;
         CompoundTag nbt = buffer.readNbt();
 
         return readNBT(nbt);
@@ -468,10 +465,9 @@ public class Technique {
         String className = nbt.getString("className");
         Technique newTech;
 
-        try {
-            Class test = Class.forName(className);
-            newTech = (Technique) test.newInstance();
-        } catch (Exception e) {
+        newTech = TechniqueControl.create(className);
+
+        if (newTech == null) {
             Cultivationcraft.LOGGER.error(className + " not found when loading Technique");
             return null;
         }

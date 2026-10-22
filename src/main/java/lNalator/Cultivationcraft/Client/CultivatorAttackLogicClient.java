@@ -2,7 +2,6 @@ package lNalator.Cultivationcraft.Client;
 
 import lNalator.Cultivationcraft.Common.Misc;
 import net.minecraft.client.Minecraft;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;

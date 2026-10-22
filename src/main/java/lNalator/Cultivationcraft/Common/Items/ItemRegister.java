@@ -2,8 +2,6 @@ package lNalator.Cultivationcraft.Common.Items;
 
 import lNalator.Cultivationcraft.Cultivationcraft;
 import lNalator.Cultivationcraft.Common.Blocks.BlockRegister;
-import lNalator.Cultivationcraft.Common.Items.ProceduralPlantItem;
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraftforge.eventbus.api.IEventBus;

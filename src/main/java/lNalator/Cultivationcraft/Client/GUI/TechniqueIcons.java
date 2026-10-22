@@ -6,8 +6,6 @@ import lNalator.Cultivationcraft.Common.Capabilities.CultivatorTechniques.ICulti
 import lNalator.Cultivationcraft.Cultivationcraft;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.resources.ResourceLocation;
 
@@ -29,7 +27,7 @@ public class TechniqueIcons {
             if (techs.getTechnique(i) != null) {
                 RenderSystem.setShaderTexture(0, techs.getTechnique(i).getIcon());
 
-                gui.blit(stack, xpos + i * spacing, ypos, gui.getBlitOffset(), 0, 0, 16, 16, 16, 16);
+                GuiComponent.blit(stack, xpos + i * spacing, ypos, gui.getBlitOffset(), 0, 0, 16, 16, 16, 16);
             }
         }
     }
@@ -92,7 +90,7 @@ public class TechniqueIcons {
         // Set the texture to be semi-transparent
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 0.5F);
 
-        gui.blit(stack, xpos + icon * spacing, ypos, gui.getBlitOffset(), 0, 0, 16, 16, 16, 16);
+        GuiComponent.blit(stack, xpos + icon * spacing, ypos, gui.getBlitOffset(), 0, 0, 16, 16, 16, 16);
 
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1F);
     }
@@ -107,7 +105,7 @@ public class TechniqueIcons {
         // Set the texture to be semi-transparent
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 0.5F);
 
-        gui.blit(stack, xpos + icon * spacing, ypos, gui.getBlitOffset(), 0, 0, 16, 16, 16, 16);
+        GuiComponent.blit(stack, xpos + icon * spacing, ypos, gui.getBlitOffset(), 0, 0, 16, 16, 16, 16);
 
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1F);
 

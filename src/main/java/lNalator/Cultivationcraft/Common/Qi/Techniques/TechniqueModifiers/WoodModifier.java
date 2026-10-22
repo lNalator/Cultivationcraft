@@ -2,7 +2,6 @@ package lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers;
 
 import lNalator.Cultivationcraft.Common.Qi.Elements.Elements;
 import lNalator.Cultivationcraft.Common.Qi.Quests.Quest;
-import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers.TechniqueModifier;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import net.minecraft.resources.ResourceLocation;
 

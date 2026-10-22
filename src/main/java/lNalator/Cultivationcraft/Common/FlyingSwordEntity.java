@@ -1,6 +1,5 @@
 package lNalator.Cultivationcraft.Common;
 
-import lNalator.Cultivationcraft.Client.Renderer;
 import lNalator.Cultivationcraft.Client.Renderers.QiGlowRenderer;
 import lNalator.Cultivationcraft.Common.Advancements.CultivationAdvancements;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.CultivatorStats;
@@ -9,13 +8,10 @@ import lNalator.Cultivationcraft.Common.Capabilities.CultivatorTechniques.Cultiv
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorTechniques.ICultivatorTechniques;
 import lNalator.Cultivationcraft.Common.Qi.Damage.QiDamageSource;
 import lNalator.Cultivationcraft.Common.Qi.Elements.Elements;
-import lNalator.Cultivationcraft.Common.Qi.Quests.Quest;
-import lNalator.Cultivationcraft.Common.Qi.Quests.QuestHandler;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.QiCondenserTechniques.FlyingSwordFormationTechnique;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.Technique;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers.TechniqueModifier;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueStats.DefaultTechniqueStatIDs;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.protocol.Packet;
@@ -25,7 +21,6 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.world.damagesource.EntityDamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.boss.EnderDragonPart;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -735,7 +730,7 @@ public class FlyingSwordEntity extends ItemEntity {
                 }
 
                 // Knockback
-                int i = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.KNOCKBACK, getItem());
+                int i = getItem().getEnchantmentLevel(Enchantments.KNOCKBACK);
                 owner.level.playSound((Player) null, getX(), getY(), getZ(), SoundEvents.PLAYER_ATTACK_KNOCKBACK, owner.getSoundSource(), 1.0F, 1.0F);
                 ++i;
 

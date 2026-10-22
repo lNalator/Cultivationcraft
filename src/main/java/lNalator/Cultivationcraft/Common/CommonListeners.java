@@ -50,7 +50,6 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.level.ChunkEvent;
 import net.minecraftforge.event.level.ChunkWatchEvent;
 import net.minecraftforge.event.level.LevelEvent;
-import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
@@ -137,7 +136,7 @@ public class CommonListeners {
     public static void LevelTick(TickEvent.LevelTickEvent event) {
         if (event.phase == TickEvent.Phase.START && event.side == LogicalSide.SERVER) {
             // Clone the array list so it doesn't bork out if modified during ticking
-            ArrayList<IChunkQiSources> ticking = (ArrayList<IChunkQiSources>) tickingQiSources.clone();
+            ArrayList<IChunkQiSources> ticking = new ArrayList<IChunkQiSources>(tickingQiSources);
 
             for (IChunkQiSources sources : ticking) {
                 if (sources == null) {
@@ -333,7 +332,7 @@ public class CommonListeners {
         CultivatorStats.getCultivatorStats(event.getEntity()).setDisconnected(false);
 
         if (!event.getEntity().getCommandSenderWorld().isClientSide()) {
-            ServerItemControl.sendPlayerStats(event.getEntity(), (Player) event.getEntity());
+            ServerItemControl.sendPlayerStats(event.getEntity(), event.getEntity());
         }
     }
 

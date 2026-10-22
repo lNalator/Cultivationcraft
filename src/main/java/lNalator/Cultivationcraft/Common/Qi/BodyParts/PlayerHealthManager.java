@@ -65,14 +65,14 @@ public class PlayerHealthManager {
                 LungPart part = ((LungPart) modifications.getOption(BodyPartNames.bodyPosition, BodyPartNames.lungSubPosition));
                 lung = part.getLungType();
 
-                ArrayList<BodyPart> lungParts = modifications.getBodyPartsOfType(LungPart.class);
+                ArrayList<LungPart> lungParts = modifications.getBodyPartsOfType(LungPart.class);
 
                 // Loop through each lung connection and check if a lung type has been assigned
                 for (int i = 0; i < lung.getLungAmount(); i++) {
                     ResourceLocation location = lung.getConnection(i).getLocation();
 
-                    for (BodyPart testLung : lungParts) {
-                        Lung lungConnection = ((LungPart) testLung).getLung(location);
+                    for (LungPart testLung : lungParts) {
+                        Lung lungConnection = testLung.getLung(location);
 
                         if (lungConnection != null) {
                             lung.setLung(i, lungConnection);
@@ -111,9 +111,9 @@ public class PlayerHealthManager {
             // Otherwise use the default food handler
             IBodyModifications modifications = BodyModifications.getBodyModifications(player);
 
-            ArrayList<BodyPart> stomach = modifications.getBodyPartsOfType(StomachPart.class);
+            ArrayList<StomachPart> stomach = modifications.getBodyPartsOfType(StomachPart.class);
             if (stomach.size() > 0) {
-                food = ((StomachPart) stomach.get(0)).getFoodStats().clone();
+                food = stomach.get(0).getFoodStats().clone();
             }
 
             // Set the players max stamina

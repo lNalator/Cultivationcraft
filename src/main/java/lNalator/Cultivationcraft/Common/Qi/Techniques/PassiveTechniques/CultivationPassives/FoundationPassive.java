@@ -1,6 +1,5 @@
 package lNalator.Cultivationcraft.Common.Qi.Techniques.PassiveTechniques.CultivationPassives;
 
-import lNalator.Cultivationcraft.Common.Qi.Techniques.PassiveTechniques.PassiveTechnique;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueStats.DefaultCultivationStatIDs;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueStats.TechniqueStatModification;
 

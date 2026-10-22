@@ -267,7 +267,7 @@ public final class DivineSenseBlockRenderer {
                 if (highlighted >= current.maxHighlights()) {
                     break;
                 }
-                if (!mc.level.hasChunkAt(pos)) {
+                if (!mc.level.isLoaded(pos)) {
                     continue;
                 }
                 var state = mc.level.getBlockState(pos);

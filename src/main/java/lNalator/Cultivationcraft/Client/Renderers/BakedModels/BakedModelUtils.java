@@ -1,6 +1,5 @@
 package lNalator.Cultivationcraft.Client.Renderers.BakedModels;
 
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 
 public class BakedModelUtils {
     /*

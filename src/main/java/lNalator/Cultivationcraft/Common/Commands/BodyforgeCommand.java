@@ -1,18 +1,15 @@
 package lNalator.Cultivationcraft.Common.Commands;
 
-import lNalator.Cultivationcraft.Client.genericClientFunctions;
 import lNalator.Cultivationcraft.Common.Capabilities.BodyModifications.BodyModifications;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.CultivatorStats;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.ICultivatorStats;
 import lNalator.Cultivationcraft.Common.Qi.BodyParts.FoodStats.QiFoodStats;
-import lNalator.Cultivationcraft.Common.Qi.Cultivation.CultivationType;
 import lNalator.Cultivationcraft.Common.Qi.CultivationTypes;
 import lNalator.Cultivationcraft.Common.Qi.Elements.Elements;
 import lNalator.Cultivationcraft.Common.Qi.Stats.BodyPartStatControl;
 import lNalator.Cultivationcraft.Common.Qi.Stats.StatIDs;
 import lNalator.Cultivationcraft.Common.Qi.TechniqueControl;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.Technique;
-import lNalator.Cultivationcraft.Cultivationcraft;
 import lNalator.Cultivationcraft.Network.PacketHandler;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -23,6 +20,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.Collection;
+import java.util.function.Supplier;
 
 public class BodyforgeCommand {
 
@@ -86,15 +84,11 @@ public class BodyforgeCommand {
         for (ServerPlayer serverplayer : players) {
             double amount = CultivatorStats.getCultivatorStats(serverplayer).getCultivation().getMaxTechLevel();
 
-            for (Class tech : TechniqueControl.getAvailableTechnics(serverplayer)) {
-                try {
-                    Technique technique = (Technique) (tech.newInstance());
+            for (Supplier<Technique> tech : TechniqueControl.getAvailableTechnics(serverplayer)) {
+                Technique technique = tech.get();
 
-                    if (technique.isValid(serverplayer) && technique.canLevel()) {
-                        technique.levelUp(serverplayer, amount);
-                    }
-                } catch (Exception e) {
-                    Cultivationcraft.LOGGER.error(tech.getName() + " is not a Technique: " + e.getMessage());
+                if (technique.canLevel()) {
+                    technique.levelUp(serverplayer, amount);
                 }
             }
         }

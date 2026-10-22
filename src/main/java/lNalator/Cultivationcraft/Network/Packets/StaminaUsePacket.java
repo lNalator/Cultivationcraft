@@ -1,12 +1,8 @@
 package lNalator.Cultivationcraft.Network.Packets;
 
-import lNalator.Cultivationcraft.Common.Capabilities.CultivatorTechniques.CultivatorTechniques;
-import lNalator.Cultivationcraft.Common.Qi.Techniques.Technique;
 import lNalator.Cultivationcraft.Cultivationcraft;
-import lNalator.Cultivationcraft.Network.PacketHandler;
 import lNalator.Cultivationcraft.StaminaHandler;
 import net.minecraft.client.Minecraft;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.fml.LogicalSide;

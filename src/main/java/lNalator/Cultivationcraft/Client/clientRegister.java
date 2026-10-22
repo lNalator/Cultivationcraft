@@ -10,7 +10,6 @@ import lNalator.Cultivationcraft.Client.Particles.WaterParticle.WaterParticle;
 import lNalator.Cultivationcraft.Client.Particles.WindParticle.WindParticle;
 import lNalator.Cultivationcraft.Common.Register;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RegisterItemDecorationsEvent;
 import net.minecraftforge.client.event.RegisterParticleProvidersEvent;

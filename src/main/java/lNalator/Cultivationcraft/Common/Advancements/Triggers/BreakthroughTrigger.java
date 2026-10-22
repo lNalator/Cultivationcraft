@@ -2,16 +2,10 @@ package lNalator.Cultivationcraft.Common.Advancements.Triggers;
 
 import lNalator.Cultivationcraft.Cultivationcraft;
 import com.google.gson.JsonObject;
-import net.minecraft.advancements.CriterionTrigger;
 import net.minecraft.advancements.critereon.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.GsonHelper;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.storage.loot.LootContext;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParam;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet;
 
 public class BreakthroughTrigger extends SimpleCriterionTrigger<BreakthroughTrigger.Instance> {
 

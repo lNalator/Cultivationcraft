@@ -1,7 +1,6 @@
 package lNalator.Cultivationcraft.Common.Qi.Techniques.QiCondenserTechniques;
 
 import lNalator.Cultivationcraft.Client.Animations.GenericQiPoses;
-import lNalator.Cultivationcraft.Client.Renderer;
 import lNalator.Cultivationcraft.Client.Renderers.QiGlowRenderer;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.CultivatorStats;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.ICultivatorStats;

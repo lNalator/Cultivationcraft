@@ -1,6 +1,5 @@
 package lNalator.Cultivationcraft.Client.GUI.Screens;
 
-import lNalator.Cultivationcraft.Client.GUI.BetterFontRenderer;
 import lNalator.Cultivationcraft.Client.GUI.TextField;
 import lNalator.Cultivationcraft.Client.genericClientFunctions;
 import lNalator.Cultivationcraft.Client.GUI.BodyPartGUI;
@@ -15,7 +14,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.Map;
 

@@ -12,7 +12,6 @@ import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
-import java.util.UUID;
 import java.util.function.Supplier;
 
 public class ElementalEffectPacket extends Packet {

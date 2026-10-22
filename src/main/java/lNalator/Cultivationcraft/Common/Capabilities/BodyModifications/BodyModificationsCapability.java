@@ -7,7 +7,6 @@ import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class BodyModificationsCapability implements ICapabilityProvider, INBTSerializable<CompoundTag> {

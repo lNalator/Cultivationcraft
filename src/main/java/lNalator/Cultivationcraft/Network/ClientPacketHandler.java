@@ -1,5 +1,6 @@
 package lNalator.Cultivationcraft.Network;
 
+import lNalator.Cultivationcraft.Common.Qi.Techniques.Technique;
 import lNalator.Cultivationcraft.Client.genericClientFunctions;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorTechniques.CultivatorTechniques;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorTechniques.ICultivatorTechniques;
@@ -24,8 +25,8 @@ public class ClientPacketHandler {
         PacketHandler.channel.sendToServer(pack);
     }
 
-    public static void sendTechStatToServer(Class tech, ResourceLocation stat) {
-        TechniqueStatSelectionPacket pack = new TechniqueStatSelectionPacket(tech.toString(), stat);
+    public static void sendTechStatToServer(Technique tech, ResourceLocation stat) {
+        TechniqueStatSelectionPacket pack = new TechniqueStatSelectionPacket(tech.getClass().toString(), stat);
         PacketHandler.channel.sendToServer(pack);
     }
 

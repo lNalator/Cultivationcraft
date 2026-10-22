@@ -28,6 +28,6 @@ public class CultivationTypeScreen {
         RenderSystem.setShaderTexture(0, TEXTURE);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
-        screen.blit(PoseStack, xPos, yPos, screen.getBlitOffset(), 0, 0, xSize, ySize, xSize, ySize);
+        GuiComponent.blit(PoseStack, xPos, yPos, screen.getBlitOffset(), 0, 0, xSize, ySize, xSize, ySize);
     }
 }

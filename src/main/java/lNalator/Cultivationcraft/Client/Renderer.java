@@ -11,22 +11,12 @@ import lNalator.Cultivationcraft.Common.Qi.BodyParts.PlayerHealthManager;
 import lNalator.Cultivationcraft.Common.Qi.Stats.BodyPartStatControl;
 import lNalator.Cultivationcraft.Common.Qi.Stats.StatIDs;
 import lNalator.Cultivationcraft.Cultivationcraft;
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.Tesselator;
-import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.Minecraft;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.resources.ResourceLocation;
 import com.mojang.math.Vector3f;
 
-import java.awt.*;
 
 public class Renderer
 {

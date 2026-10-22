@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.4.4] - WIP - Type safety
+
+### New features and changes
+
+- Qi cultivators (external path) can eat foods with potion effects (golden apples, suspicious stew, pufferfish...) to get those effects only: eating gives no Qi, and is allowed even with full Qi.
+
+### Refactoring
+
+- Removed 336 warnings reported by the Eclipse compiler (VS Code Java): 282 unused imports, 33 static methods called on an instance, unused local variables, an incomplete enum switch, and the deprecated `Class.newInstance()`, `Item.getFoodProperties()`, `getItemEnchantmentLevel` and `hasChunkAt` calls.
+- Removed every raw-type, unchecked and redundant-cast compiler warning. Techniques are now registered as typed factories (`Supplier<Technique>`) instead of classes created by reflection; saves stay compatible since techniques and their levels keep the same keys. `getBodyPartsOfType` is generic, and block properties are read through their typed constants.
+
 ## [0.4.3] - WIP - Elements, Aura and Freezing
 
 ### Fixes

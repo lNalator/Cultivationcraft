@@ -190,11 +190,11 @@ public class BodyPart {
     }
 
     public void addNeededPosition(String positionID, String subpositionID) {
-        neededPositionToForge.add(new Pair(positionID, subpositionID));
+        neededPositionToForge.add(new Pair<String, String>(positionID, subpositionID));
     }
 
     public void addNeedNotPosition(String positionID, String subpositionID) {
-        needNotPositionToForge.add(new Pair(positionID, subpositionID));
+        needNotPositionToForge.add(new Pair<String, String>(positionID, subpositionID));
     }
 
     public void addNeededTags(String tag) {

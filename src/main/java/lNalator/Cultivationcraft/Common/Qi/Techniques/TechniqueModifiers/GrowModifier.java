@@ -1,7 +1,6 @@
 package lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers;
 
 import lNalator.Cultivationcraft.Common.Qi.Quests.Quest;
-import lNalator.Cultivationcraft.Common.Qi.Quests.QuestHandler;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.QiCondenserTechniques.ItemEnhanceTechnique;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.QiCondenserTechniques.QiBarrierTechnique;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.Technique;

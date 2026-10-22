@@ -1,6 +1,5 @@
 package lNalator.Cultivationcraft.Common.Qi.Techniques.QiCondenserTechniques;
 
-import lNalator.Cultivationcraft.Client.Renderers.QiSourceRenderer;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.CultivatorStats;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.ICultivatorStats;
 import lNalator.Cultivationcraft.Common.PlayerUtils;
@@ -16,9 +15,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.event.TickEvent;
 
-import java.util.ArrayList;
 
 public class QiEmission extends Technique {
 

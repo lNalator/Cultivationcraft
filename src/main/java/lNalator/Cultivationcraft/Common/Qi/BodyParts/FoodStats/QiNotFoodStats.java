@@ -1,16 +1,15 @@
 package lNalator.Cultivationcraft.Common.Qi.BodyParts.FoodStats;
 
+import net.minecraft.world.item.SuspiciousStewItem;
+import net.minecraft.world.food.FoodProperties;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.CultivatorStats;
-import lNalator.Cultivationcraft.Common.Qi.BodyParts.PlayerHealthManager;
 import lNalator.Cultivationcraft.Common.Qi.Cultivation.CultivationType;
-import lNalator.Cultivationcraft.Common.Qi.QiSource;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueStats.DefaultCultivationStatIDs;
-import lNalator.Cultivationcraft.Cultivationcraft;
+import lNalator.Cultivationcraft.Common.Qi.BodyParts.PlayerHealthManager;
+import net.minecraft.world.item.ItemStack;
 import com.mojang.math.Vector3f;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 
-import java.util.List;
 
 public class QiNotFoodStats extends QiFoodStats {
 
@@ -50,8 +49,26 @@ public class QiNotFoodStats extends QiFoodStats {
         }
     }
 
+    // Qi cultivators don't eat for food, but can eat foods with potion effects (golden apples, suspicious stew...)
+    // to get those effects only
+    @Override
     public boolean isEdible(ItemStack item) {
-        return false;
+        FoodProperties food = item.getFoodProperties(null);
+
+        return item.getItem() instanceof SuspiciousStewItem || (food != null && !food.getEffects().isEmpty());
+    }
+
+    // Always allowed to eat those foods, even with full Qi
+    @Override
+    public boolean needsFood() {
+        return true;
+    }
+
+    // Eating gives no Qi: only the item's effects apply (vanilla applies them separately from the food data)
+    @Override
+    public void eat(int foodLevel, float saturation) {
+        // Intentionally ignore nutrition and saturation: eating must not restore Qi.
+        // Vanilla applies the item's potion effects separately from this method.
     }
 
     public boolean canEatMeat() {

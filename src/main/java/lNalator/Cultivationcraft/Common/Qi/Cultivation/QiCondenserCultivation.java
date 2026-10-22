@@ -14,7 +14,7 @@ import java.util.Map;
 
 public class QiCondenserCultivation extends CultivationType {
 
-    protected HashMap<ResourceLocation, Float> elementProgression = new HashMap();
+    protected HashMap<ResourceLocation, Float> elementProgression = new HashMap<ResourceLocation, Float>();
 
     public QiCondenserCultivation() {
         this(1);

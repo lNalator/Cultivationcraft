@@ -3,7 +3,6 @@ package lNalator.Cultivationcraft.Common.Capabilities.CultivatorTechniques;
 import lNalator.Cultivationcraft.Common.Qi.TechniqueControl;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.PassiveTechniques.PassiveTechnique;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.Technique;
-import lNalator.Cultivationcraft.Cultivationcraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
 
@@ -45,17 +44,7 @@ public class CultivatorTechniques implements ICultivatorTechniques {
 
     public void determinePassives(Player player) {
         passives.clear();
-        ArrayList<Class> passiveList = TechniqueControl.getPassiveTechniques(player);
-
-        for (Class pTech : passiveList) {
-            try {
-                PassiveTechnique passive = (PassiveTechnique) pTech.newInstance();
-
-                passives.add(passive);
-            } catch (Exception e) {
-                Cultivationcraft.LOGGER.error(pTech.getName() + " is not a Passive Technique: " + e.getMessage());
-            }
-        }
+        passives.addAll(TechniqueControl.getPassiveTechniques(player));
     }
 
     public ArrayList<PassiveTechnique> getPassives() {

@@ -1,5 +1,6 @@
 package lNalator.Cultivationcraft.Client.GUI;
 
+import net.minecraft.client.gui.GuiComponent;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -83,15 +84,15 @@ public class TextField {
     public void render(Screen screen, Font font, PoseStack poseStack, int mouseX, int mouseY) {
         RenderSystem.setShaderTexture(0, texture);
         RenderSystem.setShaderColor(backgroundColor.getRed() / 255f, backgroundColor.getGreen() / 255f, backgroundColor.getBlue() / 255f, 1);
-        screen.blit(poseStack, x, y, screen.getBlitOffset(), 0, 0, width, height, width, height);
+        GuiComponent.blit(poseStack, x, y, screen.getBlitOffset(), 0, 0, width, height, width, height);
 
         RenderSystem.setShaderColor((backgroundColor.getRed() - 100) / 255f, (backgroundColor.getGreen() - 100) / 255f, (backgroundColor.getBlue() - 100) / 255f, 1);
-        screen.blit(poseStack, x, y, screen.getBlitOffset(), 0, 0, 1, height - 1, 1, height - 1);
-        screen.blit(poseStack, x, y, screen.getBlitOffset(), 0, 0, width - 1, 1, width - 1, 1);
+        GuiComponent.blit(poseStack, x, y, screen.getBlitOffset(), 0, 0, 1, height - 1, 1, height - 1);
+        GuiComponent.blit(poseStack, x, y, screen.getBlitOffset(), 0, 0, width - 1, 1, width - 1, 1);
 
         RenderSystem.setShaderColor(1, 1, 1, 1);
-        screen.blit(poseStack, x + width - 1, y + 1, screen.getBlitOffset(), 0, 0, 1, height - 1, 1, height - 1);
-        screen.blit(poseStack, x + 1, y + height - 1, screen.getBlitOffset(), 0, 0, width - 1, 1, width - 1, 1);
+        GuiComponent.blit(poseStack, x + width - 1, y + 1, screen.getBlitOffset(), 0, 0, 1, height - 1, 1, height - 1);
+        GuiComponent.blit(poseStack, x + 1, y + height - 1, screen.getBlitOffset(), 0, 0, width - 1, 1, width - 1, 1);
 
         int textWidth = width - xPadding * 2;
         int lines = BetterFontRenderer.countLines(font, text, textWidth) + yPadding * 2;

@@ -1,20 +1,15 @@
 package lNalator.Cultivationcraft.Network.Packets.CultivatorStats;
 
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.CultivatorStats;
-import lNalator.Cultivationcraft.Common.Qi.CultivationTypes;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import lNalator.Cultivationcraft.Network.PacketHandler;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import lNalator.Cultivationcraft.Network.Packets.Packet;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.network.NetworkEvent;
-import net.minecraftforge.server.ServerLifecycleHooks;
 
-import java.util.UUID;
 import java.util.function.Supplier;
 
 public class TechniqueStatSelectionPacket extends Packet {

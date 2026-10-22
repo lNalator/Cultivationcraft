@@ -1,6 +1,5 @@
 package lNalator.Cultivationcraft.Client.Renderers;
 
-import lNalator.Cultivationcraft.Client.Particles.QiParticle;
 import lNalator.Cultivationcraft.Client.genericClientFunctions;
 import lNalator.Cultivationcraft.Common.Capabilities.ChunkQiSources.ChunkQiSources;
 import lNalator.Cultivationcraft.Common.Qi.Elements.Element;

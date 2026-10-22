@@ -1,6 +1,5 @@
 package lNalator.Cultivationcraft.Common.Qi;
 
-import net.minecraft.core.Direction;
 
 public class Freeze {
     // TODO: Fix freezing

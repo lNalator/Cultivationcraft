@@ -57,7 +57,6 @@ public class FlyingSwordRenderer extends EntityRenderer<FlyingSwordEntity> {
         BakedModel ibakedmodel = this.itemRenderer.getModel(itemstack, entityIn.level, (LivingEntity) null, 0);
         boolean flag = ibakedmodel.isGui3d();
         int j = this.getModelCount(itemstack);
-        float f = 0.25F;
 
         // Bobbing up and down
         float f1 = 0;

@@ -1,19 +1,14 @@
 package lNalator.Cultivationcraft.Common.Qi.Elements;
 
 import lNalator.Cultivationcraft.Common.Qi.Damage.QiDamageSource;
-import lNalator.Cultivationcraft.Common.Qi.QiSource;
 import lNalator.Cultivationcraft.Common.Qi.Quests.Quest;
 import lNalator.Cultivationcraft.Common.Qi.Quests.QuestHandler;
-import lNalator.Cultivationcraft.Common.Qi.Stats.BodyPartStatControl;
-import lNalator.Cultivationcraft.Common.Qi.Stats.PlayerStatModifications;
-import lNalator.Cultivationcraft.Common.Qi.Stats.StatIDs;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
 
 import java.awt.*;
 import java.util.ArrayList;

@@ -31,7 +31,6 @@ import net.minecraftforge.event.entity.item.ItemTossEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
-import net.minecraftforge.event.entity.living.MobEffectEvent;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -175,7 +174,7 @@ public class ServerListeners {
         }
 
         // Clone the array list so it doesn't bork out if modified during ticking
-        ArrayList<IChunkQiSources> ticking = (ArrayList<IChunkQiSources>) CommonListeners.tickingQiSources.clone();
+        ArrayList<IChunkQiSources> ticking = new ArrayList<IChunkQiSources>(CommonListeners.tickingQiSources);
 
         for (IChunkQiSources sources : ticking) {
             if (sources.getDimension().compareTo(event.level.dimension().location()) == 0) {

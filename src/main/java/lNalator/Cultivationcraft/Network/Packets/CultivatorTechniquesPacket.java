@@ -1,12 +1,10 @@
 package lNalator.Cultivationcraft.Network.Packets;
 
-import lNalator.Cultivationcraft.Client.ClientItemControl;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorTechniques.CultivatorTechniques;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorTechniques.ICultivatorTechniques;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.Technique;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import lNalator.Cultivationcraft.Network.PacketHandler;
-import lNalator.Cultivationcraft.Server.ServerItemControl;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.network.FriendlyByteBuf;

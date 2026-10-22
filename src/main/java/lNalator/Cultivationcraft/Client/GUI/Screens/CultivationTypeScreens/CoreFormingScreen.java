@@ -3,7 +3,6 @@ package lNalator.Cultivationcraft.Client.GUI.Screens.CultivationTypeScreens;
 import lNalator.Cultivationcraft.Client.ClientListeners;
 import lNalator.Cultivationcraft.Client.GUI.GUIButton;
 import lNalator.Cultivationcraft.Client.GUI.Screens.ConceptScreen;
-import lNalator.Cultivationcraft.Client.GUI.Screens.CultivationModifyScreen;
 import lNalator.Cultivationcraft.Common.Qi.Cultivation.CoreFormingCultivation;
 import lNalator.Cultivationcraft.Common.Qi.Cultivation.CultivationType;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers.TechniqueModifier;

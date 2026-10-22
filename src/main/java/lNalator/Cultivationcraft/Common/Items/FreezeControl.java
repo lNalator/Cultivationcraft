@@ -1,5 +1,7 @@
 package lNalator.Cultivationcraft.Common.Items;
 
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import lNalator.Cultivationcraft.Common.Blocks.BlockRegister;
 import lNalator.Cultivationcraft.Common.Blocks.custom.FrozenBlock;
 import lNalator.Cultivationcraft.Common.Blocks.entity.FrozenBlockEntity;
@@ -74,14 +76,8 @@ public class FreezeControl {
 
     public static FrozenBlockEntity createFrozenBlock(Level world, BlockPos blockPos, BlockState oldState, BlockEntity oldBlockEntity, int duration) {
         FrozenBlockEntity frozen = null;
-        if (oldState.getBlock() instanceof CampfireBlock) {
-            Property<Boolean> LIT = oldState.getBlock().getStateDefinition().getProperty("lit") != null
-                    ? (Property<Boolean>) oldState.getBlock().getStateDefinition().getProperty("lit")
-                    : null;
-            if (LIT != null
-                    && oldState.getValue(LIT).equals(true)) {
-                oldState = oldState.setValue(LIT, false);
-            }
+        if (oldState.getBlock() instanceof CampfireBlock && oldState.getValue(CampfireBlock.LIT)) {
+            oldState = oldState.setValue(CampfireBlock.LIT, false);
         }
 
         CompoundTag oldBlockEntityData = null;
@@ -128,7 +124,7 @@ public class FreezeControl {
                 assert facing != null;
                 return blockPos.relative(((Direction) blockState.getValue(facing)).getOpposite());
             } else {
-                if (blockState.getValue((Property<Boolean>) blockState.getBlock().getStateDefinition().getProperty("extended"))) {
+                if (blockState.getOptionalValue(BlockStateProperties.EXTENDED).orElse(false)) {
                     assert facing != null;
                     return blockPos.relative((Direction) blockState.getValue(facing));
                 }
@@ -151,12 +147,10 @@ public class FreezeControl {
 
     public static BlockState setFrozenBlock(BlockState oldBlockState, boolean isSecondBlock) {
         BlockState frozenBlock = BlockRegister.FROZEN_BLOCK.get().defaultBlockState();
-        Property<Direction> facing = oldBlockState.getBlock().getStateDefinition().getProperty("facing") != null
-                ? (Property<Direction>) oldBlockState.getBlock().getStateDefinition().getProperty("facing")
-                : null;
-        if (facing != null
-                && !oldBlockState.getValue(facing).equals(Direction.UP)
-                && !oldBlockState.getValue(facing).equals(Direction.DOWN)) {
+        // Any block's "facing" property, vanilla or modded, is a DirectionProperty (a Property<Direction>)
+        if (oldBlockState.getBlock().getStateDefinition().getProperty("facing") instanceof DirectionProperty facing
+                && oldBlockState.getValue(facing) != Direction.UP
+                && oldBlockState.getValue(facing) != Direction.DOWN) {
             frozenBlock = frozenBlock.setValue(FrozenBlock.FACING, oldBlockState.getValue(facing));
             frozenBlock = frozenBlock.setValue(FrozenBlock.IS_SECOND_BLOCK, isSecondBlock);
         }

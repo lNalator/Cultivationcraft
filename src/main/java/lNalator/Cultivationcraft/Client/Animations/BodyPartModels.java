@@ -6,11 +6,9 @@ import lNalator.mlmanimator.Client.Models.*;
 import lNalator.mlmanimator.Client.Models.Quads.Quad;
 import lNalator.mlmanimator.Client.Models.Quads.QuadLinkage;
 import lNalator.mlmanimator.Client.Poses.PoseHandler;
-import com.mojang.math.Vector4f;
 import net.minecraft.client.model.geom.builders.UVPair;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;

@@ -1,9 +1,7 @@
 package lNalator.Cultivationcraft.Client.GUI.Screens;
 
 import lNalator.Cultivationcraft.Client.GUI.GUIButton;
-import lNalator.Cultivationcraft.Client.genericClientFunctions;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.CultivatorStats;
-import lNalator.Cultivationcraft.Common.Capabilities.CultivatorTechniques.CultivatorTechniques;
 import lNalator.Cultivationcraft.Common.Qi.Cultivation.CultivationType;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.Technique;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueStats.DefaultTechniqueStatIDs;
@@ -58,7 +56,7 @@ public class TechniqueModifyScreen extends GenericTabScreen {
             buttons[i] = new GUIButton("TechStat" + i, " ");
         }
 
-        ResourceLocation selected = CultivatorStats.getCultivatorStats(Minecraft.getInstance().player).getTechniqueFocus(selectedTech.getClass());
+        ResourceLocation selected = CultivatorStats.getCultivatorStats(Minecraft.getInstance().player).getTechniqueFocus(selectedTech);
         buttons[resourceLocationToNumber(selected)].select();
     }
 
@@ -96,7 +94,7 @@ public class TechniqueModifyScreen extends GenericTabScreen {
 
                 buttons[i].select();
 
-                ClientPacketHandler.sendTechStatToServer(selectedTech.getClass(), stats.get(i));
+                ClientPacketHandler.sendTechStatToServer(selectedTech, stats.get(i));
 
                 return true;
             }
@@ -122,7 +120,7 @@ public class TechniqueModifyScreen extends GenericTabScreen {
     }
 
     protected TechniqueStatModification getStatModification() {
-        ResourceLocation focus = CultivatorStats.getCultivatorStats(Minecraft.getInstance().player).getTechniqueFocus(selectedTech.getClass());
+        ResourceLocation focus = CultivatorStats.getCultivatorStats(Minecraft.getInstance().player).getTechniqueFocus(selectedTech);
 
         if (focus == null) {
             focus = updateFocus();
@@ -144,7 +142,7 @@ public class TechniqueModifyScreen extends GenericTabScreen {
         CultivationType cultivation = CultivatorStats.getCultivatorStats(Minecraft.getInstance().player).getCultivation();
 
         int maxInspiration = cultivation.getMaxTechLevel();
-        int currentInspiration = cultivation.getTechLevelProgress(selectedTech.getClass());
+        int currentInspiration = cultivation.getTechLevelProgress(selectedTech);
 
         String inspiration = currentInspiration + "/" + maxInspiration;
 

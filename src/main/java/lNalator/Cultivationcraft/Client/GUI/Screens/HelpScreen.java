@@ -50,12 +50,12 @@ public class HelpScreen extends GenericTabScreen {
         helpText.resetScroll();
 
         refreshEntries();
-        selectText.setSize(selectTextWidth, selectTextHeight, (int) (selectTextWidth * 2));
+        selectText.setSize(selectTextWidth, selectTextHeight, selectTextWidth * 2);
     }
 
     private void refreshEntries() {
         selectText = new SelectableTextField();
-        selectText.setSize(selectTextWidth, selectTextHeight, (int) (selectTextWidth * 2));
+        selectText.setSize(selectTextWidth, selectTextHeight, selectTextWidth * 2);
         knowledgeRevision = ClientKnowledge.revision();
 
         debugVisible = canSeeDebug();

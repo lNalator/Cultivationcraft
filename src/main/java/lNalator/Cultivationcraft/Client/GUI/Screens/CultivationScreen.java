@@ -1,13 +1,9 @@
 package lNalator.Cultivationcraft.Client.GUI.Screens;
 
 import lNalator.Cultivationcraft.Client.GUI.GUIButton;
-import lNalator.Cultivationcraft.Client.GUI.TechniqueIcons;
 import lNalator.Cultivationcraft.Client.GUI.TextField;
-import lNalator.Cultivationcraft.Client.genericClientFunctions;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.CultivatorStats;
-import lNalator.Cultivationcraft.Common.Capabilities.CultivatorTechniques.CultivatorTechniques;
 import lNalator.Cultivationcraft.Common.Qi.Cultivation.CultivationType;
-import lNalator.Cultivationcraft.Common.Qi.Techniques.Technique;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import lNalator.Cultivationcraft.Network.ClientPacketHandler;
 import com.mojang.blaze3d.vertex.PoseStack;

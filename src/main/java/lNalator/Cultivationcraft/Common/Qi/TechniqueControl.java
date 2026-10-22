@@ -5,60 +5,76 @@ import lNalator.Cultivationcraft.Common.Qi.Techniques.BodyForgeTechniques.*;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.PassiveTechniques.*;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.BodyForgeTechniques.JetTechnique;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.QiCondenserTechniques.*;
-import lNalator.Cultivationcraft.Cultivationcraft;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.ArrayList;
+import java.util.function.Supplier;
 
 public class TechniqueControl {
 
     // Initialises all techniques
     public static void init() {
-        TechniqueControl.addTechnique(MeditateTechnique.class);
-        TechniqueControl.addTechnique(DivineSenseTechnique.class);
-        TechniqueControl.addTechnique(QiBarrierTechnique.class);
-        TechniqueControl.addTechnique(ItemEnhanceTechnique.class);
-        TechniqueControl.addTechnique(FlightTechnique.class);
-        TechniqueControl.addTechnique(QiEmission.class);
-        TechniqueControl.addTechnique(QiTransferTechnique.class);
-        TechniqueControl.addTechnique(FlyingSwordFormationTechnique.class);
-        TechniqueControl.addTechnique(IceWalkTechnique.class);
-        TechniqueControl.addTechnique(AuraTechnique.class);
-        TechniqueControl.addTechnique(LeapTechnique.class);
-        TechniqueControl.addTechnique(BiteTechnique.class);
-        TechniqueControl.addTechnique(RollTechnique.class);
-        TechniqueControl.addTechnique(SpreadTechnique.class);
-        TechniqueControl.addTechnique(FloatTechnique.class);
-        TechniqueControl.addTechnique(DartTechnique.class);
-        TechniqueControl.addTechnique(BounceTechnique.class);
-        TechniqueControl.addTechnique(JetLegTechnique.class);
-        TechniqueControl.addTechnique(JetTechnique.class);
-        TechniqueControl.addTechnique(SpitTechnique.class);
-        TechniqueControl.addTechnique(BeamTechnique.class);
-        TechniqueControl.addTechnique(SpinPetalTechnique.class);
-        TechniqueControl.addPassiveTechnique(ExpandingStomachTechnique.class);
-        TechniqueControl.addPassiveTechnique(GlideTechnique.class);
+        TechniqueControl.addTechnique(MeditateTechnique::new);
+        TechniqueControl.addTechnique(DivineSenseTechnique::new);
+        TechniqueControl.addTechnique(QiBarrierTechnique::new);
+        TechniqueControl.addTechnique(ItemEnhanceTechnique::new);
+        TechniqueControl.addTechnique(FlightTechnique::new);
+        TechniqueControl.addTechnique(QiEmission::new);
+        TechniqueControl.addTechnique(QiTransferTechnique::new);
+        TechniqueControl.addTechnique(FlyingSwordFormationTechnique::new);
+        TechniqueControl.addTechnique(IceWalkTechnique::new);
+        TechniqueControl.addTechnique(AuraTechnique::new);
+        TechniqueControl.addTechnique(LeapTechnique::new);
+        TechniqueControl.addTechnique(BiteTechnique::new);
+        TechniqueControl.addTechnique(RollTechnique::new);
+        TechniqueControl.addTechnique(SpreadTechnique::new);
+        TechniqueControl.addTechnique(FloatTechnique::new);
+        TechniqueControl.addTechnique(DartTechnique::new);
+        TechniqueControl.addTechnique(BounceTechnique::new);
+        TechniqueControl.addTechnique(JetLegTechnique::new);
+        TechniqueControl.addTechnique(JetTechnique::new);
+        TechniqueControl.addTechnique(SpitTechnique::new);
+        TechniqueControl.addTechnique(BeamTechnique::new);
+        TechniqueControl.addTechnique(SpinPetalTechnique::new);
+        TechniqueControl.addPassiveTechnique(ExpandingStomachTechnique::new);
+        TechniqueControl.addPassiveTechnique(GlideTechnique::new);
     }
 
-    // List of all techniques available in the game
-    protected static ArrayList<Class> techniques = new ArrayList<Class>();
+    // Factories of all techniques available in the game
+    protected static ArrayList<Supplier<Technique>> techniques = new ArrayList<Supplier<Technique>>();
 
-    // List of all passiveTechniques available in the game
-    protected static ArrayList<Class> passiveTechniques = new ArrayList<Class>();
+    // Factories of all passive techniques available in the game
+    protected static ArrayList<Supplier<PassiveTechnique>> passiveTechniques = new ArrayList<Supplier<PassiveTechnique>>();
 
-    public static void addTechnique(Class technique) {
+    public static void addTechnique(Supplier<Technique> technique) {
         techniques.add(technique);
     }
 
-    public static void addPassiveTechnique(Class technique) {
+    public static void addPassiveTechnique(Supplier<PassiveTechnique> technique) {
         passiveTechniques.add(technique);
     }
 
-    public static ArrayList<Class> getPassiveTechniques(Player player) {
-        ArrayList<Class> available = new ArrayList<Class>();
+    // Returns a new instance of every passive technique the specified player can use
+    public static ArrayList<PassiveTechnique> getPassiveTechniques(Player player) {
+        ArrayList<PassiveTechnique> available = new ArrayList<PassiveTechnique>();
 
-        for (Class technique : passiveTechniques) {
-            if (isAvailable(technique, player)) {
+        for (Supplier<PassiveTechnique> technique : passiveTechniques) {
+            PassiveTechnique passive = technique.get();
+
+            if (passive.isValid(player)) {
+                available.add(passive);
+            }
+        }
+
+        return available;
+    }
+
+    // Returns the factories of all the techniques that can be used by the specified player
+    public static ArrayList<Supplier<Technique>> getAvailableTechnics(Player player) {
+        ArrayList<Supplier<Technique>> available = new ArrayList<Supplier<Technique>>();
+
+        for (Supplier<Technique> technique : techniques) {
+            if (technique.get().isValid(player)) {
                 available.add(technique);
             }
         }
@@ -66,28 +82,16 @@ public class TechniqueControl {
         return available;
     }
 
-    // Returns a list of all the techniques that can be used by the specified player
-    public static ArrayList<Class> getAvailableTechnics(Player player) {
-        ArrayList<Class> available = new ArrayList<Class>();
+    // Creates the technique saved under this class name (see Technique.writeNBT), or null if it is not registered
+    public static Technique create(String className) {
+        for (Supplier<Technique> technique : techniques) {
+            Technique created = technique.get();
 
-        for (Class technique : techniques) {
-            if (isAvailable(technique, player)) {
-                available.add(technique);
+            if (created.getClass().getName().equals(className)) {
+                return created;
             }
         }
 
-        return available;
-    }
-
-    public static boolean isAvailable(Class technique, Player player) {
-        try {
-            Technique test = (Technique) technique.newInstance();
-
-            return test.isValid(player);
-        } catch (Exception e) {
-            Cultivationcraft.LOGGER.error("Error check technique validity: " + e);
-
-            return false;
-        }
+        return null;
     }
 }

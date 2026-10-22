@@ -2,24 +2,16 @@ package lNalator.Cultivationcraft.Common;
 
 import lNalator.Cultivationcraft.Common.Qi.BodyParts.FoodStats.QiFoodStats;
 import lNalator.Cultivationcraft.Cultivationcraft;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.particle.Particle;
-import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
-import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.fluids.FluidType;
 import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
-import sun.misc.Unsafe;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 
 public class Reflection {
 

@@ -7,7 +7,6 @@ import lNalator.Cultivationcraft.Common.Capabilities.BodyModifications.IBodyModi
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.CultivatorStats;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorTechniques.CultivatorTechniques;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorTechniques.ICultivatorTechniques;
-import lNalator.Cultivationcraft.Common.Misc;
 import lNalator.Cultivationcraft.Common.Qi.BodyParts.BodyForgeParts.MovementOverridePart;
 import lNalator.Cultivationcraft.Common.Qi.BodyParts.BodyForgeParts.MovementOverridePartOption;
 import lNalator.Cultivationcraft.Common.Qi.BodyParts.BodyPart;
@@ -32,7 +31,6 @@ import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-import java.util.UUID;
 
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -437,7 +435,6 @@ public class KeybindingControl {
                 result = entity.pick(d0, 1, false);
                 Vec3 Vec3 = entity.getEyePosition(1);
 
-                int i = 3;
                 double d1 = d0;
 
                 d1 = d1 * d1;
@@ -447,7 +444,6 @@ public class KeybindingControl {
 
                 Vec3 Vec31 = entity.getViewVector(1.0F);
                 Vec3 Vec32 = Vec3.add(Vec31.x * d0, Vec31.y * d0, Vec31.z * d0);
-                float f = 1.0F;
                 AABB AABB = entity.getBoundingBox().expandTowards(Vec31.scale(d0)).inflate(1.0D, 1.0D, 1.0D);
                 EntityHitResult entityHitResult = ProjectileUtil.getEntityHitResult(entity, Vec3, Vec32, AABB, (p_215312_0_) -> {
                     return !p_215312_0_.isSpectator() && p_215312_0_.isPickable();

@@ -5,7 +5,6 @@ import lNalator.Cultivationcraft.Common.Blocks.Plants.ProceduralPlantBlock;
 import lNalator.Cultivationcraft.Common.Blocks.Plants.world.ClientPlantCatalog;
 import lNalator.Cultivationcraft.Common.Items.ItemRegister;
 import lNalator.Cultivationcraft.Common.Items.ProceduralPlantItem;
-import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.event.RegisterColorHandlersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;

@@ -15,7 +15,7 @@ public class AddChunkQiSourceToClient {
     // Go through all packets in the list, trying to process them
     // Remove them from the list if they are successfully processed
     public static void processPackets() {
-        ArrayList<ChunkQiSourcesPacket> tempPackets = new ArrayList(packets);
+        ArrayList<ChunkQiSourcesPacket> tempPackets = new ArrayList<ChunkQiSourcesPacket>(packets);
 
         for (ChunkQiSourcesPacket packet : tempPackets) {
             if (packet.processPacket()) {

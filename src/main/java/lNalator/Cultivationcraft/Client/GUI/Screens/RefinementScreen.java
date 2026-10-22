@@ -106,7 +106,7 @@ public class RefinementScreen extends AbstractContainerScreen<RefinementContaine
         }else if (menu.getRefinementProgress() == 0) {
             progress = ""; 
         }else {
-            progress = Component.translatable("cultivationcraft.gui.remaining", (int) menu.getRemainingSeconds()).getString();
+            progress = Component.translatable("cultivationcraft.gui.remaining", menu.getRemainingSeconds()).getString();
         }
 
         int color = Color.darkGray.getRGB();

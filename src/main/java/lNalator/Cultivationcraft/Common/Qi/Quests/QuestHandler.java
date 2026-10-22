@@ -16,7 +16,6 @@ import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers.Techniq
 import lNalator.Cultivationcraft.Network.ClientPacketHandler;
 import lNalator.Cultivationcraft.Network.PacketHandler;
 import lNalator.Cultivationcraft.debug;
-import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 

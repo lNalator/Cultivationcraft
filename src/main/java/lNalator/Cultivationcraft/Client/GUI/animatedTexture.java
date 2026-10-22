@@ -8,7 +8,6 @@ import com.mojang.math.Matrix4f;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.resources.ResourceLocation;
 
-import java.awt.*;
 
 public class animatedTexture {
 

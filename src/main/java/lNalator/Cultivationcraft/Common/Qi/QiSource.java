@@ -3,7 +3,6 @@ package lNalator.Cultivationcraft.Common.Qi;
 import lNalator.Cultivationcraft.Common.Config;
 import lNalator.Cultivationcraft.Common.Qi.Elements.Element;
 import lNalator.Cultivationcraft.Common.Qi.Elements.Elements;
-import lNalator.Cultivationcraft.Cultivationcraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -45,8 +44,8 @@ public class QiSource {
 
     public int spawnedTick = 0;
 
-    protected HashMap<UUID, Double> currentAbsorbing = new HashMap();
-    protected HashMap<UUID, Double> absorbing = new HashMap();
+    protected HashMap<UUID, Double> currentAbsorbing = new HashMap<UUID, Double>();
+    protected HashMap<UUID, Double> absorbing = new HashMap<UUID, Double>();
 
     public QiSource(BlockPos position, int size, ResourceLocation element, double qi, int regen) {
         this(position, size, element, qi, 1, regen);
@@ -133,7 +132,7 @@ public class QiSource {
 
         // Clear the list of players absorbing from this source
         currentAbsorbing = absorbing;
-        absorbing = new HashMap();
+        absorbing = new HashMap<UUID, Double>();
 
         // A submerged non-water plant retains its reserve but cannot replenish it.
         boolean submergedPlant = level.getBlockState(pos).getBlock() instanceof lNalator.Cultivationcraft.Common.Blocks.Plants.ProceduralPlantBlock
@@ -213,7 +212,7 @@ public class QiSource {
         double qiCurrent = nbt.getDouble("qicurrent");
         int qiRegen = nbt.getInt("qiregen");
 
-        HashMap<UUID, Double> absorbing = new HashMap();
+        HashMap<UUID, Double> absorbing = new HashMap<UUID, Double>();
 
         int i = 0;
         while (nbt.hasUUID("player" + i)) {

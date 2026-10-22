@@ -1,10 +1,8 @@
 package lNalator.Cultivationcraft.Common.Capabilities.BodyModifications;
 
-import lNalator.Cultivationcraft.Common.Qi.BodyParts.BodyForgeParts.StomachPart;
 import lNalator.Cultivationcraft.Common.Qi.BodyParts.BodyPartNames;
 import lNalator.Cultivationcraft.Common.Qi.BodyParts.BodyPart;
 import lNalator.Cultivationcraft.Common.Qi.BodyParts.BodyPartOption;
-import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.nbt.CompoundTag;
 
@@ -120,19 +118,20 @@ public class BodyModifications implements IBodyModifications {
         return options.get(limb).get(subPosition);
     }
 
-    public ArrayList<BodyPart> getBodyPartsOfType(Class type) {
-        ArrayList<BodyPart> parts = new ArrayList<>();
+    // Every forged part or option of exactly this class, typed as that class
+    public <T extends BodyPart> ArrayList<T> getBodyPartsOfType(Class<T> type) {
+        ArrayList<T> parts = new ArrayList<T>();
 
         for (BodyPart part : modifications.values()) {
             if (part.getClass() == type) {
-                parts.add(part);
+                parts.add(type.cast(part));
             }
         }
 
         for (HashMap<String, BodyPartOption> optionSearch : options.values()) {
             for (BodyPart part : optionSearch.values()) {
                 if (part.getClass() == type) {
-                    parts.add(part);
+                    parts.add(type.cast(part));
                 }
             }
         }
@@ -304,9 +303,9 @@ public class BodyModifications implements IBodyModifications {
         boolean bodyChanged = !modifications.equals(mod.getModifications()) || !options.equals(mod.getModificationOptions());
 
         setSelection(mod.getSelection());
-        modifications = (HashMap<String, BodyPart>) mod.getModifications().clone();
-        options = (HashMap<String, HashMap<String, BodyPartOption>>) mod.getModificationOptions().clone();
-        tags = (ArrayList<String>) mod.getTags().clone();
+        modifications = new HashMap<String, BodyPart>(mod.getModifications());
+        options = new HashMap<String, HashMap<String, BodyPartOption>>(mod.getModificationOptions());
+        tags = new ArrayList<String>(mod.getTags());
 
         lastForged = mod.getLastForged();
         progress = mod.getProgress();

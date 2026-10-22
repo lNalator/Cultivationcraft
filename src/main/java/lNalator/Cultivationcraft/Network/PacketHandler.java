@@ -12,7 +12,6 @@ import lNalator.Cultivationcraft.Common.Capabilities.CultivatorTechniques.ICulti
 import lNalator.Cultivationcraft.Common.Qi.Effects.WindInstance;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import lNalator.Cultivationcraft.Network.Packets.*;
-import lNalator.Cultivationcraft.Network.Packets.CultivatorStats.*;
 import lNalator.Cultivationcraft.Network.Packets.keypressPacket;
 import lNalator.Cultivationcraft.Network.Packets.CultivatorStats.CultivatorStatsPacket;
 import lNalator.Cultivationcraft.Network.Packets.CultivatorStats.CultivatorTypePacket;

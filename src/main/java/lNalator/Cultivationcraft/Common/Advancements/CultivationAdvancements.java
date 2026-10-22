@@ -2,12 +2,8 @@ package lNalator.Cultivationcraft.Common.Advancements;
 
 import lNalator.Cultivationcraft.Common.Advancements.Triggers.*;
 import net.minecraft.advancements.CriteriaTriggers;
-import net.minecraft.advancements.CriterionTrigger;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 public class CultivationAdvancements {
 

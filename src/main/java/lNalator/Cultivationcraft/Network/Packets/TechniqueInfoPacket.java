@@ -1,6 +1,5 @@
 package lNalator.Cultivationcraft.Network.Packets;
 
-import lNalator.Cultivationcraft.Client.ClientItemControl;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorTechniques.CultivatorTechniques;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.Technique;
 import lNalator.Cultivationcraft.Cultivationcraft;

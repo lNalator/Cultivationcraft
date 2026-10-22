@@ -2,8 +2,6 @@ package lNalator.Cultivationcraft.Client.GUI;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.resources.ResourceLocation;
 
@@ -55,7 +53,7 @@ public class BodyPartGUI {
             RenderSystem.setShaderColor(0.5f, 1, 0.75f, 1);
         }
 
-        gui.blit(PoseStack, xPos, yPos, gui.getBlitOffset(), 0, 0, textureX, textureY, textureX, textureY);
+        GuiComponent.blit(PoseStack, xPos, yPos, gui.getBlitOffset(), 0, 0, textureX, textureY, textureX, textureY);
 
         RenderSystem.setShaderColor(1, 1, 1, 1);
     }

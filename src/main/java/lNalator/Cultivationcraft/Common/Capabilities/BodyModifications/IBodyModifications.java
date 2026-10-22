@@ -45,7 +45,7 @@ public interface IBodyModifications {
 
     public BodyPartOption getOption(String limb, String subPosition);
 
-    public ArrayList<BodyPart> getBodyPartsOfType(Class type);
+    public <T extends BodyPart> ArrayList<T> getBodyPartsOfType(Class<T> type);
 
     public void setModification(BodyPart part);
 

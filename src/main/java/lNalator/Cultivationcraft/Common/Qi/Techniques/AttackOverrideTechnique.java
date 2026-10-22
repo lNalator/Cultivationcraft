@@ -2,7 +2,6 @@ package lNalator.Cultivationcraft.Common.Qi.Techniques;
 
 import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueStats.DefaultTechniqueStatIDs;
 import lNalator.Cultivationcraft.StaminaHandler;
-import lNalator.mlmanimator.Client.Poses.PlayerPoseHandler;
 import lNalator.mlmanimator.Client.Poses.PoseHandler;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;

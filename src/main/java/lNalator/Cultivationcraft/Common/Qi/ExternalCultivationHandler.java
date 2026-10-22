@@ -4,7 +4,6 @@ import lNalator.Cultivationcraft.Common.Qi.Cultivation.*;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers.*;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import net.minecraft.resources.ResourceLocation;
-import org.checkerframework.checker.units.qual.A;
 
 import java.util.ArrayList;
 
@@ -48,10 +47,10 @@ public class ExternalCultivationHandler {
         try {
             for (Class<? extends CultivationType> cultivation : cultivationTypes) {
                 if (cultivation.toString().compareTo(className) == 0) {
-                    return cultivation.newInstance();
+                    return cultivation.getDeclaredConstructor().newInstance();
                 }
             }
-        } catch (IllegalAccessException | InstantiationException e) {
+        } catch (ReflectiveOperationException e) {
             Cultivationcraft.LOGGER.error("Error " + e + " whilst getting player cultivation of ID " + className);
         }
 
@@ -62,10 +61,10 @@ public class ExternalCultivationHandler {
         try {
             for (Class<? extends TechniqueModifier> modifier : cultivationModifiers) {
                 if (modifier.getName().toString().compareTo(className) == 0) {
-                    return modifier.newInstance();
+                    return modifier.getDeclaredConstructor().newInstance();
                 }
             }
-        } catch (IllegalAccessException | InstantiationException e) {
+        } catch (ReflectiveOperationException e) {
             Cultivationcraft.LOGGER.error("Error " + e + " whilst getting technique modifier of class " + className);
         }
 
@@ -75,11 +74,11 @@ public class ExternalCultivationHandler {
     public static TechniqueModifier getModifier(ResourceLocation ID) {
         try {
             for (Class<? extends TechniqueModifier> modifier : cultivationModifiers) {
-                if (modifier.newInstance().ID.compareTo(ID) == 0) {
-                    return modifier.newInstance();
+                if (modifier.getDeclaredConstructor().newInstance().ID.compareTo(ID) == 0) {
+                    return modifier.getDeclaredConstructor().newInstance();
                 }
             }
-        } catch (IllegalAccessException | InstantiationException e) {
+        } catch (ReflectiveOperationException e) {
             Cultivationcraft.LOGGER.error("Error " + e + " whilst getting technique modifier of ID " + ID);
         }
 
@@ -91,9 +90,9 @@ public class ExternalCultivationHandler {
 
         try {
             for (Class<? extends TechniqueModifier> cultivation : cultivationModifiers) {
-                modifiers.add(cultivation.newInstance());
+                modifiers.add(cultivation.getDeclaredConstructor().newInstance());
             }
-        } catch (IllegalAccessException | InstantiationException e) {
+        } catch (ReflectiveOperationException e) {
             Cultivationcraft.LOGGER.error("Error " + e + " whilst getting technique modifiers");
         }
 

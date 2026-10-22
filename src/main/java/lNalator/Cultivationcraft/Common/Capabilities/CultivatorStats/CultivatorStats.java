@@ -1,7 +1,7 @@
 package lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats;
 
+import lNalator.Cultivationcraft.Common.Qi.Techniques.Technique;
 import lNalator.Cultivationcraft.Common.Qi.Cultivation.CultivationType;
-import lNalator.Cultivationcraft.Common.Qi.Cultivation.FoundationEstablishmentCultivation;
 import lNalator.Cultivationcraft.Common.Qi.Cultivation.NoCultivation;
 import lNalator.Cultivationcraft.Common.Qi.CultivationTypes;
 import lNalator.Cultivationcraft.Common.Qi.ExternalCultivationHandler;
@@ -46,8 +46,8 @@ public class CultivatorStats implements ICultivatorStats {
         cultivation = newCultivation;
     }
 
-    public ResourceLocation getTechniqueFocus(Class tech) {
-        return techFocus.get(tech.toString());
+    public ResourceLocation getTechniqueFocus(Technique tech) {
+        return techFocus.get(tech.getClass().toString());
     }
 
     public void setTechniqueFocus(String tech, ResourceLocation focus) {

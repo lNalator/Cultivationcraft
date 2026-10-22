@@ -1,5 +1,6 @@
 package lNalator.Cultivationcraft.Client.GUI.Screens.CultivationTypeScreens;
 
+import net.minecraft.client.gui.GuiComponent;
 import lNalator.Cultivationcraft.Common.Qi.Cultivation.CultivationType;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -22,9 +23,9 @@ public class FoundationEstablishmentScreen extends CultivationTypeScreen {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
         float maxProgress = cultivation.getMaxStage() * cultivation.getMaxTechLevelWithoutPrevious();
-        float currentProgress = cultivation.getTechLevelProgress(cultivation.getPassive().getClass());
+        float currentProgress = cultivation.getTechLevelProgress(cultivation.getPassive());
         float height = currentProgress / maxProgress;
 
-        screen.blit(PoseStack, xPos, yPos + (int) (ySize * (1 - height)), screen.getBlitOffset(), 0, (int) (ySize * (1 - height)), xSize, (int) (ySize * height), xSize, ySize);
+        GuiComponent.blit(PoseStack, xPos, yPos + (int) (ySize * (1 - height)), screen.getBlitOffset(), 0, (int) (ySize * (1 - height)), xSize, (int) (ySize * height), xSize, ySize);
     }
 }

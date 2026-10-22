@@ -1,13 +1,10 @@
 package lNalator.Cultivationcraft.Common.Capabilities.ChunkQiSources;
 
 import lNalator.Cultivationcraft.Common.Qi.Elements.BlockElements;
-import lNalator.Cultivationcraft.Common.Qi.Elements.Element;
 import lNalator.Cultivationcraft.Common.Qi.Elements.Elements;
 import lNalator.Cultivationcraft.Common.Qi.QiSource;
 import lNalator.Cultivationcraft.Common.Qi.QiSourceConfig;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.ChunkPos;
@@ -17,7 +14,6 @@ import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.capabilities.Capability;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -79,7 +75,7 @@ public class ChunkQiSources implements IChunkQiSources {
 
         // Try to create any pending QiSources
         if (pendingQiSource.size() > 0) {
-            List<Vec3> toRemove = new ArrayList();
+            List<Vec3> toRemove = new ArrayList<Vec3>();
 
             for (Map.Entry<Vec3, Integer> qiSource : pendingQiSource.entrySet()) {
                 if (canCreate(level, qiSource.getKey(), qiSource.getValue())) {

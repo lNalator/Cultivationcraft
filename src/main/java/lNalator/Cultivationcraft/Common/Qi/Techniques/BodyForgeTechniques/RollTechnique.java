@@ -6,8 +6,6 @@ import lNalator.mlmanimator.Client.Poses.GenericPoses;
 import lNalator.mlmanimator.Client.Models.GenericLimbNames;
 import lNalator.mlmanimator.Client.Poses.PlayerPose;
 import lNalator.Cultivationcraft.Client.Animations.BodyPartModelNames;
-import lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.CultivatorStats;
-import lNalator.Cultivationcraft.Common.Qi.CultivationTypes;
 import lNalator.Cultivationcraft.Common.Qi.Elements.Elements;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import lNalator.mlmanimator.Client.Poses.PoseHandler;

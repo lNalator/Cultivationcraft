@@ -1,7 +1,6 @@
 package lNalator.Cultivationcraft.Network.Packets;
 
 import lNalator.Cultivationcraft.Common.Capabilities.BodyModifications.BodyModifications;
-import lNalator.Cultivationcraft.Common.Capabilities.BodyModifications.BodyModificationsCapability;
 import lNalator.Cultivationcraft.Common.Capabilities.BodyModifications.IBodyModifications;
 import lNalator.Cultivationcraft.Common.Qi.BodyParts.BodyPart;
 import lNalator.Cultivationcraft.Common.Qi.BodyParts.BodyPartNames;

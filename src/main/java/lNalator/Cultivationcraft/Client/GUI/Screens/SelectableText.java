@@ -1,5 +1,6 @@
 package lNalator.Cultivationcraft.Client.GUI.Screens;
 
+import net.minecraft.client.gui.GuiComponent;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -128,7 +129,7 @@ public class SelectableText {
             if (selected) {
                 RenderSystem.setShaderTexture(0, texture);
                 RenderSystem.setShaderColor(highlightColor.getRed() / 255f, highlightColor.getGreen() / 255f, highlightColor.getBlue() / 255f, 1);
-                screen.blit(poseStack, xPos - 2, yPos - yPadding, screen.getBlitOffset(), 0, 0, xEnd - xPos + 4, lineHeight, xEnd - xPos + 4, lineHeight);
+                GuiComponent.blit(poseStack, xPos - 2, yPos - yPadding, screen.getBlitOffset(), 0, 0, xEnd - xPos + 4, lineHeight, xEnd - xPos + 4, lineHeight);
             }
 
             FormattedText formatedName = font.substrByWidth(FormattedText.of(getName()), xEnd - xPos);
