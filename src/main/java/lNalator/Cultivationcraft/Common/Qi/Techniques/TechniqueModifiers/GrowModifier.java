@@ -34,11 +34,9 @@ public class GrowModifier extends TechniqueModifier {
         return 1;
     }
 
+    // Each rank adds 25% size
     @Override
-    public void doResize(Player owner, Technique tech) {
-        super.doResize(owner, tech);
-
+    public Vec3 getSize(Player owner) {
+        return size.scale(1 + 0.25 * (getRank(owner) - 1));
     }
-
-    // TODO: FlyingSword hitbox resizing
 }

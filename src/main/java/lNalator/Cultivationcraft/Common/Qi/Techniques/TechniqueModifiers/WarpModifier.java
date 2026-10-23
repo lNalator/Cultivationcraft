@@ -23,6 +23,7 @@ public class WarpModifier extends TechniqueModifier {
 
     public WarpModifier() {
         ID = new ResourceLocation(Cultivationcraft.MODID, "concept.warp");
+        unique = true;
         CATEGORY = MODIFIER_CATEGORY;
 
         unlockQuest = new Quest(Quest.ENDER_TELEPORT, 1);
@@ -105,5 +106,5 @@ public class WarpModifier extends TechniqueModifier {
         return true;
     }
 
-    // TODO: Modify flight to teleport instead
+    // Flight with Warp jumps instead of gliding: see FlightTechnique
 }

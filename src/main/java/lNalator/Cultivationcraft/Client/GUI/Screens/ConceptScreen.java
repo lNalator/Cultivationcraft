@@ -9,7 +9,9 @@ import lNalator.Cultivationcraft.Cultivationcraft;
 import lNalator.Cultivationcraft.Network.ClientPacketHandler;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
+import lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.CultivatorStats;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.resources.ResourceLocation;
 
 import java.awt.*;
@@ -48,10 +50,10 @@ public class ConceptScreen extends GenericTabScreen {
     public ConceptScreen(boolean choose) {
         super(0, Component.translatable("cultivationcraft.gui.concept"), new ResourceLocation(Cultivationcraft.MODID, "textures/gui/stats.png"));
 
+        selectable = choose;
         generateText();
 
         selectText.setSize(selectTextWidth, selectTextHeight);
-        selectable = choose;
 
         if (selectable) {
             select = new GUIButton("select", Component.translatable("cultivationcraft.gui.select").getString());
@@ -66,7 +68,9 @@ public class ConceptScreen extends GenericTabScreen {
         selectText = new SelectableTextField();
 
         for (TechniqueModifier modifier : ExternalCultivationHandler.getModifiers()) {
-            if (modifier.canUse(Minecraft.getInstance().player) && modifier.hasLearnt(Minecraft.getInstance().player)) {
+            Player player = Minecraft.getInstance().player;
+
+            if (selectable ? modifier.canChooseAsCore(player) : modifier.canUse(player) && modifier.hasLearnt(player)) {
                 if (!categories.containsKey(modifier.CATEGORY)) {
                     categories.put(modifier.CATEGORY, new ArrayList<>());
                 }
@@ -79,7 +83,14 @@ public class ConceptScreen extends GenericTabScreen {
             SelectableText category = new SelectableText(entry.getKey());
 
             for (ResourceLocation location : entry.getValue()) {
-                category.addItem(new SelectableText(location));
+                // An owned core chosen again is reinforced: show the rank it would reach
+                int rank = CultivatorStats.getCultivatorStats(Minecraft.getInstance().player).getCultivation().getModifierRank(location);
+
+                if (selectable && rank > 0) {
+                    category.addItem(new SelectableText(location, Component.translatable(location.toLanguageKey()).append(" ").append(Component.translatable("cultivationcraft.gui.rank", rank + 1))));
+                } else {
+                    category.addItem(new SelectableText(location));
+                }
             }
 
             selectText.addSelectable(category);

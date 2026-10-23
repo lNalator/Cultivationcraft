@@ -168,8 +168,10 @@ public class ServerListeners {
 
     @SubscribeEvent
     public static void LevelTick(TickEvent.LevelTickEvent event) {
-        // Only do on server
-        if (event.side == LogicalSide.CLIENT) {
+        // Only do on server, once per tick: the event fires at START and END, and sources were also ticked
+        // in CommonListeners, so each source ticked 3 times per tick. Its absorbing-player list was then
+        // synced empty right after being filled (no visible Qi stream) and it regenerated 3 times too fast
+        if (event.side == LogicalSide.CLIENT || event.phase != TickEvent.Phase.END) {
             return;
         }
 

@@ -57,6 +57,10 @@ public class QiProjectile extends AbstractHurtingProjectile {
         entityData.define(ID_LIFE, 0f);
     }
 
+    public void scaleLife(float multiplier) {
+        entityData.set(ID_LIFE, entityData.get(ID_LIFE) * multiplier);
+    }
+
     public float getAlpha() {
         if (entityData.get(ID_LIFE) > 20) {
             return 0.8f;
@@ -136,7 +140,7 @@ public class QiProjectile extends AbstractHurtingProjectile {
 
         for (TechniqueModifier mod : CultivatorStats.getCultivatorStats((Player) getOwner()).getCultivation().getModifiers()) {
             mod.onHitEntity((Player) getOwner(), hit.getEntity(), damage, getElement(), position());
-            damage *= mod.getDamageMultiplier(new QiEmission());
+            damage *= mod.getDamageMultiplier((Player) getOwner(), new QiEmission());
         }
 
         CultivatorAttackLogic.attackEntity((Player) getOwner(), hit.getEntity(), -1, damage, null, getElement(), "QiProjectile");

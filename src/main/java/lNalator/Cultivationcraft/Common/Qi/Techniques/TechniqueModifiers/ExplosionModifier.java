@@ -16,6 +16,7 @@ public class ExplosionModifier extends TechniqueModifier {
 
     public ExplosionModifier() {
         ID = new ResourceLocation(Cultivationcraft.MODID, "concept.explosion");
+        unique = true;
         CATEGORY = MODIFIER_CATEGORY;
 
         unlockQuest = new Quest(Quest.EXPLOSION_DAMAGE_TAKEN, 1);

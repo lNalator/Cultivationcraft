@@ -1,7 +1,14 @@
 package lNalator.Cultivationcraft.Common.Qi.Stats;
 
 import lNalator.Cultivationcraft.Common.Capabilities.BodyModifications.BodyModifications;
+import lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.CultivatorStats;
+import lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.ICultivatorStats;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorTechniques.CultivatorTechniques;
+import lNalator.Cultivationcraft.Common.Qi.CultivationTypes;
+import lNalator.Cultivationcraft.Common.Qi.Cultivation.CoreFormingCultivation;
+import lNalator.Cultivationcraft.Common.Qi.Cultivation.CultivationType;
+import lNalator.Cultivationcraft.Common.Qi.Cultivation.FoundationEstablishmentCultivation;
+import lNalator.Cultivationcraft.Common.Qi.Cultivation.QiCondenserCultivation;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorTechniques.ICultivatorTechniques;
 import lNalator.Cultivationcraft.Common.Qi.BodyParts.BodyPart;
 import lNalator.Cultivationcraft.Common.Qi.BodyParts.BodyPartOption;
@@ -21,6 +28,9 @@ import java.util.UUID;
 public class PlayerStatControl {
 
     PlayerStatModifications stats = new PlayerStatModifications();
+
+    // Cultivation the realm bonuses were last computed for, so a breakthrough (whatever triggered it) re-applies them
+    public CultivationType realmBonusSource = null;
 
     // Fixed UUIDs so each player's modifiers can be removed reliably and never stack
     private static final UUID HEALTH_MODIFIER_UUID = UUID.fromString("84d45106-aebb-4011-bf83-de53c55c3ac5");
@@ -104,6 +114,7 @@ public class PlayerStatControl {
             newStats.combine(passive.getStats());
         }
 
+        calculateRealmBonuses(player, newStats);
         calculateVariantResistances(player, newStats);
         calculateSizeStatChanges(newStats);
 
@@ -150,6 +161,36 @@ public class PlayerStatControl {
         }
 
         return newStats.getStats().get(StatIDs.size);
+    }
+
+    // Bonus per stage passed through each external realm: Foundation +1 max HP, Qi Condensation +1 max HP and +1% speed, Core Forming +2 max HP
+    protected void calculateRealmBonuses(Player player, PlayerStatModifications newStats) {
+        ICultivatorStats cultivatorStats = CultivatorStats.getCultivatorStats(player);
+        realmBonusSource = cultivatorStats.getCultivation();
+
+        if (cultivatorStats.getCultivationType() != CultivationTypes.QI_CONDENSER) {
+            return;
+        }
+
+        float hp = 0;
+        float speed = 0;
+
+        // Each previous cultivation is a stage that has been broken through
+        for (CultivationType passed = realmBonusSource.getPreviousCultivation(); passed != null; passed = passed.getPreviousCultivation()) {
+            if (passed instanceof FoundationEstablishmentCultivation) {
+                hp += 1;
+            } else if (passed instanceof QiCondenserCultivation) {
+                hp += 1;
+                speed += 0.01f * StatIDs.defaultMovementSpeed;
+            } else if (passed instanceof CoreFormingCultivation) {
+                hp += 2;
+            }
+        }
+
+        PlayerStatModifications bonuses = new PlayerStatModifications();
+        bonuses.setStat(StatIDs.maxHP, hp);
+        bonuses.setStat(StatIDs.movementSpeed, speed);
+        newStats.combine(bonuses);
     }
 
     // Applies additional resistances for variant elements

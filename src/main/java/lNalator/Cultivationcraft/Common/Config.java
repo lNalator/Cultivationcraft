@@ -9,6 +9,12 @@ public class Config {
         protected static final ForgeConfigSpec.ConfigValue<Boolean> qiSourceElementalEffects;
         private static final ForgeConfigSpec.IntValue stabiliseGoalBase;
         private static final ForgeConfigSpec.IntValue stabiliseGoalStep;
+        private static final ForgeConfigSpec.DoubleValue pressureDamageMultiplier;
+        private static final ForgeConfigSpec.IntValue echoStep;
+        private static final ForgeConfigSpec.DoubleValue ownElementEfficiency;
+        private static final ForgeConfigSpec.DoubleValue variantOwnElementEfficiency;
+        private static final ForgeConfigSpec.DoubleValue otherElementEfficiency;
+        private static final ForgeConfigSpec.DoubleValue pressingElementEfficiency;
         private static ForgeConfigSpec.IntValue procPlantCatalogSize;
         private static ForgeConfigSpec.IntValue procPlantRegionSizeChunks;
         private static ForgeConfigSpec.IntValue procPlantTier3ChancePercent;
@@ -47,6 +53,18 @@ public class Config {
                     .defineInRange("stabilise_goal_base", 1000, 1, 1000000);
             stabiliseGoalStep = builder.comment("Added to the stabilisation goal at each following stage")
                     .defineInRange("stabilise_goal_step", 500, 0, 1000000);
+            pressureDamageMultiplier = builder.comment("Damage multiplier when the attacker's core element presses the target's core element (Golden Core)")
+                    .defineInRange("pressure_damage_multiplier", 1.25, 1.0, 10.0);
+            echoStep = builder.comment("Echo concept: each echo is this many percent weaker than the previous one (the first is 40%)")
+                    .defineInRange("echo_step", 5, 0, 40);
+            ownElementEfficiency = builder.comment("Cultivation efficiency of an elemental core in a Qi source of its own element")
+                    .defineInRange("own_element_efficiency", 1.25, 0.01, 10.0);
+            variantOwnElementEfficiency = builder.comment("Cultivation efficiency of Ice and Lightning cores in a Qi source of their own element")
+                    .defineInRange("variant_own_element_efficiency", 1.5, 0.01, 10.0);
+            otherElementEfficiency = builder.comment("Cultivation efficiency of an elemental core in a Qi source of another element")
+                    .defineInRange("other_element_efficiency", 0.5, 0.01, 10.0);
+            pressingElementEfficiency = builder.comment("Cultivation efficiency of an elemental core in a Qi source of an element that presses it")
+                    .defineInRange("pressing_element_efficiency", 0.1, 0.01, 10.0);
             builder.pop();
 
             builder.push("Procedural Plants");
@@ -99,6 +117,30 @@ public class Config {
 
         public static int stabiliseGoal(int stage) {
             return stabiliseGoalBase.get() + stabiliseGoalStep.get() * (stage - 1);
+        }
+
+        public static int echoStep() {
+            return echoStep.get();
+        }
+
+        public static double ownElementEfficiency() {
+            return ownElementEfficiency.get();
+        }
+
+        public static double variantOwnElementEfficiency() {
+            return variantOwnElementEfficiency.get();
+        }
+
+        public static double otherElementEfficiency() {
+            return otherElementEfficiency.get();
+        }
+
+        public static double pressingElementEfficiency() {
+            return pressingElementEfficiency.get();
+        }
+
+        public static float pressureDamageMultiplier() {
+            return pressureDamageMultiplier.get().floatValue();
         }
 
         public static boolean qiSourceElementalEffectsOn() {

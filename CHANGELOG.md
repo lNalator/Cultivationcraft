@@ -1,5 +1,38 @@
 # Changelog
 
+## [0.4.5] - WIP - Realm passives and Core Forming concepts
+
+### New features and changes
+
+- Realm passives: each stage broken through now gives a bonus, recalculated from the cultivation history so existing saves get it too. Foundation Establishment: +1 max HP per stage. Qi Condensation: +1 max HP and +1% movement speed per stage. Core Forming: +2 max HP per stage.
+- Sea of Qi (Qi Condensation signature, kept in Core Forming): with full Qi, the surplus slowly regenerates life (1 HP every 4 seconds).
+- Golden Core (Core Forming signature): elements press each other in the loop Fire > Wood > Wind > Earth > Water > Fire, and Ice and Lightning press and are pressed by every other element. A player whose core element presses the target player's core deals ×1.25 damage (`pressure_damage_multiplier` in the server config). Pure stays outside the loop and makes techniques cost 10% less Qi.
+- Core Forming has its own passive: the Qi Condensation stats plus the Qi absorption range (+1 block every 500 points), levelled with cultivated Qi and the chosen focus like in Qi Condensation. Qi already cultivated in Core Forming on existing saves is moved into Max Qi. Technique training caps now keep growing in Core Forming, and each technique use trains 1 point plus 1 per Core Forming stage (4 points at stage 3).
+- Core Forming cultivators can cultivate in every Qi source, at an efficiency set by their core: 125% in their own element (150% for Ice and Lightning cores), 50% in other elements, 10% in an element that presses their core (Ice and Lightning cores keep 50%), and 100% in pure and "any" sources and for Pure cores. Values are in the server config (`own_element_efficiency`, `variant_own_element_efficiency`, `other_element_efficiency`, `pressing_element_efficiency`).
+- Core Forming breakthroughs can reinforce a core already owned instead of choosing a new concept, which removes the block at stage 7. Each extra rank: elemental cores make their states 25% longer and stronger, Grow +25% size, Falling +50% falling damage. Aura, Explosion, Warp and Elasticity are unique and cannot be reinforced.
+- Non-elemental concept unlock quests now progress from Qi Condensation stage 4, instead of only in Core Forming. When choosing a core, an owned core that can be reinforced shows the rank it would reach, e.g. "(rank 2)". The first core, chosen when leaving Qi Condensation, must still be the elemental one.
+- Added the Infusion concept (unique): techniques leave their element along their path (Qi projectiles, flying swords) and in a 2-block zone around their impact, with weaker states and no block effect. Unlocked by equipping 5 different items with an elemental enchantment (Fire Aspect, Flame, Respiration, Aqua Affinity, Depth Strider, Riptide, Frost Walker, Channeling, Feather Falling, Thorns); each item only counts once.
+- New exclusive Mass axis: Falling and Levitation cannot be taken together. Mass only acts on a real fall of over 2 blocks, not while swimming, climbing, gliding, riding or flying. Falling now makes the player fall 1.5x faster. Added Levitation: falls are slowed to Slow Falling speed with no fall damage (sneak to fall at normal speed: only the distance fallen from the moment the player sneaks counts for fall damage), and Qi projectiles last 50% longer per rank. Levitation is unlocked by falling slowly for 60 seconds (Slow Falling effect).
+- New exclusive Field axis: Gravity pulls the entities around a technique's impact towards it, Repulsion pushes them away and slows enemy projectiles to 30% of their speed. Radius 3 blocks, stronger near the impact; each rank adds 1 block and 25% force. Rooted targets are not moved. Gravity is unlocked by taking 50 fall damage, Repulsion by being knocked back 50 times; both are stabilised by moving entities.
+- New exclusive Rhythm axis. Haste: Qi projectiles and flying swords +30% speed (+10% per extra rank), the aura pulses every 0.7 s, and damage is reduced by 15%; unlocked by using the same technique 50 times in a row (toggled techniques like Flight do not count). Charge: holding Qi Emission's key charges the shot up to x2 damage and Qi cost in 2 s (+0.5 per extra rank), flying swords are 25% slower but deal x1.5 damage, and the aura pulses every 1.5 s with x1.5 damage; unlocked by landing 10 hits of 20 damage or more.
+- Added the Echo concept: each technique hit repeats on its target 1 s later at 40% of its damage; each extra rank adds another echo, 5 points weaker than the previous one (`echo_step` in the server config), never below 5%. Echoes cost no Qi and never echo themselves. Unlocked by taking 25 hits in a row, at most 1 s apart.
+- Added the Poison concept: technique hits poison the target and block all its regeneration (new Blocked Regeneration state, Sea of Qi included) for 3 s, +2 s per extra rank. Unlocked by meditating while poisoned for 5 minutes in total; the count restarts on death.
+- Falling landings now show a ground slam: fake copies of the ground blocks lift and tilt away from the impact then settle back, over cracks and block particles, with a heavy impact sound. Purely visual, the world is never changed.
+- Flight with the Warp concept no longer glides: the player teleports by jumps every 0.5 s in the direction they move (look up or down to jump vertically). The flight speed sets the jump length (5 blocks at base, 9 at most), and each jump costs 10 Qi per block.
+- Grow now also enlarges the flying swords' hitbox, matching their bigger model.
+- Elasticity's fall bounce costs half as much Qi (half the damage taken instead of all of it).
+
+### Fixes
+
+- Fixed Qi source particles disappearing in front of and behind clouds: they were drawn with the depth test off, which also stopped them writing depth, so the clouds drawn afterwards painted over them. They now stay visible through clouds like through walls.
+- Fixed the Falling landing shockwave missing some mobs in its zone: its hit box was flat at the player's feet, so mobs standing exactly on the same level were not detected. It now covers one block up and down and uses the same circle as the ground slam visual.
+- Fixed Qi sources being ticked up to 3 times per server tick (two listeners, one of them at both the start and end of the tick): the list of players absorbing was synced empty right after being filled, so the Qi stream to a meditating player was not shown, and sources regenerated 3 times faster than configured. They now tick once per tick.
+- Fixed the Qi stream from a source to a meditating player being missing or patchy: particle spawning added up frame times instead of following game ticks, so it depended on the frame rate. A source being absorbed now sends a continuous stream (one particle every 2 ticks to each absorbing player), stream particles live long enough to reach players outside the source's radius, the stream stops when absorption stops, and two players absorbing at once can no longer crash the renderer.
+- Fixed Item Enhance giving its concept effects (Explosion, Infusion...) the attacker instead of the entity hit, so they happened on the player.
+- Fixed Falling's extra gravity on projectiles being applied at any speed (a stray `;` disabled its speed cap).
+- Network protocol version is now 9.
+- The core chosen at a Core Forming breakthrough is now checked on the server (learnt and allowed), instead of trusting the client.
+
 ## [0.4.4] - WIP - Code cleanup, quest goals and food
 
 ### New features and changes

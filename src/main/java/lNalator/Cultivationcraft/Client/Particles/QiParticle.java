@@ -19,6 +19,8 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
+import org.lwjgl.opengl.GL11;
+
 import java.awt.*;
 import java.util.Random;
 
@@ -27,17 +29,25 @@ public class QiParticle extends TextureSheetParticle {
     Entity target;
 
     static final ParticleRenderType QI_PARTICLE_RENDER_TYPE = new ParticleRenderType() {
+        // Qi is seen through everything. Disabling the depth test also stops depth writes, so the clouds,
+        // drawn after the particles, painted over them whether they were in front or behind. Instead the
+        // test always passes and writes the nearest depth, so nothing drawn later can cover the particles.
         public void begin(BufferBuilder p_107455_, TextureManager p_107456_) {
             RenderSystem.depthMask(true);
             RenderSystem.setShaderTexture(0, TextureAtlas.LOCATION_PARTICLES);
-            RenderSystem.disableDepthTest();
+            RenderSystem.enableDepthTest();
+            RenderSystem.depthFunc(GL11.GL_ALWAYS);
+            GL11.glDepthRange(0, 0);
             RenderSystem.enableBlend();
             RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
             p_107455_.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.PARTICLE);
         }
 
+        // The quads are drawn here, so the depth state is restored afterwards
         public void end(Tesselator p_107458_) {
             p_107458_.end();
+            GL11.glDepthRange(0, 1);
+            RenderSystem.depthFunc(GL11.GL_LEQUAL);
         }
 
         public String toString() {
@@ -151,8 +161,11 @@ public class QiParticle extends TextureSheetParticle {
                 // Determine the velocity of the particles based on their lifespan and the distance they need to travel
                 direction = direction.scale(distance / (float) life);
             } else {
-                life = (int) distance * 2;
-                direction = direction.scale(0.5);
+                // Live long enough to reach the player, wherever they are: the source radius was too short once
+                // the absorption range lets players meditate outside it
+                double toTarget = new Vec3(xPos, yPos, zPos).distanceTo(target.position());
+                life = (int) Math.ceil(toTarget / QiSourceRenderer.STREAM_SPEED) + 5;
+                direction = direction.scale(QiSourceRenderer.STREAM_SPEED);
             }
 
             QiParticle particle = new QiParticle(world, xPos, yPos, zPos, direction.x, direction.y, direction.z, life, sprites);

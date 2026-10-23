@@ -30,6 +30,29 @@ public class Elements {
     protected static ArrayList<ResourceLocation> defaultElements = new ArrayList<>();
     protected static HashMap<ResourceKey<Level>, ArrayList<ResourceLocation>> dimensionElements = new HashMap<>();
 
+    // Golden Core pressure loop: each element presses the next one
+    protected static final ResourceLocation[] PRESSURE_LOOP = {fireElement, woodElement, windElement, earthElement, waterElement};
+
+    // Whether an attacker's core element presses (deals extra damage to) the target's core element.
+    // Ice and Lightning press every other element and are pressed by every other element; Pure (noElement) is outside the loop
+    public static boolean presses(ResourceLocation attacker, ResourceLocation target) {
+        if (attacker.equals(target) || attacker.equals(noElement) || target.equals(noElement) || attacker.equals(anyElement) || target.equals(anyElement)) {
+            return false;
+        }
+
+        if (attacker.equals(iceElement) || attacker.equals(lightningElement) || target.equals(iceElement) || target.equals(lightningElement)) {
+            return true;
+        }
+
+        for (int i = 0; i < PRESSURE_LOOP.length; i++) {
+            if (PRESSURE_LOOP[i].equals(attacker)) {
+                return PRESSURE_LOOP[(i + 1) % PRESSURE_LOOP.length].equals(target);
+            }
+        }
+
+        return false;
+    }
+
     public static void init() {
         createElements();
         createMaterialElements();

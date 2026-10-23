@@ -33,6 +33,11 @@ public class QiCondenserCultivation extends CultivationType {
         ID = new ResourceLocation(Cultivationcraft.MODID, "cultivation.qicondensation");
     }
 
+    @Override
+    public boolean hasSeaOfQi() {
+        return true;
+    }
+
     public void stageCalculations() {
         techLevel = 200 + (100 * stage);
     }

@@ -8,6 +8,7 @@ import lNalator.Cultivationcraft.Common.Qi.Elements.Elements;
 import lNalator.Cultivationcraft.Common.Qi.QiProjectile;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.Technique;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers.TechniqueModifier;
+import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers.ChargeModifier;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueStats.DefaultTechniqueStatIDs;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueStats.TechniqueStatModification;
 import lNalator.Cultivationcraft.Cultivationcraft;
@@ -60,6 +61,36 @@ public class QiEmission extends Technique {
         addTechniqueStat(amount, 1, amountModification);
     }
 
+    // Charge concept: holding the key charges the shot, released to fire. -1 when not charging
+    protected int chargeStart = -1;
+    protected float charge = 1;
+
+    @Override
+    public void useKeyPressed(boolean keyDown, Player player) {
+        TechniqueModifier chargeCore = CultivatorStats.getCultivatorStats(player).getCultivation().getModifiers().stream()
+                .filter(mod -> mod instanceof ChargeModifier).findFirst().orElse(null);
+
+        if (chargeCore == null || cooldownCount > 0) {
+            charge = 1;
+            super.useKeyPressed(keyDown, player);
+            return;
+        }
+
+        if (keyDown) {
+            chargeStart = player.tickCount;
+            return;
+        }
+
+        if (chargeStart >= 0) {
+            float progress = Math.min(1, (player.tickCount - chargeStart) / (float) ChargeModifier.CHARGE_TICKS);
+            charge = 1 + (((ChargeModifier) chargeCore).getMaxCharge(player) - 1) * progress;
+            chargeStart = -1;
+
+            activate(player);
+            charge = 1;
+        }
+    }
+
     public boolean isValid(Player player) {
         ICultivatorStats stats = CultivatorStats.getCultivatorStats(player);
 
@@ -102,12 +133,17 @@ public class QiEmission extends Technique {
     protected void spawnProjectile(Player player, Vec3 positionModifier) {
         // Try to consume Qi for this projectile, doing nothing if there is not enough Qi to do so
         // Happens once per projectile spawned
-        if (!spendExternalQi(player, 1)) {
+        if (!spendExternalQi(player, charge)) {
             return;
         }
 
         Vec3 pos = PlayerUtils.getPosition(player).add(positionModifier);
-        Entity projectile = new QiProjectile(player.level, player, pos.x, pos.y, pos.z, getElement(), (int) getTechniqueStat(DefaultTechniqueStatIDs.damage, player), (float) getTechniqueStat(DefaultTechniqueStatIDs.movementSpeed, player), this, (float) getTechniqueStat(DefaultTechniqueStatIDs.lifetime, player));
+        float tempo = 1;
+        for (TechniqueModifier mod : CultivatorStats.getCultivatorStats(player).getCultivation().getModifiers()) {
+            tempo *= mod.getTempoMultiplier(player);
+        }
+
+        Entity projectile = new QiProjectile(player.level, player, pos.x, pos.y, pos.z, getElement(), (int) (getTechniqueStat(DefaultTechniqueStatIDs.damage, player) * charge), (float) getTechniqueStat(DefaultTechniqueStatIDs.movementSpeed, player) * tempo, this, (float) getTechniqueStat(DefaultTechniqueStatIDs.lifetime, player));
         ((QiProjectile) projectile).setDirection(player.getLookAngle());
 
         for (TechniqueModifier mod : CultivatorStats.getCultivatorStats(player).getCultivation().getModifiers()) {

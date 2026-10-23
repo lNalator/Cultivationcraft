@@ -34,6 +34,17 @@ public class Quest {
     public static final ResourceLocation FREEZE_ENTITY = new ResourceLocation(Cultivationcraft.MODID, "cultivationcraft.quest.freeze");
     public static final ResourceLocation EXTINGUISH = new ResourceLocation(Cultivationcraft.MODID, "cultivationcraft.quest.extinguish");
     public static final ResourceLocation LIGHTNING_CHAIN = new ResourceLocation(Cultivationcraft.MODID, "cultivationcraft.quest.lightningchain");
+    public static final ResourceLocation ELEMENTAL_ITEM = new ResourceLocation(Cultivationcraft.MODID, "cultivationcraft.quest.elementalitem");
+    public static final ResourceLocation HIT_STREAK = new ResourceLocation(Cultivationcraft.MODID, "cultivationcraft.quest.hitstreak");
+    public static final ResourceLocation ECHO_HIT = new ResourceLocation(Cultivationcraft.MODID, "cultivationcraft.quest.echohit");
+    public static final ResourceLocation POISON_MEDITATION = new ResourceLocation(Cultivationcraft.MODID, "cultivationcraft.quest.poisonmeditation");
+    public static final ResourceLocation POISON_APPLIED = new ResourceLocation(Cultivationcraft.MODID, "cultivationcraft.quest.poisonapplied");
+    public static final ResourceLocation TECHNIQUE_STREAK = new ResourceLocation(Cultivationcraft.MODID, "cultivationcraft.quest.techniquestreak");
+    public static final ResourceLocation TECHNIQUE_USED = new ResourceLocation(Cultivationcraft.MODID, "cultivationcraft.quest.techniqueused");
+    public static final ResourceLocation BIG_HIT = new ResourceLocation(Cultivationcraft.MODID, "cultivationcraft.quest.bighit");
+    public static final ResourceLocation FIELD_MOVED = new ResourceLocation(Cultivationcraft.MODID, "cultivationcraft.quest.fieldmoved");
+    public static final ResourceLocation KNOCKBACK_TAKEN = new ResourceLocation(Cultivationcraft.MODID, "cultivationcraft.quest.knockbacktaken");
+    public static final ResourceLocation SLOW_FALL = new ResourceLocation(Cultivationcraft.MODID, "cultivationcraft.quest.slowfall");
     public static final ResourceLocation ENDER_TELEPORT = new ResourceLocation(Cultivationcraft.MODID, "cultivationcraft.quest.endertp");
 
     public final ResourceLocation mode;

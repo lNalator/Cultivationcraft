@@ -9,6 +9,8 @@ import lNalator.Cultivationcraft.Common.Qi.Damage.QiDamageSource;
 import lNalator.Cultivationcraft.Common.Qi.Stats.BodyPartStatControl;
 import lNalator.Cultivationcraft.Common.Qi.Stats.PlayerStatModifications;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers.TechniqueModifier;
+import lNalator.Cultivationcraft.Common.Qi.Quests.Quest;
+import lNalator.Cultivationcraft.Common.Qi.Quests.QuestHandler;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueStats.DefaultTechniqueStatIDs;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueStats.TechniqueStatModification;
 import lNalator.Cultivationcraft.Network.ClientPacketHandler;
@@ -346,9 +348,31 @@ public class Technique {
 
         if (player instanceof ServerPlayer) {
             CultivationAdvancements.TECH_USE.trigger((ServerPlayer) player, this.getClass().getName(), 0);
+            QuestHandler.progressQuest(player, Quest.TECHNIQUE_USED, 1);
+
+            // Haste unlock: the same technique used 50 times in a row; toggled techniques (Flight...) do not count
+            if (type != useType.Toggle) {
+                progressSameTechniqueStreak(player);
+            }
         }
 
         addModifiers(player);
+    }
+
+    protected static final int SAME_TECHNIQUE_STREAK = 50;
+    // Per player: last technique class used and how many times in a row
+    protected static final java.util.HashMap<java.util.UUID, java.util.Map.Entry<Class<?>, Integer>> techniqueStreaks = new java.util.HashMap<>();
+
+    protected void progressSameTechniqueStreak(Player player) {
+        var last = techniqueStreaks.get(player.getUUID());
+        int count = last != null && last.getKey() == getClass() ? last.getValue() + 1 : 1;
+
+        if (count >= SAME_TECHNIQUE_STREAK) {
+            QuestHandler.progressQuest(player, Quest.TECHNIQUE_STREAK, 1);
+            count = 0;
+        }
+
+        techniqueStreaks.put(player.getUUID(), java.util.Map.entry(getClass(), count));
     }
 
     public void deactivate(Player player) {

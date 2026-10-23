@@ -7,6 +7,14 @@ Grouped by category. Each item has a priority (P1 = next, P2 = soon, P3 = later)
 - **P2 · S** Divine Sense: spiritual plant markers should shrink/grow with the plant's current Qi amount (`Client/Renderers/DivineSenseBlockRenderer.java`).
 - **P2 · M** Elements: bigger visual feedback (particles, sounds) when an element hits a block or an entity, for clearer player feedback (`Common/Qi/Elements/*`).
 
+## Qi sources (0.4.5)
+
+- **P1 · M** Qi stream rework: the Qi sent from a source to a meditating player should travel at about the player's absorption speed, and be clearly visible arriving at the character. Also decide whether the reserve should matter (today a source refills about as fast as a player absorbs, so it never empties).
+
+## Flying swords
+
+- **P3 · L** Flying sword AI rework, to do together (Enzo + Claude). Includes the Levitation behaviour: swords hovering above the player between attacks.
+
 ## Interface
 
 - **P2 · S** Widen the technique selection list so longer names fit.

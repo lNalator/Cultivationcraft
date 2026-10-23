@@ -13,6 +13,7 @@ public class AuraModifier extends TechniqueModifier {
 
     public AuraModifier() {
         ID = AURA_ID;
+        unique = true;
         CATEGORY = MODIFIER_CATEGORY;
 
         // Qi overflow: 30 s meditating in a Qi source with full Qi

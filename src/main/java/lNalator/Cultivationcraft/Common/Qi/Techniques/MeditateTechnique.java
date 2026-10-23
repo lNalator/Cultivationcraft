@@ -1,5 +1,6 @@
 package lNalator.Cultivationcraft.Common.Qi.Techniques;
 
+import net.minecraft.world.effect.MobEffects;
 import lNalator.Cultivationcraft.Client.Animations.GenericQiPoses;
 import lNalator.Cultivationcraft.Common.Advancements.CultivationAdvancements;
 import lNalator.Cultivationcraft.Common.Capabilities.BodyModifications.BodyModifications;
@@ -73,6 +74,11 @@ public class MeditateTechnique extends MovementOverrideTechnique {
             CultivationType cultivation = stats.getCultivation();
 
             List<QiSource> sources = ChunkQiSources.getQiSourcesInRange(event.player.level, event.player.position(), (int) cultivation.getCultivationStat(event.player, DefaultCultivationStatIDs.qiAbsorbRange));
+
+            // Poison unlock: meditating while poisoned
+            if (event.player.hasEffect(MobEffects.POISON)) {
+                QuestHandler.progressQuest(event.player, Quest.POISON_MEDITATION, 1.0 / 20.0);
+            }
 
             // If meditating in a Qi Source, give advancement
             if (sources.size() > 0 && event.side == LogicalSide.SERVER) {

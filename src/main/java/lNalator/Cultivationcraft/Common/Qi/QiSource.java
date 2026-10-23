@@ -42,7 +42,8 @@ public class QiSource {
     public static final int minSpawnTime = 30;
     public static final int maxSpawnTime = 10;
 
-    public int spawnedTick = 0;
+    // Client only: last game tick a particle was considered for this source
+    public long spawnedTick = -1;
 
     protected HashMap<UUID, Double> currentAbsorbing = new HashMap<UUID, Double>();
     protected HashMap<UUID, Double> absorbing = new HashMap<UUID, Double>();
@@ -129,6 +130,11 @@ public class QiSource {
 
         boolean update = toUpdate;
         toUpdate = false;
+
+        // Tell clients when absorption stops too, or a full source would keep streaming to them
+        if (!currentAbsorbing.isEmpty() && absorbing.isEmpty()) {
+            update = true;
+        }
 
         // Clear the list of players absorbing from this source
         currentAbsorbing = absorbing;

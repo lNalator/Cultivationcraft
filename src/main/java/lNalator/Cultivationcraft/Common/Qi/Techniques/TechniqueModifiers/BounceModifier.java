@@ -16,6 +16,7 @@ public class BounceModifier extends TechniqueModifier {
 
     public BounceModifier() {
         ID = new ResourceLocation(Cultivationcraft.MODID, "concept.bounce");
+        unique = true;
         CATEGORY = MODIFIER_CATEGORY;
 
         unlockQuest = new Quest(Quest.BOUNCE, 1);
@@ -25,7 +26,6 @@ public class BounceModifier extends TechniqueModifier {
         qiMult = 1.5f;
     }
 
-    // TODO: Qi consumption reduced on damage taken
     public boolean onHitBlock(Player owner, BlockHitResult hit, float damage, ResourceLocation element, Entity projectile) {
         super.onHitBlock(owner, hit, damage, element, projectile);
 
@@ -50,8 +50,8 @@ public class BounceModifier extends TechniqueModifier {
             return;
         }
 
-        // Do nothing if the player does not have enough Qi
-        if (!CultivatorStats.getCultivatorStats(owner).getCultivation().consumeQi(owner, damage)) {
+        // Bouncing costs half the damage taken in Qi; do nothing if the player does not have enough
+        if (!CultivatorStats.getCultivatorStats(owner).getCultivation().consumeQi(owner, damage / 2)) {
             return;
         }
 

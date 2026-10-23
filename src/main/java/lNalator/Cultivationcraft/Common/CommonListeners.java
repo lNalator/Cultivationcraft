@@ -1,5 +1,13 @@
 package lNalator.Cultivationcraft.Common;
 
+import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers.InfusionModifier;
+import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers.LevitationModifier;
+import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers.TechniqueModifier;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraftforge.event.entity.living.LivingFallEvent;
+import net.minecraftforge.event.entity.living.LivingKnockBackEvent;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraftforge.event.entity.living.LivingEquipmentChangeEvent;
 import lNalator.Cultivationcraft.Client.ClientItemControl;
 import lNalator.Cultivationcraft.Client.ClientListeners;
 import lNalator.Cultivationcraft.Client.GUI.SkillHotbarOverlay;
@@ -83,9 +91,39 @@ public class CommonListeners {
             }
         } else {
             ServerListeners.playerTick(event);
+
+            // Slow fall quest (Levitation): falling slowly, from the Slow Falling effect or Levitation itself
+            if (event.phase == TickEvent.Phase.END && !event.player.isOnGround() && event.player.getDeltaMovement().y < 0
+                    && (event.player.hasEffect(MobEffects.SLOW_FALLING) || (LevitationModifier.hasLevitation(event.player) && TechniqueModifier.massApplies(event.player) && !event.player.isShiftKeyDown()))) {
+                QuestHandler.progressQuest(event.player, Quest.SLOW_FALL, 1.0 / 20.0);
+            }
         }
 
         clearStatus(event.player);
+    }
+
+    // Repulsion unlock: being knocked back
+    @SubscribeEvent
+    public static void knockBack(LivingKnockBackEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player) {
+            QuestHandler.progressQuest(player, Quest.KNOCKBACK_TAKEN, 1);
+        }
+    }
+
+    // Levitation: no fall damage, except the distance fallen while sneaking
+    @SubscribeEvent
+    public static void livingFall(LivingFallEvent event) {
+        if (event.getEntity() instanceof Player player && !player.level.isClientSide) {
+            event.setDistance(LevitationModifier.damagingFall(player, event.getDistance()));
+        }
+    }
+
+    // Infusion unlock: equipping (armor or hands) an item with an elemental enchantment
+    @SubscribeEvent
+    public static void equipmentChange(LivingEquipmentChangeEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player) {
+            InfusionModifier.countElementalItem(player, event.getTo());
+        }
     }
 
     @SubscribeEvent
@@ -132,38 +170,7 @@ public class CommonListeners {
         lNalator.Cultivationcraft.Common.Commands.CultiDevCommand.register(commandDispatcher);
     }
 
-    @SubscribeEvent
-    public static void LevelTick(TickEvent.LevelTickEvent event) {
-        if (event.phase == TickEvent.Phase.START && event.side == LogicalSide.SERVER) {
-            // Clone the array list so it doesn't bork out if modified during ticking
-            ArrayList<IChunkQiSources> ticking = new ArrayList<IChunkQiSources>(tickingQiSources);
-
-            for (IChunkQiSources sources : ticking) {
-                if (sources == null) {
-                    return;
-                }
-
-                if (sources.getDimension().compareTo(event.level.dimension().location()) == 0) {
-                    boolean update = false;
-
-                    if (sources.tick(event.level)) {
-                        update = true;
-                    }
-
-                    if (update) {
-                        LevelChunk chunk = event.level.getChunk(sources.getChunkPos().x, sources.getChunkPos().z);
-
-                        // Mark the LevelChunk as dirty so it will save the updated capability
-                        chunk.setUnsaved(true);
-
-                        // Send the updated capability data to all tracking clients
-                        // TODO - Is this updating too much?
-                        PacketHandler.sendChunkQiSourcesToClient(chunk);
-                    }
-                }
-            }
-        }
-    }
+    // Qi sources are ticked once per server tick in ServerListeners.LevelTick
 
     @SubscribeEvent
     public static void worldLoad(LevelEvent.Load event) {

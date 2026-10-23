@@ -110,7 +110,12 @@ public class AuraTechnique extends Technique {
             deflectProjectiles(player, range);
         }
 
-        if (++pulseTimer >= PULSE_TICKS) {
+        float interval = PULSE_TICKS;
+        for (TechniqueModifier mod : CultivatorStats.getCultivatorStats(player).getCultivation().getModifiers()) {
+            interval *= mod.getAuraIntervalMultiplier(player);
+        }
+
+        if (++pulseTimer >= interval) {
             pulseTimer = 0;
             pulse(player, element, range);
         }
@@ -120,6 +125,9 @@ public class AuraTechnique extends Technique {
 
     protected void pulse(Player player, ResourceLocation element, double range) {
         double damage = getTechniqueStat(DefaultTechniqueStatIDs.damage, player);
+        for (TechniqueModifier mod : CultivatorStats.getCultivatorStats(player).getCultivation().getModifiers()) {
+            damage *= mod.getAuraDamageMultiplier(player);
+        }
         double chance = getTechniqueStat(intensity, player);
         int hits = 0;
 
