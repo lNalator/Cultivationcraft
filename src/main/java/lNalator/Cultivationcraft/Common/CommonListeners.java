@@ -97,6 +97,11 @@ public class CommonListeners {
                     && (event.player.hasEffect(MobEffects.SLOW_FALLING) || (LevitationModifier.hasLevitation(event.player) && TechniqueModifier.massApplies(event.player) && !event.player.isShiftKeyDown()))) {
                 QuestHandler.progressQuest(event.player, Quest.SLOW_FALL, 1.0 / 20.0);
             }
+
+            // Crawl quest (Shrink): crawling through 1-block-high gaps
+            if (event.phase == TickEvent.Phase.END && event.player.isVisuallyCrawling()) {
+                QuestHandler.progressQuest(event.player, Quest.CRAWL, 1.0 / 20.0);
+            }
         }
 
         clearStatus(event.player);

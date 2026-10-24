@@ -34,7 +34,15 @@ minecraft {
     // These can be tweaked, removed, or duplicated as needed.
     runs {
         client {
-            workingDirectory project.file('run')
+            // -Pplayer=Dev2 -PclientDir=run-client2 starts a second player with its own folder, so options and logs don't clash
+            workingDirectory project.file(project.findProperty('clientDir') ?: 'run')
+
+            // Fixed offline name (Dev1 by default), so several clients can join the same server
+            args '--username', project.findProperty('player') ?: 'Dev1'
+            // ./gradlew runClient -Pconnect joins the local server directly (see multiplayer-test.ps1)
+            if (project.hasProperty('connect')) {
+                args '--server', 'localhost', '--port', '25565'
+            }
 
             // Recommended logging data for a userdev environment
             // The markers can be added/remove as needed separated by commas.
@@ -42,6 +50,10 @@ minecraft {
             // "REGISTRIES": For firing of registry events.
             // "REGISTRYDUMP": For getting the contents of all registries.
             property 'forge.logging.markers', 'REGISTRIES'
+
+            // Remap mixin refmaps of dependency mods (Distant Horizons) from SRG to official names, otherwise their injections silently don't apply in dev.
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
 
             // Recommended logging level for the console
             // You can set various levels here.
@@ -63,6 +75,10 @@ minecraft {
 
             property 'forge.logging.markers', 'REGISTRIES'
 
+            // Remap mixin refmaps of dependency mods (Distant Horizons) from SRG to official names, otherwise their injections silently don't apply in dev.
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
+
             property 'forge.logging.console.level', 'debug'
 
             property 'forge.enabledGameTestNamespaces', 'cultivationcraft'
@@ -82,6 +98,10 @@ minecraft {
 
             property 'forge.logging.markers', 'REGISTRIES'
 
+            // Remap mixin refmaps of dependency mods (Distant Horizons) from SRG to official names, otherwise their injections silently don't apply in dev.
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
+
             property 'forge.logging.console.level', 'debug'
 
             property 'forge.enabledGameTestNamespaces', 'cultivationcraft'
@@ -98,6 +118,10 @@ minecraft {
             workingDirectory project.file('run')
 
             property 'forge.logging.markers', 'REGISTRIES'
+
+            // Remap mixin refmaps of dependency mods (Distant Horizons) from SRG to official names, otherwise their injections silently don't apply in dev.
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
 
             property 'forge.logging.console.level', 'debug'
 
@@ -144,6 +168,7 @@ dependencies {
     // settings.gradle substitutes the MLM Animator checkout; CI pins its upstream commit.
     implementation fg.deobf("curse.maven:ironchest-228756:3966365")
     runtimeOnly fg.deobf("curse.maven:jade-324717:4800904")
+    implementation fg.deobf("curse.maven:distant-horizons-508933:9004749")
 
     // Real mod deobf dependency examples - these get remapped to your current mappings
     // compileOnly fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}:api") // Adds JEI API as a compile dependency

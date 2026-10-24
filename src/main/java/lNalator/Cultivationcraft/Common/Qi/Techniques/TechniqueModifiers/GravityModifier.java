@@ -20,6 +20,7 @@ public class GravityModifier extends TechniqueModifier {
     protected static final double BASE_RADIUS = 3;
     protected static final double BASE_FORCE = 0.5;
 
+    // TODO core design: a dark core bending the light around it, with debris pulled into orbit
     public GravityModifier() {
         ID = new ResourceLocation(Cultivationcraft.MODID, "concept.gravity");
         CATEGORY = FIELD_CATEGORY;

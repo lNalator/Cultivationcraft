@@ -11,6 +11,7 @@ import net.minecraft.world.phys.Vec3;
 
 public class GrowModifier extends TechniqueModifier {
 
+    // TODO core design: a core slowly swelling and shrinking, with growth rings
     public GrowModifier() {
         ID = new ResourceLocation(Cultivationcraft.MODID, "concept.grow");
         CATEGORY = SIZE_CATEGORY;

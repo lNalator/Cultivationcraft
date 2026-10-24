@@ -14,6 +14,7 @@ import net.minecraft.world.phys.Vec3;
 
 public class BounceModifier extends TechniqueModifier {
 
+    // TODO core design: a rubbery core that squashes and springs back, like a slime
     public BounceModifier() {
         ID = new ResourceLocation(Cultivationcraft.MODID, "concept.bounce");
         unique = true;

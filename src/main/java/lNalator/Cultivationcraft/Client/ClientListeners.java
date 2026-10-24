@@ -18,7 +18,11 @@ import lNalator.Cultivationcraft.Common.Qi.CultivationTypes;
 import lNalator.Cultivationcraft.Common.Qi.BodyParts.BodyPart;
 import lNalator.Cultivationcraft.Common.Qi.BodyParts.BodyPartOption;
 import lNalator.Cultivationcraft.Common.Qi.BodyParts.PlayerHealthManager;
+import lNalator.Cultivationcraft.Client.Renderers.QiSourceRenderer;
+import lNalator.Cultivationcraft.Common.Qi.Elements.Element;
 import lNalator.Cultivationcraft.Common.Qi.Elements.Elements;
+import lNalator.Cultivationcraft.Common.Qi.QiSource;
+import net.minecraft.network.chat.Component;
 import lNalator.Cultivationcraft.Common.Qi.Stats.BodyPartStatControl;
 import lNalator.Cultivationcraft.Common.Qi.Stats.PlayerStatModifications;
 import lNalator.Cultivationcraft.Common.Qi.Stats.StatIDs;
@@ -252,6 +256,18 @@ public class ClientListeners {
                             font.draw(event.getPoseStack(), text, x, y, 0xFFFFFF);
                         }
                     }
+                }
+
+                // Size, element and density tier of the Qi source looked at, under the plant line
+                QiSource source = QiSourceRenderer.focused;
+                if (source != null) {
+                    Font font = mc.font;
+                    Element element = Elements.getElement(source.getElement());
+                    String text = Component.translatable("cultivationcraft.qisource.tier", Component.translatable("cultivationcraft.qisource.size." + source.getSizeTier()),
+                            element.getName(), Component.translatable("cultivationcraft.qisource.tier." + source.getDensityTier())).getString();
+                    int x = (mc.getWindow().getGuiScaledWidth() - font.width(text)) / 2;
+                    int y = mc.getWindow().getGuiScaledHeight() / 2 + 24;
+                    font.draw(event.getPoseStack(), text, x, y, element.color.getRGB() & 0xFFFFFF);
                 }
             }
         }

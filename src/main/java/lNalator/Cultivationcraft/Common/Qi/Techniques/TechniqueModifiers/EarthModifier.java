@@ -10,6 +10,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class EarthModifier extends TechniqueModifier {
 
+    // TODO core design: rough stone with cracks and small rocks orbiting (review the current earth.png)
     public EarthModifier() {
         ID = new ResourceLocation(Cultivationcraft.MODID, "concept.earth");
         CATEGORY = ELEMENTAL_CATEGORY;

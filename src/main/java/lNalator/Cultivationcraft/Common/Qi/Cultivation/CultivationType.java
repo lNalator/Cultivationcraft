@@ -1,8 +1,8 @@
 package lNalator.Cultivationcraft.Common.Qi.Cultivation;
 
 import lNalator.Cultivationcraft.Common.Qi.Stats.BodyPartStatControl;
+import lNalator.Cultivationcraft.Client.GUI.Screens.CultivationTypeScreens.CultivationScreens;
 import lNalator.Cultivationcraft.Client.GUI.Screens.CultivationTypeScreens.CultivationTypeScreen;
-import lNalator.Cultivationcraft.Client.GUI.Screens.GenericTabScreen;
 import lNalator.Cultivationcraft.Common.Advancements.CultivationAdvancements;
 import lNalator.Cultivationcraft.Common.Capabilities.ChunkQiSources.ChunkQiSources;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.CultivatorStats;
@@ -52,7 +52,8 @@ public class CultivationType {
 
     protected PassiveTechnique passive = new PassiveTechnique();
 
-    protected CultivationTypeScreen screen = new CultivationTypeScreen();
+    // Created on first use, client side only (see CultivationScreens)
+    protected CultivationTypeScreen screen;
 
     protected ArrayList<CultivationType> advancements = new ArrayList<>();
 
@@ -251,10 +252,6 @@ public class CultivationType {
         return advancingCultivation;
     }
 
-    public GenericTabScreen getAdvancmentOptionScreen() {
-        return null;
-    }
-
     public boolean hasAdvancementOptions() {
         return false;
     }
@@ -353,6 +350,8 @@ public class CultivationType {
     }
 
     public CultivationTypeScreen getScreen() {
+        if (screen == null)
+            screen = CultivationScreens.create(this);
         return screen;
     }
 

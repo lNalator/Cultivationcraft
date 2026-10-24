@@ -19,6 +19,7 @@ public class LevitationModifier extends TechniqueModifier {
     // Slow Falling potion speed
     protected static final double MAX_FALL_SPEED = 0.1;
 
+    // TODO core design: a core gently bobbing up and down, with light wisps beneath it
     public LevitationModifier() {
         ID = LEVITATION_ID;
         CATEGORY = MASS_CATEGORY;

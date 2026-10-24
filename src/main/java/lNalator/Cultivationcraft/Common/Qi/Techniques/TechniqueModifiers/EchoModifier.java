@@ -41,6 +41,7 @@ public class EchoModifier extends TechniqueModifier {
     private static final HashMap<UUID, long[]> streaks = new HashMap<>();
     private static long serverTick = 0;
 
+    // TODO core design: concentric rings rippling out of the core, repeating with a delay
     public EchoModifier() {
         ID = new ResourceLocation(Cultivationcraft.MODID, "concept.echo");
         CATEGORY = MODIFIER_CATEGORY;

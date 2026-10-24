@@ -28,6 +28,7 @@ public class PoisonModifier extends TechniqueModifier {
     protected static final int BASE_DURATION = 60;
     protected static final int RANK_DURATION = 40;
 
+    // TODO core design: a sickly green core bubbling and dripping
     public PoisonModifier() {
         ID = POISON_ID;
         CATEGORY = MODIFIER_CATEGORY;

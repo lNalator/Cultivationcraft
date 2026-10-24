@@ -7,6 +7,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class WindModifier extends TechniqueModifier {
 
+    // TODO core design: air currents swirling around the core
     public WindModifier() {
         ID = new ResourceLocation(Cultivationcraft.MODID, "concept.wind");
         CATEGORY = ELEMENTAL_CATEGORY;

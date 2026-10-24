@@ -167,10 +167,10 @@ public class Technique {
     public String getTechniqueStatString(Player player) {
         String statString = "";
 
-        for (ResourceLocation stat : getTechniqueStats()) {
-            statString += "\n" + Component.translatable(stat.getPath()).getString() + ": ";
+        for (ResourceLocation stat : getDisplayedStats(player)) {
+            statString += "\n" + getStatName(stat, player) + ": ";
 
-            double value = getTechniqueStat(stat, player);
+            double value = getDisplayedStat(stat, player);
             value = (int) (value * 1000) / 1000.0;
 
             if (value % 1.0 == 0) {
@@ -185,6 +185,19 @@ public class Technique {
 
     public Set<ResourceLocation> getTechniqueStats() {
         return defaultStats.keySet();
+    }
+
+    // The stats shown to the player, their name and value: a technique can show a stat differently or add derived ones (see FlightTechnique with Warp)
+    public Set<ResourceLocation> getDisplayedStats(Player player) {
+        return getTechniqueStats();
+    }
+
+    public String getStatName(ResourceLocation stat, Player player) {
+        return Component.translatable(stat.getPath()).getString();
+    }
+
+    public double getDisplayedStat(ResourceLocation stat, Player player) {
+        return getTechniqueStat(stat, player);
     }
 
     public boolean hasTechniqueStat(ResourceLocation stat) {

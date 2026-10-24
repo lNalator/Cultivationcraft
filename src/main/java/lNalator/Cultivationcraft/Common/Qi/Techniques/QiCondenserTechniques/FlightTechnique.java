@@ -16,6 +16,7 @@ import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueStats.TechniqueSt
 import lNalator.Cultivationcraft.Common.Reflection;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import lNalator.mlmanimator.Client.Poses.PoseHandler;
+import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -26,13 +27,21 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.event.TickEvent;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 public class FlightTechnique extends Technique {
 
     // Warp flight: the flight speed becomes the length of a jump, base speed (0.01) = 5 blocks
     protected static final double WARP_BLOCKS_PER_SPEED = 500;
     protected static final int WARP_INTERVAL = 10;
+    protected static final int WARP_MIN_INTERVAL = 2;
     // ponytail: vanilla rejects player moves over ~10 blocks in a tick ("moved too quickly"); longer jumps need a server-side teleport packet
     protected static final double WARP_MAX_BLOCKS = 9;
+
+    // Shown instead of the movement speed with Warp
+    public static final ResourceLocation BLOCKS_PER_JUMP = new ResourceLocation(Cultivationcraft.MODID, "cultivationcraft.tstat.blocksperjump");
+    public static final ResourceLocation WARP_DELAY = new ResourceLocation(Cultivationcraft.MODID, "cultivationcraft.tstat.warpdelay");
 
     protected Vec3 lastWarpPos = null;
 
@@ -87,7 +96,7 @@ public class FlightTechnique extends Technique {
             if (hasWarp(event.player)) {
                 event.player.getAbilities().setFlyingSpeed(0);
 
-                if (event.player.isLocalPlayer() && event.player.tickCount % WARP_INTERVAL == 0) {
+                if (event.player.isLocalPlayer() && event.player.tickCount % getWarpInterval(event.player) == 0) {
                     warpJump(event.player);
                 }
             }
@@ -129,17 +138,66 @@ public class FlightTechnique extends Technique {
         return CultivatorStats.getCultivatorStats(player).getCultivation().getModifiers().stream().anyMatch(mod -> mod instanceof WarpModifier);
     }
 
-    // Jump in the direction the player is moving (looking up or down moves vertically), shortened until the destination is free
+    protected double getWarpBlocks(Player player) {
+        return getTechniqueStat(DefaultTechniqueStatIDs.movementSpeed, player) * WARP_BLOCKS_PER_SPEED;
+    }
+
+    // Speed past the jump length cap shortens the delay between jumps instead, so the travel speed keeps growing
+    protected int getWarpInterval(Player player) {
+        return Math.max(WARP_MIN_INTERVAL, (int) Math.round(WARP_INTERVAL / Math.max(1, getWarpBlocks(player) / WARP_MAX_BLOCKS)));
+    }
+
+    @Override
+    public Set<ResourceLocation> getDisplayedStats(Player player) {
+        if (!hasWarp(player)) {
+            return super.getDisplayedStats(player);
+        }
+
+        Set<ResourceLocation> stats = new LinkedHashSet<>(super.getDisplayedStats(player));
+        stats.add(WARP_DELAY);
+
+        return stats;
+    }
+
+    @Override
+    public String getStatName(ResourceLocation stat, Player player) {
+        if (stat.equals(DefaultTechniqueStatIDs.movementSpeed) && hasWarp(player)) {
+            return super.getStatName(BLOCKS_PER_JUMP, player);
+        }
+
+        return super.getStatName(stat, player);
+    }
+
+    @Override
+    public double getDisplayedStat(ResourceLocation stat, Player player) {
+        if (stat.equals(WARP_DELAY)) {
+            return getWarpInterval(player) / 20.0;
+        }
+
+        if (stat.equals(DefaultTechniqueStatIDs.movementSpeed) && hasWarp(player)) {
+            return Math.min(WARP_MAX_BLOCKS, getWarpBlocks(player));
+        }
+
+        return super.getDisplayedStat(stat, player);
+    }
+
+    // Jump in the direction the player is moving (looking up or down moves vertically), shortened until the destination is free.
+    // The fly up (jump) and down (sneak) keys jump straight up or down instead
     protected void warpJump(Player player) {
-        if (player.zza == 0 && player.xxa == 0) {
+        int vertical = (Minecraft.getInstance().options.keyJump.isDown() ? 1 : 0) - (Minecraft.getInstance().options.keyShift.isDown() ? 1 : 0);
+        Vec3 direction;
+
+        if (vertical != 0) {
+            direction = new Vec3(0, vertical, 0);
+        } else if (player.zza != 0 || player.xxa != 0) {
+            Vec3 forward = player.getLookAngle().scale(Math.signum(player.zza));
+            Vec3 strafe = Vec3.directionFromRotation(0, player.getYRot() - 90).scale(Math.signum(player.xxa));
+            direction = forward.add(strafe).normalize();
+        } else {
             return;
         }
 
-        Vec3 forward = player.getLookAngle().scale(Math.signum(player.zza));
-        Vec3 strafe = Vec3.directionFromRotation(0, player.getYRot() - 90).scale(Math.signum(player.xxa));
-        Vec3 direction = forward.add(strafe).normalize();
-
-        for (double distance = Math.min(WARP_MAX_BLOCKS, getTechniqueStat(DefaultTechniqueStatIDs.movementSpeed, player) * WARP_BLOCKS_PER_SPEED); distance >= 1; distance -= 1) {
+        for (double distance = Math.min(WARP_MAX_BLOCKS, getWarpBlocks(player)); distance >= 1; distance -= 1) {
             Vec3 offset = direction.scale(distance);
 
             if (player.level.noCollision(player, player.getBoundingBox().move(offset))) {

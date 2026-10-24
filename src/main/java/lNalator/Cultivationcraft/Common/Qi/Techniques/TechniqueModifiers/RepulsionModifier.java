@@ -10,6 +10,7 @@ import net.minecraft.world.phys.Vec3;
 // Field axis, opposite of Gravity: the impact pushes everything away and slows enemy projectiles around it
 public class RepulsionModifier extends GravityModifier {
 
+    // TODO core design: shockwaves pushing particles away from the core
     public RepulsionModifier() {
         ID = new ResourceLocation(Cultivationcraft.MODID, "concept.repulsion");
 

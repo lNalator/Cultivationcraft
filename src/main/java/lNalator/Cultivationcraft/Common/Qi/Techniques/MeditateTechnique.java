@@ -108,15 +108,18 @@ public class MeditateTechnique extends MovementOverrideTechnique {
                 remaining = ((QiFoodStats) event.player.getFoodData()).meditation(remaining, event.player);
             }
 
-            // Loop through every source and try to cultivate from it
-            for (QiSource source : sources) {
+            // Share the absorption between every source the player can cultivate in: the first source used to take
+            // all of it, so the others in range showed no stream
+            List<QiSource> usable = sources.stream().filter(source -> cultivation.canCultivate(source.getElement())).toList();
+            double share = usable.isEmpty() ? 0 : remaining / usable.size();
+
+            for (QiSource source : usable) {
                 if (remaining <= 0) {
                     break;
                 }
-                if (!cultivation.canCultivate(source.getElement())) {
-                    continue;
-                }
-                double absorbed = source.absorbQi(remaining, event.player);
+                // A dense source lets the player absorb faster
+                double bonus = source.getDensityBonus();
+                double absorbed = source.absorbQi(Math.min(share, remaining) * bonus, event.player);
                 float unused = cultivation.progressCultivation(event.player, (float) absorbed, source.getElement());
                 // progressCultivation returns unused Qi, not spent Qi. Return any
                 // surplus to the source when the current stage has reached its cap.
@@ -124,7 +127,7 @@ public class MeditateTechnique extends MovementOverrideTechnique {
                 if (returned > 0) {
                     source.subtractQi(-returned);
                 }
-                remaining = Math.max(0, remaining - (absorbed - returned));
+                remaining = Math.max(0, remaining - (absorbed - returned) / bonus);
             }
 
             // Passively cultivate
@@ -168,7 +171,7 @@ public class MeditateTechnique extends MovementOverrideTechnique {
                     if (element == null || element.compareTo(source.getElement()) == 0) // Do not absorb more qi than the players max absorb speed
                     {
                         if (remaining > 0) {
-                            double absorbed = source.absorbQi(remaining, event.player);
+                            double absorbed = source.absorbBodyQi(remaining, event.player);
                             remaining -= absorbed;
                             toAdd += absorbed;
                         }

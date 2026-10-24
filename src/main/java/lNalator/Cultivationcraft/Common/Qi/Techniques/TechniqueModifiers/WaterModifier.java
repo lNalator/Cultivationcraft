@@ -8,6 +8,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class WaterModifier extends TechniqueModifier {
 
+    // TODO core design: a flowing, wavy liquid surface (review the current water.png)
     public WaterModifier() {
         ID = new ResourceLocation(Cultivationcraft.MODID, "concept.water");
         CATEGORY = ELEMENTAL_CATEGORY;

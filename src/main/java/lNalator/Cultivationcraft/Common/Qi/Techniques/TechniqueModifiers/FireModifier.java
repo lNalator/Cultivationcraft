@@ -7,6 +7,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class FireModifier extends TechniqueModifier {
 
+    // TODO core design: flickering flames and rising embers
     public FireModifier() {
         ID = new ResourceLocation(Cultivationcraft.MODID, "concept.fire");
         CATEGORY = ELEMENTAL_CATEGORY;

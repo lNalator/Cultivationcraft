@@ -100,8 +100,8 @@ public class PlantCatalogCommands {
         return Commands.argument("storage_fraction", DoubleArgumentType.doubleArg(0, 1)).suggests((ctx, builder) -> {
             for (String value : List.of("0", "0.25", "0.5", "0.75", "1")) {
                 if (value.startsWith(builder.getRemaining())) {
-                    int capacity = (int) (Double.parseDouble(value) * (QiSourceConfig.MaxStorage - QiSourceConfig.MinStorage))
-                            + QiSourceConfig.MinStorage;
+                    int capacity = (int) (Double.parseDouble(value) * (QiSourceConfig.MaxReserve - QiSourceConfig.MinReserve))
+                            + QiSourceConfig.MinReserve;
                     builder.suggest(value, Component.literal("Maximum capacity: " + capacity + " Qi"));
                 }
             }

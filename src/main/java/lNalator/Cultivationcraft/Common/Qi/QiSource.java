@@ -59,7 +59,8 @@ public class QiSource {
 
         qiMax = qi;
         qiCurrent = current;
-        qiRegen = regen;
+        // Sources saved before the reserve rework could refill in a minute
+        qiRegen = Math.max(regen, QiSourceConfig.MaxRegen);
     }
 
     public BlockPos getPos() {
@@ -84,7 +85,31 @@ public class QiSource {
     }
 
     public int getQiMax() {
-        return (int) (qiMax * (QiSourceConfig.MaxStorage - QiSourceConfig.MinStorage)) + QiSourceConfig.MinStorage;
+        return (int) (qiMax * (QiSourceConfig.MaxReserve - QiSourceConfig.MinReserve)) + QiSourceConfig.MinReserve;
+    }
+
+    // Absorption speed multiplier from the Qi the source holds now: its size and how full it is
+    public double getDensityBonus() {
+        double bonus = Math.sqrt(getQiCurrent() / (QiSourceConfig.MinReserve / 2.0));
+
+        return Math.max(Config.Server.qiSourceMinBonus(), Math.min(Config.Server.qiSourceMaxBonus(), bonus));
+    }
+
+    // Density tier shown to the player: 0 poor, 1 normal, 2 rich, 3 abundant
+    public int getDensityTier() {
+        double bonus = getDensityBonus();
+
+        return bonus < 0.75 ? 0 : bonus < 1.5 ? 1 : bonus < 2.5 ? 2 : 3;
+    }
+
+    // Reserve size shown to the player: 0 small (about 80% of sources), 1 medium, 2 large, 3 huge
+    public int getSizeTier() {
+        return qiMax < 0.1 ? 0 : qiMax < 0.4 ? 1 : qiMax < 0.8 ? 2 : 3;
+    }
+
+    // Body cultivation counts Qi in the old reserve unit
+    public double absorbBodyQi(double toAbsorb, Player player) {
+        return absorbQi(toAbsorb / QiSourceConfig.BODY_QI_SCALE, player) * QiSourceConfig.BODY_QI_SCALE;
     }
 
     public HashMap<UUID, Double> getAbsorbingPlayers() {
@@ -170,7 +195,8 @@ public class QiSource {
         subtractQi(toAbsorb);
 
         if (toAbsorb > 0) {
-            absorbing.put(player.getUUID(), toAbsorb);
+            // Blood and meditation both draw from the source in a tick: the stream shows their total
+            absorbing.merge(player.getUUID(), toAbsorb, Double::sum);
             toUpdate = true;
         }
 

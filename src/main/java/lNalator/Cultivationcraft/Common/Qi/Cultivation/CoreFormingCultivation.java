@@ -3,16 +3,13 @@ package lNalator.Cultivationcraft.Common.Qi.Cultivation;
 import lNalator.Cultivationcraft.Common.Config;
 import lNalator.Cultivationcraft.Common.Qi.Quests.Quest;
 import lNalator.Cultivationcraft.Cultivationcraft;
-import lNalator.Cultivationcraft.Client.GUI.Screens.ConceptScreen;
-import lNalator.Cultivationcraft.Client.GUI.Screens.GenericTabScreen;
-import lNalator.Cultivationcraft.Client.GUI.Screens.CultivationTypeScreens.CoreFormingScreen;
+import lNalator.Cultivationcraft.Client.GUI.Screens.CultivationTypeScreens.CultivationScreens;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.CultivatorStats;
 import lNalator.Cultivationcraft.Common.Qi.ExternalCultivationHandler;
 import lNalator.Cultivationcraft.Common.Qi.Elements.Elements;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.PassiveTechniques.CultivationPassives.CoreFormingPassive;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers.*;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueStats.DefaultCultivationStatIDs;
-import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
@@ -31,7 +28,6 @@ public class CoreFormingCultivation extends CultivationType
         maxedTechsToBreakthrough = 0;
         maxStage = 9;
         passive = new CoreFormingPassive();
-        screen = new CoreFormingScreen();
         tribulation = new Tribulation(maxStage, 75, 0.6f);
 
         ID = new ResourceLocation(Cultivationcraft.MODID, "cultivation.coreforming");
@@ -99,12 +95,6 @@ public class CoreFormingCultivation extends CultivationType
             return  false;
 
         return true;
-    }
-
-    @Override
-    public GenericTabScreen getAdvancmentOptionScreen()
-    {
-        return new ConceptScreen(true);
     }
 
     // Every Qi source can be cultivated, at an efficiency set by the core's element (Golden Core pressure)
@@ -182,7 +172,7 @@ public class CoreFormingCultivation extends CultivationType
     @Override
     public boolean clientPreBreakthrough(Player player)
     {
-        Minecraft.getInstance().forceSetScreen(new ConceptScreen(true));
+        CultivationScreens.openAdvancementOption(this);
 
         return false;
     }

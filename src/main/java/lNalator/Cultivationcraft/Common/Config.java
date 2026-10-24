@@ -38,6 +38,8 @@ public class Config {
         private static ForgeConfigSpec.DoubleValue spawnMultIce;
         private static ForgeConfigSpec.DoubleValue spawnMultLightning;
         private static ForgeConfigSpec.DoubleValue spawnMultNone;
+        private static ForgeConfigSpec.DoubleValue qiSourceMinBonus;
+        private static ForgeConfigSpec.DoubleValue qiSourceMaxBonus;
 
         public static final ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
         public static final ForgeConfigSpec spec;
@@ -46,6 +48,13 @@ public class Config {
             builder.push("First Person Rendering");
             qiSourceElementalEffects = builder.comment("Enable Qi Sources to apply their elemental effects to the world around them")
                     .define("Enable Qi Source Elemental Effects", true);
+            builder.pop();
+
+            builder.push("Qi Sources");
+            qiSourceMinBonus = builder.comment("Lowest absorption speed multiplier of a nearly empty Qi source")
+                    .defineInRange("min_absorption_bonus", 0.25, 0.01, 10.0);
+            qiSourceMaxBonus = builder.comment("Highest absorption speed multiplier of a large, full Qi source")
+                    .defineInRange("max_absorption_bonus", 3.0, 0.01, 100.0);
             builder.pop();
 
             builder.push("Core Forming");
@@ -117,6 +126,14 @@ public class Config {
 
         public static int stabiliseGoal(int stage) {
             return stabiliseGoalBase.get() + stabiliseGoalStep.get() * (stage - 1);
+        }
+
+        public static double qiSourceMinBonus() {
+            return qiSourceMinBonus.get();
+        }
+
+        public static double qiSourceMaxBonus() {
+            return qiSourceMaxBonus.get();
         }
 
         public static int echoStep() {

@@ -43,6 +43,11 @@ public class ConceptScreen extends GenericTabScreen {
     protected int selectButtonX = 127;
     protected int selectButtonY = 160;
 
+    // Outside of a breakthrough, the player switches between the concepts unlocked and the ones condensed into a core
+    protected boolean showCores = false;
+    protected GUIButton unlockedButton;
+    protected GUIButton coresButton;
+
     public ConceptScreen() {
         this(false);
     }
@@ -58,6 +63,10 @@ public class ConceptScreen extends GenericTabScreen {
         if (selectable) {
             select = new GUIButton("select", Component.translatable("cultivationcraft.gui.select").getString());
             select.disable();
+        } else {
+            unlockedButton = new GUIButton("unlocked", Component.translatable("cultivationcraft.gui.concept.unlocked").getString());
+            coresButton = new GUIButton("cores", Component.translatable("cultivationcraft.gui.concept.cores").getString());
+            unlockedButton.select();
         }
     }
 
@@ -67,10 +76,12 @@ public class ConceptScreen extends GenericTabScreen {
         HashMap<ResourceLocation, ArrayList<ResourceLocation>> categories = new HashMap<>();
         selectText = new SelectableTextField();
 
-        for (TechniqueModifier modifier : ExternalCultivationHandler.getModifiers()) {
-            Player player = Minecraft.getInstance().player;
+        Player player = Minecraft.getInstance().player;
 
-            if (selectable ? modifier.canChooseAsCore(player) : modifier.canUse(player) && modifier.hasLearnt(player)) {
+        for (TechniqueModifier modifier : ExternalCultivationHandler.getModifiers()) {
+            boolean owned = CultivatorStats.getCultivatorStats(player).getCultivation().getModifierRank(modifier.ID) > 0;
+
+            if (selectable ? modifier.canChooseAsCore(player) : showCores ? owned : modifier.hasLearnt(player) && !owned) {
                 if (!categories.containsKey(modifier.CATEGORY)) {
                     categories.put(modifier.CATEGORY, new ArrayList<>());
                 }
@@ -88,6 +99,8 @@ public class ConceptScreen extends GenericTabScreen {
 
                 if (selectable && rank > 0) {
                     category.addItem(new SelectableText(location, Component.translatable(location.toLanguageKey()).append(" ").append(Component.translatable("cultivationcraft.gui.rank", rank + 1))));
+                } else if (showCores) {
+                    category.addItem(new SelectableText(location, Component.translatable(location.toLanguageKey()).append(" ").append(Component.translatable("cultivationcraft.gui.rank", rank))));
                 } else {
                     category.addItem(new SelectableText(location));
                 }
@@ -108,6 +121,27 @@ public class ConceptScreen extends GenericTabScreen {
             this.onClose();
 
             return true;
+        }
+
+        if (!selectable) {
+            boolean unlockedClicked = unlockedButton.mouseClick((int) mouseX, (int) mouseY, buttonPressed);
+
+            if (unlockedClicked || coresButton.mouseClick((int) mouseX, (int) mouseY, buttonPressed)) {
+                showCores = !unlockedClicked;
+
+                if (showCores) {
+                    coresButton.select();
+                    unlockedButton.unselect();
+                } else {
+                    unlockedButton.select();
+                    coresButton.unselect();
+                }
+
+                generateText();
+                selectText.setSize(selectTextWidth, selectTextHeight);
+
+                return true;
+            }
         }
 
         int edgeSpacingX = (this.width - this.xSize) / 2;
@@ -157,6 +191,10 @@ public class ConceptScreen extends GenericTabScreen {
 
         String text = selectText.getText();
 
+        if (!selectable && selectText.getSelectables().isEmpty()) {
+            text = Component.translatable(showCores ? "cultivationcraft.gui.concept.nocores" : "cultivationcraft.gui.concept.nounlocked").getString();
+        }
+
         if (selectable) {
             select.disable();
         }
@@ -188,6 +226,11 @@ public class ConceptScreen extends GenericTabScreen {
         if (selectable) {
             select.setPos(edgeSpacingX + selectButtonX - select.width / 2, selectButtonY + edgeSpacingY);
             select.render(PoseStack, mouseX, mouseY, this);
+        } else {
+            unlockedButton.setPos(edgeSpacingX + selectButtonX - unlockedButton.width - 2, selectButtonY + edgeSpacingY);
+            unlockedButton.render(PoseStack, mouseX, mouseY, this);
+            coresButton.setPos(edgeSpacingX + selectButtonX + 2, selectButtonY + edgeSpacingY);
+            coresButton.render(PoseStack, mouseX, mouseY, this);
         }
     }
 }

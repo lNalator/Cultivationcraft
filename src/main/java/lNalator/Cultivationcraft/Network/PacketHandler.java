@@ -64,6 +64,7 @@ public class PacketHandler {
     protected static final byte QI_STREAM = 105;
     protected static final byte NOTIFICATION = 106;
     protected static final byte GROUND_SLAM = 107;
+    protected static final byte TRIBULATION = 108;
     protected static final String PROTOCOL_VERSION = "9";
 
     public static final SimpleChannel channel = NetworkRegistry.newSimpleChannel(
@@ -91,6 +92,9 @@ public class PacketHandler {
                 java.util.Optional.of(net.minecraftforge.network.NetworkDirection.PLAY_TO_CLIENT));
         channel.registerMessage(GROUND_SLAM, lNalator.Cultivationcraft.Network.Packets.GroundSlamPacket.class, lNalator.Cultivationcraft.Network.Packets.GroundSlamPacket::encode,
                 lNalator.Cultivationcraft.Network.Packets.GroundSlamPacket::decode, lNalator.Cultivationcraft.Network.Packets.GroundSlamPacket::handle,
+                java.util.Optional.of(net.minecraftforge.network.NetworkDirection.PLAY_TO_CLIENT));
+        channel.registerMessage(TRIBULATION, lNalator.Cultivationcraft.Network.Packets.TribulationPacket.class, lNalator.Cultivationcraft.Network.Packets.TribulationPacket::encode,
+                lNalator.Cultivationcraft.Network.Packets.TribulationPacket::decode, lNalator.Cultivationcraft.Network.Packets.TribulationPacket::handle,
                 java.util.Optional.of(net.minecraftforge.network.NetworkDirection.PLAY_TO_CLIENT));
         channel.registerMessage(KEYPRESS, keypressPacket.class, keypressPacket::encode, keypressPacket::decode, keypressPacket::handle);
         channel.registerMessage(ATTACK, AttackPacket.class, AttackPacket::encode, AttackPacket::decode, AttackPacket::handle);

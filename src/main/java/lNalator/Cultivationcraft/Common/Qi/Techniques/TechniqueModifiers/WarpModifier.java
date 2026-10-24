@@ -21,6 +21,7 @@ public class WarpModifier extends TechniqueModifier {
 
     int range = 6;
 
+    // TODO core design: an ender-like disappearance: the core flickers, vanishes and reappears with purple portal particles (review the current warp.png)
     public WarpModifier() {
         ID = new ResourceLocation(Cultivationcraft.MODID, "concept.warp");
         unique = true;
@@ -62,6 +63,11 @@ public class WarpModifier extends TechniqueModifier {
 
             negmodifier *= -1;
             modifier += 0.5f;
+
+            // No ground within 64 blocks (in the air above the world, over the void...): would loop forever
+            if (modifier > 64) {
+                return;
+            }
         }
 
         teleport(owner, owner, destination);

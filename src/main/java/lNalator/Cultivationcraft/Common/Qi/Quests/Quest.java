@@ -44,6 +44,7 @@ public class Quest {
     public static final ResourceLocation BIG_HIT = new ResourceLocation(Cultivationcraft.MODID, "cultivationcraft.quest.bighit");
     public static final ResourceLocation FIELD_MOVED = new ResourceLocation(Cultivationcraft.MODID, "cultivationcraft.quest.fieldmoved");
     public static final ResourceLocation KNOCKBACK_TAKEN = new ResourceLocation(Cultivationcraft.MODID, "cultivationcraft.quest.knockbacktaken");
+    public static final ResourceLocation CRAWL = new ResourceLocation(Cultivationcraft.MODID, "cultivationcraft.quest.crawl");
     public static final ResourceLocation SLOW_FALL = new ResourceLocation(Cultivationcraft.MODID, "cultivationcraft.quest.slowfall");
     public static final ResourceLocation ENDER_TELEPORT = new ResourceLocation(Cultivationcraft.MODID, "cultivationcraft.quest.endertp");
 

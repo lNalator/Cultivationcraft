@@ -21,6 +21,7 @@ import net.minecraft.world.phys.Vec3;
 
 public class FallModifier extends TechniqueModifier {
 
+    // TODO core design: a heavy, meteor-like core with a streak trailing below it
     public FallModifier() {
         ID = new ResourceLocation(Cultivationcraft.MODID, "concept.fall");
         CATEGORY = MASS_CATEGORY;

@@ -8,6 +8,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class IceModifier extends TechniqueModifier {
 
+    // TODO core design: a frozen, crystalline core covered in frost with a cold shine (review the current static ice.png)
     public IceModifier() {
         ID = new ResourceLocation(Cultivationcraft.MODID, "concept.ice");
         CATEGORY = ELEMENTAL_CATEGORY;

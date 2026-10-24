@@ -9,6 +9,7 @@ public class QiModifier extends TechniqueModifier {
 
     public static final ResourceLocation QI_ID = new ResourceLocation(Cultivationcraft.MODID, "concept.pure");
 
+    // TODO core design: a soft, pure white-blue glow
     public QiModifier() {
         ID = QI_ID;
         CATEGORY = ELEMENTAL_CATEGORY;

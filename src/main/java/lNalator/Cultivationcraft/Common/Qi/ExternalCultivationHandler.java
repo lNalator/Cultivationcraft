@@ -29,6 +29,7 @@ public class ExternalCultivationHandler {
         addModifier(WarpModifier.class);
         addModifier(BounceModifier.class);
         addModifier(GrowModifier.class);
+        addModifier(ShrinkModifier.class);
         addModifier(InfusionModifier.class);
         addModifier(LevitationModifier.class);
         addModifier(GravityModifier.class);

@@ -14,6 +14,7 @@ import net.minecraft.world.phys.Vec3;
 
 public class ExplosionModifier extends TechniqueModifier {
 
+    // TODO core design: unstable glowing cracks throwing sparks (review the current explosion.png)
     public ExplosionModifier() {
         ID = new ResourceLocation(Cultivationcraft.MODID, "concept.explosion");
         unique = true;

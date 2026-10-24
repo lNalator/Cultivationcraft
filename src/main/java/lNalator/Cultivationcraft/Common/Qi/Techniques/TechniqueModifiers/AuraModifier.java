@@ -11,13 +11,14 @@ public class AuraModifier extends TechniqueModifier {
 
     public static final ResourceLocation AURA_ID = new ResourceLocation(Cultivationcraft.MODID, "concept.aura");
 
+    // TODO core design: a pulsing halo radiating around the core (review the current aura.png)
     public AuraModifier() {
         ID = AURA_ID;
         unique = true;
         CATEGORY = MODIFIER_CATEGORY;
 
-        // Qi overflow: 30 s meditating in a Qi source with full Qi
-        unlockQuest = new Quest(Quest.QI_OVERFLOW, 30);
+        // Qi overflow: 5 min (cumulated) meditating in a Qi source with full Qi
+        unlockQuest = new Quest(Quest.QI_OVERFLOW, 300);
         // ponytail: placeholder threshold until the per-minute measurement (design C1)
         stabiliseQuest = new Quest(Quest.AURA_HIT, 200);
 

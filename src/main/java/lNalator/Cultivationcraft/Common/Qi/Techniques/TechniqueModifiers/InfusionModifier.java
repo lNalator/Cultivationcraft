@@ -34,6 +34,7 @@ public class InfusionModifier extends TechniqueModifier {
     // Infused states are weaker than a direct hit
     protected static final float INFUSED_STRENGTH = 0.5f;
 
+    // TODO core design: veins of Qi flowing into the core
     public InfusionModifier() {
         ID = new ResourceLocation(Cultivationcraft.MODID, "concept.infusion");
         unique = true;

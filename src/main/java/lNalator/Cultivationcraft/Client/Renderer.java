@@ -25,9 +25,15 @@ public class Renderer
     public static boolean QiSourcesVisible = false;
     // Qi particles are only shown within 4x the Divine Sense detection radius
     public static double QiSenseRadius = 16;
+    // Game tick Divine Sense last ran: it could end without its deactivate() running on the client
+    // (techniques re-synced from the server, death...), which left the sources visible
+    public static long QiSenseTick = -1;
 
     public static void render(float partialTick)
     {
+        if (Minecraft.getInstance().level.getGameTime() - QiSenseTick > 1)
+            QiSourcesVisible = false;
+
         if (!Minecraft.getInstance().isPaused())
                 QiSourceRenderer.renderQiSources(partialTick);
 

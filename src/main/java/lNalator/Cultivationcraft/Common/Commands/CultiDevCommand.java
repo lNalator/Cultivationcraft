@@ -91,7 +91,13 @@ public class CultiDevCommand {
         ServerPlayer player = ctx.getSource().getPlayerOrException();
         ICultivatorStats stats = CultivatorStats.getCultivatorStats(player);
         int stage = IntegerArgumentType.getInteger(ctx, "stage");
+        // Build on the realm below the target: the stages and cores of the realms above are dropped,
+        // otherwise cores condensed in Core Forming stay owned in Qi Condensation (or count twice)
         CultivationType current = stats.getCultivation();
+
+        while (current instanceof CoreFormingCultivation || (!coreForming && current instanceof QiCondenserCultivation)) {
+            current = current.getPreviousCultivation();
+        }
 
         stats.setCultivationType(CultivationTypes.QI_CONDENSER);
 
