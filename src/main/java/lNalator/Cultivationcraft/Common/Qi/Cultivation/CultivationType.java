@@ -697,6 +697,20 @@ public class CultivationType {
         PacketHandler.sendCultivatorStatsToClient(player);
     }
 
+    // Falls back to the stage below, whose tribulation has to be passed again.
+    // Returns null at the first stage: a cultivator never goes back to no cultivation.
+    public CultivationType revert() {
+        if (previousCultivation == null || previousCultivation instanceof NoCultivation) {
+            return null;
+        }
+
+        previousCultivation.hasTribulated = false;
+        previousCultivation.isTribulating = false;
+        previousCultivation.tribulation.reset();
+
+        return previousCultivation;
+    }
+
     public void setPreviousCultivation(CultivationType previous) {
         previousCultivation = previous;
     }

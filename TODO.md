@@ -24,6 +24,10 @@ Grouped by chantier/category. Each item has a priority (P1 = next, P2 = soon, P3
 - **P3 · S** Divine Sense marker showing a tribulation through walls, from further away.
 - **P3 · S** A ray of light on the player when they survive the tribulation, as the clouds part.
 
+## Minecraft versions
+
+- **P1 · L** Provide the mod for Minecraft versions above 1.19.2, up to at least 1.21, or even v26.
+
 ## Elements and visual feedback
 
 - **P2 · M** Elements: bigger visual feedback (particles, sounds) when an element hits a block or an entity (`Common/Qi/Elements/*`).

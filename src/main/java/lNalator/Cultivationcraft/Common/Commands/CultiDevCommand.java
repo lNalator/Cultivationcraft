@@ -5,6 +5,8 @@ import lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.ICultivator
 import lNalator.Cultivationcraft.Common.Qi.BodyParts.PlayerHealthManager;
 import lNalator.Cultivationcraft.Common.Qi.Cultivation.CoreFormingCultivation;
 import lNalator.Cultivationcraft.Common.Qi.Cultivation.CultivationType;
+import lNalator.Cultivationcraft.Common.Qi.Cultivation.FoundationEstablishmentCultivation;
+import lNalator.Cultivationcraft.Common.Qi.Cultivation.NoCultivation;
 import lNalator.Cultivationcraft.Common.Qi.Cultivation.QiCondenserCultivation;
 import lNalator.Cultivationcraft.Common.Qi.CultivationTypes;
 import lNalator.Cultivationcraft.Common.Qi.ExternalCultivationHandler;
@@ -101,6 +103,20 @@ public class CultiDevCommand {
 
         stats.setCultivationType(CultivationTypes.QI_CONDENSER);
 
+        // Chain every stage below the target, as real breakthroughs do, so a revert goes back one stage at a time
+        if (!(current instanceof QiCondenserCultivation) && !(current instanceof FoundationEstablishmentCultivation && current.getStage() == current.getMaxStage())) {
+            current = new NoCultivation();
+
+            for (int s = 1; s <= 5; s++) {
+                current = chain(new FoundationEstablishmentCultivation(s), current);
+            }
+        }
+
+        int qiStages = coreForming ? 8 : stage - 1;
+        for (int s = current instanceof QiCondenserCultivation ? current.getStage() + 1 : 1; s <= qiStages; s++) {
+            current = chain(new QiCondenserCultivation(s), current);
+        }
+
         if (coreForming) {
             CoreFormingCultivation cultivation = new CoreFormingCultivation(stage);
 
@@ -134,6 +150,11 @@ public class CultiDevCommand {
         PacketHandler.sendCultivatorStatsToClient(player);
         ctx.getSource().sendSuccess(Component.literal("Realm set to " + (coreForming ? "Core Forming " : "Qi Condensation ") + stage), true);
         return 1;
+    }
+
+    private static CultivationType chain(CultivationType stage, CultivationType previous) {
+        stage.setPreviousCultivation(previous);
+        return stage;
     }
 
     protected static int learn(CommandContext<CommandSourceStack> ctx, ResourceLocation id) throws CommandSyntaxException {

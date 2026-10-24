@@ -1,5 +1,6 @@
 package lNalator.Cultivationcraft.Common;
 
+import lNalator.Cultivationcraft.Common.Qi.Cultivation.CultivationType;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers.InfusionModifier;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers.LevitationModifier;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers.TechniqueModifier;
@@ -397,8 +398,10 @@ public class CommonListeners {
 
             // If player dies while tribulating, reset current stage of cultivation
             if (CultivatorStats.getCultivatorStats(event.getEntity()).getCultivationType() == CultivationTypes.QI_CONDENSER) {
-                if (CultivatorStats.getCultivatorStats(event.getEntity()).getCultivation().isTribulating()) {
-                    CultivatorStats.getCultivatorStats(event.getEntity()).setCultivation(CultivatorStats.getCultivatorStats(event.getEntity()).getCultivation().getPreviousCultivation());
+                CultivationType cultivation = CultivatorStats.getCultivatorStats(event.getEntity()).getCultivation();
+
+                if (cultivation.isTribulating() && cultivation.revert() != null) {
+                    CultivatorStats.getCultivatorStats(event.getEntity()).setCultivation(cultivation.getPreviousCultivation());
                 }
             }
         }

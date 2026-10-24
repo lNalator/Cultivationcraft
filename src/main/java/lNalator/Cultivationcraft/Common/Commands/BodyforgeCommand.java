@@ -4,6 +4,7 @@ import lNalator.Cultivationcraft.Common.Capabilities.BodyModifications.BodyModif
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.CultivatorStats;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.ICultivatorStats;
 import lNalator.Cultivationcraft.Common.Qi.BodyParts.FoodStats.QiFoodStats;
+import lNalator.Cultivationcraft.Common.Qi.Cultivation.CultivationType;
 import lNalator.Cultivationcraft.Common.Qi.CultivationTypes;
 import lNalator.Cultivationcraft.Common.Qi.Elements.Elements;
 import lNalator.Cultivationcraft.Common.Qi.Stats.BodyPartStatControl;
@@ -120,7 +121,14 @@ public class BodyforgeCommand {
 
     protected static int revertCultivation(CommandSourceStack commandSourceStack, Collection<ServerPlayer> players) {
         for (ServerPlayer serverplayer : players) {
-            CultivatorStats.getCultivatorStats(serverplayer).setCultivation(CultivatorStats.getCultivatorStats(serverplayer).getCultivation().getPreviousCultivation());
+            CultivationType previous = CultivatorStats.getCultivatorStats(serverplayer).getCultivation().revert();
+
+            if (previous == null) {
+                commandSourceStack.sendFailure(Component.literal(serverplayer.getScoreboardName() + " is already at the first stage"));
+                continue;
+            }
+
+            CultivatorStats.getCultivatorStats(serverplayer).setCultivation(previous);
             PacketHandler.sendCultivatorStatsToClient(serverplayer);
         }
 

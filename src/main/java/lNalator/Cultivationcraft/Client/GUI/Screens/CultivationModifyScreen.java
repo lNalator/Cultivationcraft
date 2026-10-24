@@ -20,7 +20,7 @@ public class CultivationModifyScreen extends TechniqueModifyScreen {
 
     @Override
     protected void drawStats(PoseStack PoseStack, int mouseX, int mouseY) {
-        if (cultivation.statsCanLevel()) {
+        if (cultivation.statsCanLevel() && selectedTech.getFirstStatChange() != null) {
             TechniqueStatModification modifications = getStatModification();
 
             stats = new ArrayList<>();

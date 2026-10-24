@@ -157,7 +157,7 @@ public class Technique {
     }
 
     public ResourceLocation getFirstStatChange() {
-        return (ResourceLocation) statChangesPerLevel.keySet().toArray()[0];
+        return statChangesPerLevel.isEmpty() ? null : statChangesPerLevel.keySet().iterator().next();
     }
 
     protected void addTechniqueStat(ResourceLocation stat, double amount) {

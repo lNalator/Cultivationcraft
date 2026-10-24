@@ -121,6 +121,11 @@ public class TechniqueModifyScreen extends GenericTabScreen {
     }
 
     protected TechniqueStatModification getStatModification() {
+        // No levelable stats (e.g. passive of a reverted cultivation)
+        if (selectedTech.getFirstStatChange() == null) {
+            return null;
+        }
+
         ResourceLocation focus = CultivatorStats.getCultivatorStats(Minecraft.getInstance().player).getTechniqueFocus(selectedTech);
 
         if (focus == null) {
@@ -159,8 +164,9 @@ public class TechniqueModifyScreen extends GenericTabScreen {
             double statValue = selectedTech.getDisplayedStat(stats.get(stat), Minecraft.getInstance().player);
             drawStat(PoseStack, stat, stats.get(stat), statValue);
 
-            double value = modifications.getStatChange(stats.get(stat));
-            drawStatChanges(PoseStack, stat, stats.get(stat), value);
+            if (modifications != null) {
+                drawStatChanges(PoseStack, stat, stats.get(stat), modifications.getStatChange(stats.get(stat)));
+            }
 
             // Only draw button if this stat can level
             if (selectedTech.getStatChangesPerLevel(stats.get(stat)) != null) {
