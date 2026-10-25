@@ -6,7 +6,7 @@ Grouped by chantier/category. Each item has a priority (P1 = next, P2 = soon, P3
 
 ### Concepts (Core Forming)
 
-- **P2 · L** Specific, representative design for each core created by a concept, shown in the cultivation screen (e.g. Warp gets an ender-like disappearance effect, Ice a frozen look). Ideas are noted as `TODO core design` above each concept's constructor (`Common/Qi/Techniques/TechniqueModifiers/*Modifier.java`); cores without a texture use `textures/cores/blank.png`.
+- **P2 · L** Core textures: each concept's core texture, rendered in the Core Forming cultivation screen, becomes a specific animated texture (`coreTexture`, an `animatedTexture` sprite sheet in `textures/cores/` with its number of frames and speed), e.g. Warp an ender-like disappearance, Ice a frozen look. Already animated, to review: Aura (4 frames), Explosion (4), Warp (20), Water (6). Static, to animate: Ice, Earth. Every other concept still uses `blank.png`. Ideas are noted as `TODO core texture` above each concept's constructor (`Common/Qi/Techniques/TechniqueModifiers/*Modifier.java`).
 - **P2 · M** Purge an absorbed element: slowly clear (at a low rate) the Qi of one element absorbed during Qi Condensation, so a player can still advance their realm and, if they spend the time, change their main element to get a different or rarer core.
 - **P3 · M** Undecided offers: Warp flight jumps beyond 9 blocks (server-side teleport; speed past the cap now shortens the Warp Delay instead); Haste reducing the techniques' 0.25 s cooldown.
 - **P3 · S** Warp teleporting Qi projectiles (`WarpModifier.QiProjectileSpawnOverride`).
@@ -14,14 +14,8 @@ Grouped by chantier/category. Each item has a priority (P1 = next, P2 = soon, P3
 - **P3 · L** Paused axes: Body (Blood / Vitality) and Perception (Light / Shadow).
 - **P3 · L** Let the player modify a concept's effect, on chosen techniques or directly. Groundwork for the technique rework below.
 
-### Qi sources and Divine Sense
-
-- **P2 · S** Divine Sense: spiritual plant markers should shrink/grow with the plant's current Qi amount (`Client/Renderers/DivineSenseBlockRenderer.java`).
-- **P2 · M** Divine Sense radial menu with multiple selection (Qi sources, spiritual blocks, entities, everything). Mask stored in the capability and filtered in `DivineSenseTechnique`, plus an entity render in `DivineSenseBlockRenderer`.
-
 ### Tribulation
 
-- **P3 · S** Divine Sense marker showing a tribulation through walls, from further away.
 - **P3 · S** A ray of light on the player when they survive the tribulation, as the clouds part.
 
 ## Minecraft versions
@@ -33,6 +27,7 @@ Grouped by chantier/category. Each item has a priority (P1 = next, P2 = soon, P3
 - **P2 · M** Elements: bigger visual feedback (particles, sounds) when an element hits a block or an entity (`Common/Qi/Elements/*`).
 - **P2 · M** QiGlowRenderer: element-coloured halo for Qi Barrier, meditation, breakthrough and tribulation, pill effects and higher realms seen in Divine Sense (`Client/Renderers/QiGlowRenderer.java`, `render()` is empty).
 - **P3 · S** Replace the placeholder icons of the elemental states.
+- **P3 · M** Idea to explore: Divine Sense creature outlines without Mixin. Draw the sensed entities ourselves into vanilla's outline buffer (`OutlineBufferSource`) with our colour after the entities stage, then run the outline shader (`LevelRenderer.entityEffect`, private: reflection) ourselves, also when no vanilla entity glows that frame (otherwise filled silhouettes). Would allow a distance fade and per-entity transparency, unlike the current Glowing mixins (`MinecraftMixin`, `EntityMixin`). Risks: depends on a private field and the render order, possible conflicts with Distant Horizons and shaders.
 - **P3 · S** Remove the vanilla freeze damage (1 every 2 s) while frozen? (undecided)
 - **P3 · M** Ice Walk in the air (option B), later.
 
@@ -78,3 +73,4 @@ Grouped by chantier/category. Each item has a priority (P1 = next, P2 = soon, P3
 ## Known bugs
 
 - **P2 · M** Client freeze after death (OpenAL), listed as a known issue since 0.4.0: needs a thread dump.
+- **P2 · S** The flying sword array deals no damage to the Ender Dragon (probably because the dragon only takes damage through its parts, `EnderDragonPart`).

@@ -10,7 +10,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class EarthModifier extends TechniqueModifier {
 
-    // TODO core design: rough stone with cracks and small rocks orbiting (review the current earth.png)
+    // TODO core texture (animated coreTexture shown in the cultivation screen): rough stone with cracks and small rocks orbiting (earth.png is static: make it animated)
     public EarthModifier() {
         ID = new ResourceLocation(Cultivationcraft.MODID, "concept.earth");
         CATEGORY = ELEMENTAL_CATEGORY;

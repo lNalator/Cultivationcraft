@@ -65,7 +65,8 @@ public class PacketHandler {
     protected static final byte NOTIFICATION = 106;
     protected static final byte GROUND_SLAM = 107;
     protected static final byte TRIBULATION = 108;
-    protected static final String PROTOCOL_VERSION = "9";
+    protected static final byte DIVINE_SENSE_PING = 109;
+    protected static final String PROTOCOL_VERSION = "10";
 
     public static final SimpleChannel channel = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(Cultivationcraft.MODID, "main"),
@@ -95,6 +96,9 @@ public class PacketHandler {
                 java.util.Optional.of(net.minecraftforge.network.NetworkDirection.PLAY_TO_CLIENT));
         channel.registerMessage(TRIBULATION, lNalator.Cultivationcraft.Network.Packets.TribulationPacket.class, lNalator.Cultivationcraft.Network.Packets.TribulationPacket::encode,
                 lNalator.Cultivationcraft.Network.Packets.TribulationPacket::decode, lNalator.Cultivationcraft.Network.Packets.TribulationPacket::handle,
+                java.util.Optional.of(net.minecraftforge.network.NetworkDirection.PLAY_TO_CLIENT));
+        channel.registerMessage(DIVINE_SENSE_PING, lNalator.Cultivationcraft.Network.Packets.DivineSensePingPacket.class, lNalator.Cultivationcraft.Network.Packets.DivineSensePingPacket::encode,
+                lNalator.Cultivationcraft.Network.Packets.DivineSensePingPacket::decode, lNalator.Cultivationcraft.Network.Packets.DivineSensePingPacket::handle,
                 java.util.Optional.of(net.minecraftforge.network.NetworkDirection.PLAY_TO_CLIENT));
         channel.registerMessage(KEYPRESS, keypressPacket.class, keypressPacket::encode, keypressPacket::decode, keypressPacket::handle);
         channel.registerMessage(ATTACK, AttackPacket.class, AttackPacket::encode, AttackPacket::decode, AttackPacket::handle);
@@ -203,6 +207,10 @@ public class PacketHandler {
         // Send the cultivator's stats to the client
         BodyModificationsPacket pack = new BodyModificationsPacket(player.getUUID(), modifications);
         channel.send(distribute, pack);
+    }
+
+    public static void sendDivineSensePing(ServerPlayer target, Player observer) {
+        channel.send(PacketDistributor.PLAYER.with(() -> target), new lNalator.Cultivationcraft.Network.Packets.DivineSensePingPacket(observer.getId(), observer.getEyePosition()));
     }
 
     public static void sendTechniqueInfoToClients(TechniqueInfoPacket packet, Player except) {

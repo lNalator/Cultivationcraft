@@ -7,7 +7,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class WoodModifier extends TechniqueModifier {
 
-    // TODO core design: bark and leaves, with vines sprouting from the core
+    // TODO core texture (animated coreTexture shown in the cultivation screen): bark and leaves, with vines sprouting from the core (no texture yet, uses blank.png)
     public WoodModifier() {
         ID = new ResourceLocation(Cultivationcraft.MODID, "concept.wood");
         CATEGORY = ELEMENTAL_CATEGORY;

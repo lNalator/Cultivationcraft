@@ -2,6 +2,7 @@ package lNalator.Cultivationcraft.Client;
 
 import lNalator.Cultivationcraft.Client.GUI.ScreenTabControl;
 import lNalator.Cultivationcraft.Client.GUI.SkillHotbarOverlay;
+import lNalator.Cultivationcraft.Client.GUI.Screens.DivineSenseMenuScreen;
 import lNalator.Cultivationcraft.Common.Capabilities.BodyModifications.BodyModifications;
 import lNalator.Cultivationcraft.Common.Capabilities.BodyModifications.IBodyModifications;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.CultivatorStats;
@@ -57,9 +58,12 @@ public class KeybindingControl {
     public static void init(RegisterKeyMappingsEvent event) {
         keyBindings = new KeyMapping[4];
         keyBindings[0] = new KeyMapping("Switch Hotbar", GLFW_KEY_GRAVE_ACCENT, "Cultivation");
+        // Held to show the Divine Sense radial menu
+        keyBindings[1] = new KeyMapping("Divine Sense Menu", GLFW_KEY_G, "Cultivation");
         keyBindings[3] = new KeyMapping("Cultivation Menu", GLFW_KEY_K, "Cultivation");
 
         event.register(keyBindings[0]);
+        event.register(keyBindings[1]);
         event.register(keyBindings[3]);
 
         techniqueKeys = new KeyMapping[CultivatorTechniques.numberOfTechniques];
@@ -406,6 +410,11 @@ public class KeybindingControl {
             // Do not do hotbar interactions if the player has no cultivation
             if (CultivatorStats.getCultivatorStats(genericClientFunctions.getPlayer()).getCultivationType() == CultivationTypes.NO_CULTIVATION) {
                 SkillHotbarOverlay.setActive(false);
+                return;
+            }
+
+            if (keyBindings[1].consumeClick()) {
+                DivineSenseMenuScreen.open(keyBindings[1]);
                 return;
             }
 

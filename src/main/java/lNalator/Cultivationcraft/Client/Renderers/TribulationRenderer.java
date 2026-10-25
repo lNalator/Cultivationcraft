@@ -2,11 +2,13 @@ package lNalator.Cultivationcraft.Client.Renderers;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.BufferUploader;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.math.Matrix4f;
 import lNalator.Cultivationcraft.Common.Qi.Cultivation.Tribulation;
+import lNalator.Cultivationcraft.Common.Qi.Techniques.DivineSenseTechnique;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -24,6 +26,7 @@ import net.minecraftforge.client.event.ViewportEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import org.lwjgl.opengl.GL11;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +35,8 @@ import java.util.Random;
 /**
  * Tribulation storm: black clouds swirling into a vortex above the tribulating player, with no rain. Before each strike
  * a light blue ring runs through the clouds from the edge to the eye, and the lightning strikes when it gets there.
- * Seen by every player around (see TribulationPacket), the sky turns black under the storm.
+ * Seen by every player around (see TribulationPacket), the sky turns black under the storm. Players with an active
+ * Divine Sense are synced from further away: beyond the storm's range they only see a marker, through walls.
  */
 @Mod.EventBusSubscriber(modid = Cultivationcraft.MODID, value = Dist.CLIENT)
 public final class TribulationRenderer {
@@ -46,6 +50,9 @@ public final class TribulationRenderer {
         float intensity = 0;
         // Height of the clouds, eased towards cloudTarget so they don't jump with the terrain
         double base = Double.NaN;
+
+        // Phase of the Divine Sense marker's pulse, faster while a strike charges
+        double pulse = 0;
 
         // Diffuse lightning flickering somewhere in the clouds
         int flickerAge = -1;
@@ -74,6 +81,14 @@ public final class TribulationRenderer {
     private static final double STEP = 2;
 
     private static final float[] RING_COLOR = {0.75f, 0.9f, 1f};
+    private static final float[] FLASH_COLOR = {1f, 1f, 1f};
+
+    // Divine Sense marker: far markers are drawn this close along the same line of sight, at the same size on screen,
+    // so the render distance does not cut them
+    private static final double MARKER_DISTANCE = 96;
+    private static final int FLASH_TICKS = 6;
+    private static final double PULSE_SPEED = 0.15;
+    private static final double CHARGED_PULSE_SPEED = 0.9;
 
     private static final Map<Integer, Storm> storms = new HashMap<>();
     private static final Random random = new Random();
@@ -85,7 +100,10 @@ public final class TribulationRenderer {
             storm = new Storm();
             storm.entityId = entityId;
             storms.put(entityId, storm);
-            play(center, SoundEvents.LIGHTNING_BOLT_THUNDER, 0.8f, 0.5f);
+
+            if (inStormRange(center)) {
+                play(center, SoundEvents.LIGHTNING_BOLT_THUNDER, 0.8f, 0.5f);
+            }
         }
 
         storm.center = center;
@@ -100,6 +118,13 @@ public final class TribulationRenderer {
         if (level != null) {
             level.playLocalSound(center.x, cloudTarget(center), center.z, sound, SoundSource.WEATHER, volume, pitch, false);
         }
+    }
+
+    // Further away, the storm is only synced for Divine Sense (see Tribulation.sync): no clouds, sky or sounds
+    private static boolean inStormRange(Vec3 center) {
+        var player = Minecraft.getInstance().player;
+
+        return player != null && player.position().distanceToSqr(center) <= Tribulation.VISIBLE_RANGE * Tribulation.VISIBLE_RANGE;
     }
 
     private static boolean lost(Storm storm) {
@@ -137,6 +162,14 @@ public final class TribulationRenderer {
 
             double target = cloudTarget(center(storm, 1));
             storm.base = Double.isNaN(storm.base) ? target : storm.base + (target - storm.base) * 0.05;
+            storm.pulse += ticksToStrike(storm) <= CHARGE_TICKS ? CHARGED_PULSE_SPEED : PULSE_SPEED;
+
+            // Out of range the storm fades away instead of vanishing, and keeps ticking for the Divine Sense marker
+            if (!inStormRange(storm.center)) {
+                storm.intensity = Math.max(0, storm.intensity - 1f / DISSIPATE_TICKS);
+                return false;
+            }
+
             storm.intensity = Math.min(1, storm.intensity + 1f / GATHER_TICKS);
 
             if (ticksToStrike(storm) == CHARGE_TICKS) {
@@ -213,6 +246,11 @@ public final class TribulationRenderer {
             return;
         }
 
+        if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_WEATHER) {
+            renderSenseMarkers(event);
+            return;
+        }
+
         // Before particles and weather: the clouds write their depth, so rain and particles closer than them stay in front
         if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_TRIPWIRE_BLOCKS) {
             return;
@@ -238,6 +276,10 @@ public final class TribulationRenderer {
         BufferBuilder buffer = tesselator.getBuilder();
 
         for (Storm storm : storms.values()) {
+            if (storm.intensity <= 0) {
+                continue;
+            }
+
             Vec3 center = center(storm, partialTick);
             double base = Double.isNaN(storm.base) ? cloudTarget(center) : storm.base;
             double time = storm.tick + partialTick;
@@ -267,6 +309,106 @@ public final class TribulationRenderer {
 
         modelView.popPose();
         RenderSystem.applyModelViewMatrix();
+    }
+
+    // Divine Sense: a column of light from the tribulating player up to the clouds and a diamond around them, through walls.
+    // It pulses faster and faster while a strike charges, and flashes white when it strikes
+    private static void renderSenseMarkers(RenderLevelStageEvent event) {
+        Minecraft mc = Minecraft.getInstance();
+        DivineSenseTechnique sense = DivineSenseBlockRenderer.activeSense(mc);
+
+        if (sense == null || !sense.senses(DivineSenseTechnique.SENSE_TRIBULATIONS) || mc.options.hideGui) {
+            return;
+        }
+
+        Vec3 camera = event.getCamera().getPosition();
+        float partialTick = event.getPartialTick();
+        Matrix4f matrix = event.getPoseStack().last().pose();
+
+        // Same state handling as DivineSenseBlockRenderer, drawn at the same stage
+        boolean depthTest = GL11.glIsEnabled(GL11.GL_DEPTH_TEST);
+        boolean blend = GL11.glIsEnabled(GL11.GL_BLEND);
+        boolean depthWrite = GL11.glGetBoolean(GL11.GL_DEPTH_WRITEMASK);
+        float lineWidth = GL11.glGetFloat(GL11.GL_LINE_WIDTH);
+        var shader = RenderSystem.getShader();
+        var modelView = RenderSystem.getModelViewStack();
+        modelView.pushPose();
+        modelView.setIdentity();
+        RenderSystem.applyModelViewMatrix();
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.disableDepthTest();
+        RenderSystem.depthMask(false);
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+        RenderSystem.setShaderColor(1, 1, 1, 1);
+        RenderSystem.lineWidth(2);
+
+        try {
+            BufferBuilder buffer = Tesselator.getInstance().getBuilder();
+            buffer.begin(VertexFormat.Mode.DEBUG_LINES, DefaultVertexFormat.POSITION_COLOR);
+
+            for (Storm storm : storms.values()) {
+                if (lost(storm) || storm.entityId == mc.player.getId()) {
+                    continue;
+                }
+
+                Vec3 center = center(storm, partialTick);
+                double top = Double.isNaN(storm.base) ? cloudTarget(center) : storm.base;
+                double distance = center.distanceTo(camera);
+                double scale = distance > MARKER_DISTANCE ? MARKER_DISTANCE / distance : 1;
+
+                boolean flash = storm.tick >= Tribulation.STRIKE_INTERVAL && storm.tick % Tribulation.STRIKE_INTERVAL < FLASH_TICKS;
+                float[] color = flash ? FLASH_COLOR : RING_COLOR;
+                float alpha = flash ? 1 : (float) (0.55 + 0.3 * Math.sin(storm.pulse + partialTick * PULSE_SPEED));
+
+                // The column, four lines around the player up to the base of the clouds
+                double half = 0.6;
+                for (int corner = 0; corner < 4; corner++) {
+                    double x = center.x + ((corner & 1) == 0 ? -half : half);
+                    double z = center.z + ((corner & 2) == 0 ? -half : half);
+                    markerLine(buffer, matrix, camera, scale, new Vec3(x, center.y, z), new Vec3(x, top, z), color, alpha);
+                }
+
+                // The diamond, around the player's body
+                Vec3 middle = center.add(0, 1, 0);
+                double size = 1.5;
+                Vec3[] tips = {middle.add(size, 0, 0), middle.add(0, 0, size), middle.add(-size, 0, 0), middle.add(0, 0, -size)};
+                Vec3 up = middle.add(0, size * 1.3, 0), down = middle.add(0, -size * 1.3, 0);
+
+                for (int tip = 0; tip < tips.length; tip++) {
+                    markerLine(buffer, matrix, camera, scale, tips[tip], tips[(tip + 1) % tips.length], color, alpha);
+                    markerLine(buffer, matrix, camera, scale, tips[tip], up, color, alpha);
+                    markerLine(buffer, matrix, camera, scale, tips[tip], down, color, alpha);
+                }
+            }
+
+            BufferUploader.drawWithShader(buffer.end());
+        } finally {
+            modelView.popPose();
+            RenderSystem.applyModelViewMatrix();
+            RenderSystem.depthMask(depthWrite);
+            if (depthTest) {
+                RenderSystem.enableDepthTest();
+            } else {
+                RenderSystem.disableDepthTest();
+            }
+            if (blend) {
+                RenderSystem.enableBlend();
+            } else {
+                RenderSystem.disableBlend();
+            }
+            RenderSystem.lineWidth(lineWidth);
+            RenderSystem.setShader(() -> shader);
+            RenderSystem.setShaderColor(1, 1, 1, 1);
+        }
+    }
+
+    // Positions relative to the camera, brought closer by scale
+    private static void markerLine(BufferBuilder buffer, Matrix4f matrix, Vec3 camera, double scale, Vec3 start, Vec3 end, float[] color, float alpha) {
+        Vec3 from = start.subtract(camera).scale(scale), to = end.subtract(camera).scale(scale);
+
+        buffer.vertex(matrix, (float) from.x, (float) from.y, (float) from.z).color(color[0], color[1], color[2], alpha).endVertex();
+        buffer.vertex(matrix, (float) to.x, (float) to.y, (float) to.z).color(color[0], color[1], color[2], alpha).endVertex();
     }
 
     // How thick the clouds are at this point, from the centre of the storm: spiral arms, the eye, the frayed edge

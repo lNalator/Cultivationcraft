@@ -9,7 +9,7 @@ import net.minecraft.world.phys.Vec3;
 // The opposite of Grow on the Size axis: smaller, cheaper and weaker techniques
 public class ShrinkModifier extends TechniqueModifier {
 
-    // TODO core design: a dense core pulled inwards, with Qi rings contracting onto it
+    // TODO core texture (animated coreTexture shown in the cultivation screen): a dense core pulled inwards, with Qi rings contracting onto it (no texture yet, uses blank.png)
     public ShrinkModifier() {
         ID = new ResourceLocation(Cultivationcraft.MODID, "concept.shrink");
         CATEGORY = SIZE_CATEGORY;

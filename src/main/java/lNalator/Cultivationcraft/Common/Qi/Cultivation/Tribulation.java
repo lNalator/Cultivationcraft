@@ -1,9 +1,11 @@
 package lNalator.Cultivationcraft.Common.Qi.Cultivation;
 
+import lNalator.Cultivationcraft.Common.Qi.Techniques.DivineSenseTechnique;
 import lNalator.Cultivationcraft.Network.PacketHandler;
 import lNalator.Cultivationcraft.Network.Packets.TribulationPacket;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.entity.player.Player;
@@ -16,7 +18,7 @@ public class Tribulation
     // One lightning strike every 10 seconds
     public static final int STRIKE_INTERVAL = 200;
     // Players this far away still see the storm
-    protected static final double VISIBLE_RANGE = 256;
+    public static final double VISIBLE_RANGE = 256;
     protected static final int SYNC_INTERVAL = 10;
 
     protected int tick = 0;
@@ -59,8 +61,7 @@ public class Tribulation
 
         // The storm above the player, for everyone around (see TribulationRenderer)
         if (tick % SYNC_INTERVAL == 1)
-            PacketHandler.channel.send(PacketDistributor.NEAR.with(PacketDistributor.TargetPoint.p(player.getX(), player.getY(), player.getZ(), VISIBLE_RANGE, player.level.dimension())),
-                    new TribulationPacket(player.getId(), player.position(), tick, lightningStrikes));
+            sync(player);
 
         if (tick % STRIKE_INTERVAL == 0)
         {
@@ -70,6 +71,23 @@ public class Tribulation
         }
 
         return false;
+    }
+
+    // Players with an active Divine Sense sense the tribulation from further away, 2 detection radii beyond the storm
+    protected void sync(Player player)
+    {
+        TribulationPacket packet = new TribulationPacket(player.getId(), player.position(), tick, lightningStrikes);
+
+        for (ServerPlayer other : ((ServerLevel) player.level).players())
+        {
+            double range = VISIBLE_RANGE;
+
+            if (DivineSenseTechnique.getActive(other) != null)
+                range += 2 * DivineSenseTechnique.getSenseProfile(other).radius();
+
+            if (other.distanceToSqr(player) <= range * range)
+                PacketHandler.channel.send(PacketDistributor.PLAYER.with(() -> other), packet);
+        }
     }
 
     public void lightning(BlockPos targetPos, float power, ServerLevel level)

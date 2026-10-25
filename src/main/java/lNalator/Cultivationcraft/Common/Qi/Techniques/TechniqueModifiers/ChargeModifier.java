@@ -15,7 +15,7 @@ public class ChargeModifier extends TechniqueModifier {
     // Ticks to reach the full charge
     public static final int CHARGE_TICKS = 40;
 
-    // TODO core design: light slowly filling the core, then a bright flash when full
+    // TODO core texture (animated coreTexture shown in the cultivation screen): light slowly filling the core, then a bright flash when full (no texture yet, uses blank.png)
     public ChargeModifier() {
         ID = CHARGE_ID;
         CATEGORY = RHYTHM_CATEGORY;

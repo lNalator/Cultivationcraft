@@ -14,7 +14,7 @@ import net.minecraft.world.phys.Vec3;
 
 public class ExplosionModifier extends TechniqueModifier {
 
-    // TODO core design: unstable glowing cracks throwing sparks (review the current explosion.png)
+    // TODO core texture (animated coreTexture shown in the cultivation screen): unstable glowing cracks throwing sparks (explosion.png: 4 frames, to review)
     public ExplosionModifier() {
         ID = new ResourceLocation(Cultivationcraft.MODID, "concept.explosion");
         unique = true;

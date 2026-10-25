@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "lNalator.Cultivationcraft.Mixin",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "cultivationcraft.refmap.json",
+  "mixins": [],
+  "client": [
+    "EntityMixin",
+    "MinecraftMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

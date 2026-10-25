@@ -28,7 +28,7 @@ public class PoisonModifier extends TechniqueModifier {
     protected static final int BASE_DURATION = 60;
     protected static final int RANK_DURATION = 40;
 
-    // TODO core design: a sickly green core bubbling and dripping
+    // TODO core texture (animated coreTexture shown in the cultivation screen): a sickly green core bubbling and dripping (no texture yet, uses blank.png)
     public PoisonModifier() {
         ID = POISON_ID;
         CATEGORY = MODIFIER_CATEGORY;

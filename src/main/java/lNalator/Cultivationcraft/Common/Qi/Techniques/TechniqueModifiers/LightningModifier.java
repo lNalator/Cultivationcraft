@@ -7,7 +7,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class LightningModifier extends TechniqueModifier {
 
-    // TODO core design: crackling electric arcs jumping across the core
+    // TODO core texture (animated coreTexture shown in the cultivation screen): crackling electric arcs jumping across the core (no texture yet, uses blank.png)
     public LightningModifier() {
         ID = new ResourceLocation(Cultivationcraft.MODID, "concept.lightning");
         CATEGORY = ELEMENTAL_CATEGORY;

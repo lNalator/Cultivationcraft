@@ -26,7 +26,9 @@ import net.minecraft.network.chat.Component;
 import lNalator.Cultivationcraft.Common.Qi.Stats.BodyPartStatControl;
 import lNalator.Cultivationcraft.Common.Qi.Stats.PlayerStatModifications;
 import lNalator.Cultivationcraft.Common.Qi.Stats.StatIDs;
+import lNalator.Cultivationcraft.Common.Qi.Techniques.DivineSenseTechnique;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.Technique;
+import lNalator.Cultivationcraft.Client.GUI.DivineSensePingOverlay;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.PassiveTechniques.PassiveTechnique;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -221,10 +223,13 @@ public class ClientListeners {
         if (event.getOverlay().id() == VanillaGuiOverlay.HOTBAR.id()) {
             SkillHotbarOverlay.PostRenderSkillHotbar(event.getPoseStack());
 
+            // Vigilance: where someone senses this player from
+            DivineSensePingOverlay.render(event.getPoseStack(), event.getPartialTick());
+
             // Draw dynamic Tier/Age HUD when looking at a Procedural Plant (visible only during Divine Sense)
             if (Renderer.QiSourcesVisible) {
                 var mc = Minecraft.getInstance();
-                if (mc.hitResult instanceof BlockHitResult bhr && mc.level != null) {
+                if (Renderer.senses(DivineSenseTechnique.SENSE_BLOCKS) && mc.hitResult instanceof BlockHitResult bhr && mc.level != null) {
                     BlockPos pos = bhr.getBlockPos();
                     var st = mc.level.getBlockState(pos);
                     if (st.getBlock() instanceof ProceduralPlantBlock) {
@@ -260,7 +265,7 @@ public class ClientListeners {
 
                 // Size, element and density tier of the Qi source looked at, under the plant line
                 QiSource source = QiSourceRenderer.focused;
-                if (source != null) {
+                if (source != null && Renderer.senses(DivineSenseTechnique.SENSE_QI_SOURCES)) {
                     Font font = mc.font;
                     Element element = Elements.getElement(source.getElement());
                     String text = Component.translatable("cultivationcraft.qisource.tier", Component.translatable("cultivationcraft.qisource.size." + source.getSizeTier()),

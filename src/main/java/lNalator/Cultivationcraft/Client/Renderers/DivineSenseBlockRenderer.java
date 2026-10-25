@@ -2,7 +2,9 @@ package lNalator.Cultivationcraft.Client.Renderers;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.PriorityQueue;
 
 import org.lwjgl.opengl.GL11;
@@ -14,10 +16,11 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.math.Matrix4f;
 
-import lNalator.Cultivationcraft.Common.Capabilities.CultivatorTechniques.CultivatorTechniques;
+import lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.CultivatorStats;
 import lNalator.Cultivationcraft.Common.Blocks.Plants.ProceduralPlantBlock;
 import lNalator.Cultivationcraft.Common.Blocks.Plants.entity.ProceduralPlantBlockEntity;
 import lNalator.Cultivationcraft.Common.Blocks.Plants.world.ClientPlantCatalog;
+import lNalator.Cultivationcraft.Common.Qi.Cultivation.CoreFormingCultivation;
 import lNalator.Cultivationcraft.Common.Qi.Elements.Elements;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.DivineSenseTechnique;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.DivineSenseTechnique.SenseProfile;
@@ -30,6 +33,12 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.decoration.ArmorStand;
+import net.minecraft.world.entity.monster.Enemy;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -43,7 +52,8 @@ import net.minecraftforge.fml.common.Mod;
 
 /**
  * Tag-driven, client-only detection; never requests chunks or changes block
- * rendering.
+ * rendering. Also outlines the creatures and players in range with the glowing
+ * effect, filtered by the Divine Sense radial menu (see DivineSenseTechnique.SENSE_*).
  */
 @Mod.EventBusSubscriber(modid = Cultivationcraft.MODID, value = Dist.CLIENT)
 public final class DivineSenseBlockRenderer {
@@ -70,21 +80,29 @@ public final class DivineSenseBlockRenderer {
     private static final List<BlockPos> nearby = new ArrayList<>();
     private static final BufferBuilder BUFFER = new BufferBuilder(32768);
     private static final BufferBuilder PLANT_BUFFER = new BufferBuilder(16384);
+    private static final BufferBuilder PLAYER_BUFFER = new BufferBuilder(16384);
     private static ClientLevel scannedLevel;
     private static int scanTicks;
 
-    private static boolean isActive(Minecraft mc) {
+    // Only chooses which entities are outlined: the outlines follow them every frame
+    private static final int ENTITY_SCAN_INTERVAL = 5;
+    private static final List<Entity> sensedEntities = new ArrayList<>();
+    // Entity id -> outline colour
+    private static final Map<Integer, Integer> glowing = new HashMap<>();
+    private static int entityScanTicks;
+
+    // Hostiles in red (magenta in the Nether), other creatures in yellow
+    private static final int HOSTILE_COLOR = 0xFF3030;
+    private static final int NETHER_HOSTILE_COLOR = 0xFF40FF;
+    private static final int CREATURE_COLOR = 0xFFE040;
+    private static final int PLAYER_COLOR = 0xFFFFFF;
+
+    // The client player's Divine Sense when it is active and they can use it, else null
+    public static DivineSenseTechnique activeSense(Minecraft mc) {
         if (mc.player == null || mc.level == null || !mc.player.isAlive() || mc.player.isSpectator()) {
-            return false;
+            return null;
         }
-        var techniques = CultivatorTechniques.getCultivatorTechniques(mc.player);
-        for (int i = 0; i < CultivatorTechniques.numberOfTechniques; i++) {
-            var technique = techniques.getTechnique(i);
-            if (technique instanceof DivineSenseTechnique && technique.isActive() && technique.isValid(mc.player)) {
-                return true;
-            }
-        }
-        return false;
+        return DivineSenseTechnique.getActive(mc.player);
     }
 
     private static void clearScan() {
@@ -96,6 +114,9 @@ public final class DivineSenseBlockRenderer {
         scanOrigin = null;
         sectionIndex = 0;
         scanTicks = 0;
+        sensedEntities.clear();
+        glowing.clear();
+        entityScanTicks = 0;
     }
 
     @SubscribeEvent
@@ -104,7 +125,8 @@ public final class DivineSenseBlockRenderer {
             return;
         }
         Minecraft mc = Minecraft.getInstance();
-        if (!isActive(mc)) {
+        DivineSenseTechnique sense = activeSense(mc);
+        if (sense == null) {
             clearScan();
             return;
         }
@@ -113,6 +135,19 @@ public final class DivineSenseBlockRenderer {
         }
         SenseProfile current = DivineSenseTechnique.getSenseProfile(mc.player);
         Vec3 origin = mc.player.getEyePosition();
+        if (entityScanTicks-- <= 0) {
+            scanEntities(mc, sense, current, origin);
+            entityScanTicks = ENTITY_SCAN_INTERVAL - 1;
+        }
+        updateGlowing(mc, current, origin);
+        if (!sense.senses(DivineSenseTechnique.SENSE_BLOCKS)) {
+            nearby.clear();
+            pendingSections.clear();
+            candidates.clear();
+            scanTicks = 0;
+            scanProfile = null;
+            return;
+        }
         // Refresh immediately on a breakthrough, realm reset, teleport, or world change.
         if (scannedLevel != mc.level || !current.equals(scanProfile)
                 || (scanOrigin != null && origin.distanceToSqr(scanOrigin) > 64)) {
@@ -215,6 +250,23 @@ public final class DivineSenseBlockRenderer {
         }
     }
 
+    // The creatures and players in range, nearest first, with their own budget so ores cannot hide them
+    private static void scanEntities(Minecraft mc, DivineSenseTechnique sense, SenseProfile profile, Vec3 origin) {
+        sensedEntities.clear();
+        boolean creatures = sense.senses(DivineSenseTechnique.SENSE_CREATURES);
+        boolean players = sense.senses(DivineSenseTechnique.SENSE_PLAYERS);
+        if (!creatures && !players) {
+            return;
+        }
+        double radius = profile.radius();
+        List<Entity> found = mc.level.getEntities(mc.player, new AABB(origin, origin).inflate(radius),
+                entity -> entity instanceof LivingEntity && !(entity instanceof ArmorStand) && entity.isAlive()
+                && !entity.isSpectator() && (entity instanceof Player ? players : creatures)
+                && entity.getBoundingBox().getCenter().distanceToSqr(origin) < radius * radius);
+        found.sort(Comparator.comparingDouble((Entity entity) -> entity.getBoundingBox().getCenter().distanceToSqr(origin)));
+        sensedEntities.addAll(found.subList(0, Math.min(found.size(), profile.maxHighlights())));
+    }
+
     private static double distanceSquaredToBox(Vec3 point, AABB box) {
         double x = point.x - Mth.clamp(point.x, box.minX, box.maxX);
         double y = point.y - Mth.clamp(point.y, box.minY, box.maxY);
@@ -228,13 +280,18 @@ public final class DivineSenseBlockRenderer {
     }
 
     @SubscribeEvent
-    // TODO: spiritual plant markers should shrink/grow with the plant's current Qi amount
     public static void render(RenderLevelStageEvent event) {
         if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_WEATHER) {
             return;
         }
         Minecraft mc = Minecraft.getInstance();
-        if (!isActive(mc) || mc.options.hideGui || scannedLevel != mc.level || nearby.isEmpty()) {
+        DivineSenseTechnique sense = activeSense(mc);
+        if (sense == null || mc.options.hideGui) {
+            return;
+        }
+        boolean blocks = sense.senses(DivineSenseTechnique.SENSE_BLOCKS) && scannedLevel == mc.level && !nearby.isEmpty();
+        boolean players = sense.senses(DivineSenseTechnique.SENSE_PLAYERS) && !sensedEntities.isEmpty();
+        if (!blocks && !players) {
             return;
         }
         SenseProfile current = DivineSenseTechnique.getSenseProfile(mc.player);
@@ -262,8 +319,9 @@ public final class DivineSenseBlockRenderer {
         try {
             BUFFER.begin(VertexFormat.Mode.DEBUG_LINES, DefaultVertexFormat.POSITION_COLOR);
             PLANT_BUFFER.begin(VertexFormat.Mode.DEBUG_LINES, DefaultVertexFormat.POSITION_COLOR);
+            PLAYER_BUFFER.begin(VertexFormat.Mode.DEBUG_LINES, DefaultVertexFormat.POSITION_COLOR);
             int highlighted = 0;
-            for (BlockPos pos : nearby) {
+            for (BlockPos pos : blocks ? nearby : List.<BlockPos>of()) {
                 if (highlighted >= current.maxHighlights()) {
                     break;
                 }
@@ -299,15 +357,19 @@ public final class DivineSenseBlockRenderer {
                 // Subtract in double precision before sending positions to the GPU.
                 AABB relativeBounds = bounds.move(-camera.x, -camera.y, -camera.z);
                 if (state.getBlock() instanceof ProceduralPlantBlock) {
-                    cross(pose.last().pose(), relativeBounds, plantColor(mc.level, pos, state), alpha); 
+                    float strength = plantStrength(mc.level, pos, state);
+                    // The marker grows with the plant's Qi: 20% of the plant without Qi, its full size at the maximum
+                    cross(pose.last().pose(), relativeBounds, plantColor(state, strength), alpha, Mth.lerp(strength, 0.2f, 1f));
                 }else {
-                    outline(pose.last().pose(), relativeBounds, 0x91DCCD, alpha);
+                    outline(BUFFER, pose.last().pose(), relativeBounds, 0x91DCCD, alpha);
                 }
             }
             BufferUploader.drawWithShader(BUFFER.end());
             // Width is a draw state: use a separate batch to keep ore outlines thin.
             RenderSystem.lineWidth(2);
             BufferUploader.drawWithShader(PLANT_BUFFER.end());
+            renderPlayerHitboxes(mc, event, current, camera, origin);
+            BufferUploader.drawWithShader(PLAYER_BUFFER.end());
         } finally {
             modelView.popPose();
             RenderSystem.applyModelViewMatrix();
@@ -328,7 +390,110 @@ public final class DivineSenseBlockRenderer {
         }
     }
 
-    private static int plantColor(ClientLevel level, BlockPos pos, BlockState state) {
+    // Sensed entities and the colour of their outline, drawn by the vanilla glowing effect so it follows the model
+    // (see MinecraftMixin and EntityMixin). Updated every tick
+    private static void updateGlowing(Minecraft mc, SenseProfile current, Vec3 origin) {
+        glowing.clear();
+        for (Entity entity : sensedEntities) {
+            // Players only show their hitbox (see renderPlayerHitboxes)
+            if (entity instanceof Player || entity.isRemoved() || entity.level != mc.level) {
+                continue;
+            }
+            double distance = entity.getBoundingBox().getCenter().distanceTo(origin);
+            if (distance >= current.radius()) {
+                continue;
+            }
+            glowing.put(entity.getId(), entityColor(mc.level, entity));
+        }
+    }
+
+    // Players show their hitbox, not the glowing outline. A player of a higher realm is blurred: faint copies
+    // of their hitbox trembling around them, further apart and fainter towards the edge of the detection radius
+    private static void renderPlayerHitboxes(Minecraft mc, RenderLevelStageEvent event, SenseProfile current, Vec3 camera, Vec3 origin) {
+        float partialTick = event.getPartialTick();
+        var matrix = event.getPoseStack().last().pose();
+        for (Entity entity : sensedEntities) {
+            if (!(entity instanceof Player target) || entity.isRemoved() || entity.level != mc.level) {
+                continue;
+            }
+            // Interpolated, so the hitbox follows the player smoothly between ticks and scans
+            Vec3 position = entity.getPosition(partialTick);
+            AABB bounds = entity.getBoundingBox().move(position.subtract(entity.position()));
+            double distance = bounds.getCenter().distanceTo(origin);
+            double blur = blur(mc.player, target, distance, current);
+            if (distance >= current.radius() || !event.getFrustum().isVisible(bounds.inflate(1))) {
+                continue;
+            }
+            double closeFade = smoothstep(0.5, 4, Math.sqrt(distanceSquaredToBox(camera, bounds)));
+            double rangeFade = smoothstep(0, 3, current.radius() - distance);
+            int alpha = (int) Math.round(255 * current.peakOpacity() * closeFade * rangeFade * (1 - 0.6 * blur));
+            if (alpha == 0) {
+                continue;
+            }
+            int color = entityColor(mc.level, entity);
+            AABB relativeBounds = bounds.move(-camera.x, -camera.y, -camera.z);
+            if (blur <= 0) {
+                outline(PLAYER_BUFFER, matrix, relativeBounds, color, alpha);
+                continue;
+            }
+            alpha /= 2;
+            double time = (mc.level.getGameTime() + partialTick) * 0.3;
+            for (int copy = 0; copy < 3; copy++) {
+                double phase = time + copy * 2.1;
+                AABB shifted = relativeBounds.move(Math.sin(phase) * blur * 0.4, Math.cos(phase * 1.3) * blur * 0.2,
+                        Math.sin(phase * 0.7 + 1) * blur * 0.4).inflate(blur * 0.15 * copy);
+                outline(PLAYER_BUFFER, matrix, shifted, color, alpha);
+            }
+        }
+    }
+
+    public static boolean isGlowing(Entity entity) {
+        return glowColor(entity) >= 0;
+    }
+
+    // The outline colour of an entity sensed by Divine Sense, -1 if it is not sensed
+    public static int glowColor(Entity entity) {
+        if (!entity.level.isClientSide || Minecraft.getInstance().options.hideGui) {
+            return -1;
+        }
+        Integer color = glowing.get(entity.getId());
+        return color != null ? color : -1;
+    }
+
+    // A player of a higher realm hides their aura: blurred at the edge of the detection radius,
+    // clear once they come a third of the way in
+    private static double blur(Player observer, Player target, double distance, SenseProfile profile) {
+        if (DivineSenseTechnique.getRealm(target) <= DivineSenseTechnique.getRealm(observer)) {
+            return 0;
+        }
+        return smoothstep(profile.radius() * 2 / 3.0, profile.radius(), distance);
+    }
+
+    private static int entityColor(ClientLevel level, Entity entity) {
+        if (entity instanceof Player player) {
+            return playerColor(player);
+        }
+        if (entity instanceof Enemy) {
+            return level.dimension() == Level.NETHER ? NETHER_HOSTILE_COLOR : HOSTILE_COLOR;
+        }
+        return CREATURE_COLOR;
+    }
+
+    // Players show the element of their core once they have one
+    private static int playerColor(Player player) {
+        var cultivation = CultivatorStats.getCultivatorStats(player).getCultivation();
+        if (cultivation instanceof CoreFormingCultivation) {
+            for (ResourceLocation elementId : cultivation.getElements()) {
+                var element = Elements.getElement(elementId);
+                if (element != null && !Elements.noElement.equals(elementId)) {
+                    return element.color.getRGB() & 0xFFFFFF;
+                }
+            }
+        }
+        return PLAYER_COLOR;
+    }
+
+    private static int plantColor(BlockState state, float strength) {
         var entry = ClientPlantCatalog.get(state.getValue(ProceduralPlantBlock.SPECIES));
         if (entry == null) {
             return 0xFFFFFF;
@@ -338,7 +503,14 @@ public final class DivineSenseBlockRenderer {
         if (element == null) {
             return 0xFFFFFF;
         }
+        int red = Math.round(Mth.lerp(strength, 255f, element.color.getRed()));
+        int green = Math.round(Mth.lerp(strength, 255f, element.color.getGreen()));
+        int blue = Math.round(Mth.lerp(strength, 255f, element.color.getBlue()));
+        return (red << 16) | (green << 8) | blue;
+    }
 
+    // The plant's Qi, from 0 to 1
+    private static float plantStrength(ClientLevel level, BlockPos pos, BlockState state) {
         // The block state supplies a stable fallback while block-entity data arrives.
         int growth = switch (state.getValue(ProceduralPlantBlock.TIER)) {
             case 3 ->
@@ -354,37 +526,36 @@ public final class DivineSenseBlockRenderer {
         // A logarithmic curve gives low-growth plants noticeable color quickly,
         // with diminishing gains toward full element color at maximum growth.
         double clampedGrowth = Mth.clamp((double) growth, 0, ProceduralPlantBlockEntity.MAX_SPIRITUAL_GROWTH);
-        float strength = (float) (Math.log1p(clampedGrowth)
+        return (float) (Math.log1p(clampedGrowth)
                 / Math.log1p(ProceduralPlantBlockEntity.MAX_SPIRITUAL_GROWTH));
-        int red = Math.round(Mth.lerp(strength, 255f, element.color.getRed()));
-        int green = Math.round(Mth.lerp(strength, 255f, element.color.getGreen()));
-        int blue = Math.round(Mth.lerp(strength, 255f, element.color.getBlue()));
-        return (red << 16) | (green << 8) | blue;
     }
 
-    private static void cross(Matrix4f matrix, AABB box, int color, int alpha) {
+    private static void cross(Matrix4f matrix, AABB box, int color, int alpha, float scale) {
         // Three intersecting world-space axes, rather than a camera-facing marker.
         double x = (box.minX + box.maxX) * .5;
         double y = (box.minY + box.maxY) * .5;
         double z = (box.minZ + box.maxZ) * .5;
-        line(PLANT_BUFFER, matrix, box.minX, y, z, box.maxX, y, z, color, alpha);
-        line(PLANT_BUFFER, matrix, x, box.minY, z, x, box.maxY, z, color, alpha);
-        line(PLANT_BUFFER, matrix, x, y, box.minZ, x, y, box.maxZ, color, alpha);
+        double halfX = (box.maxX - box.minX) * .5 * scale;
+        double halfY = (box.maxY - box.minY) * .5 * scale;
+        double halfZ = (box.maxZ - box.minZ) * .5 * scale;
+        line(PLANT_BUFFER, matrix, x - halfX, y, z, x + halfX, y, z, color, alpha);
+        line(PLANT_BUFFER, matrix, x, y - halfY, z, x, y + halfY, z, color, alpha);
+        line(PLANT_BUFFER, matrix, x, y, z - halfZ, x, y, z + halfZ, color, alpha);
     }
 
-    private static void outline(Matrix4f matrix, AABB box, int color, int alpha) {
+    private static void outline(BufferBuilder buffer, Matrix4f matrix, AABB box, int color, int alpha) {
         for (int corner = 0; corner < 8; corner++) {
             double x = (corner & 1) == 0 ? box.minX : box.maxX;
             double y = (corner & 2) == 0 ? box.minY : box.maxY;
             double z = (corner & 4) == 0 ? box.minZ : box.maxZ;
             if ((corner & 1) == 0) {
-                line(BUFFER, matrix, x, y, z, box.maxX, y, z, color, alpha);
+                line(buffer, matrix, x, y, z, box.maxX, y, z, color, alpha);
             }
             if ((corner & 2) == 0) {
-                line(BUFFER, matrix, x, y, z, x, box.maxY, z, color, alpha);
+                line(buffer, matrix, x, y, z, x, box.maxY, z, color, alpha);
             }
             if ((corner & 4) == 0) {
-                line(BUFFER, matrix, x, y, z, x, y, box.maxZ, color, alpha);
+                line(buffer, matrix, x, y, z, x, y, box.maxZ, color, alpha);
             }
         }
     }

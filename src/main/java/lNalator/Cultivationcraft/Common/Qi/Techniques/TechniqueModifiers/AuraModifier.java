@@ -11,7 +11,7 @@ public class AuraModifier extends TechniqueModifier {
 
     public static final ResourceLocation AURA_ID = new ResourceLocation(Cultivationcraft.MODID, "concept.aura");
 
-    // TODO core design: a pulsing halo radiating around the core (review the current aura.png)
+    // TODO core texture (animated coreTexture shown in the cultivation screen): a pulsing halo radiating around the core (aura.png: 4 frames, to review)
     public AuraModifier() {
         ID = AURA_ID;
         unique = true;

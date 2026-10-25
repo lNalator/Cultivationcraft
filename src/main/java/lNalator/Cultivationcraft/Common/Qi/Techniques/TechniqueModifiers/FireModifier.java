@@ -7,7 +7,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class FireModifier extends TechniqueModifier {
 
-    // TODO core design: flickering flames and rising embers
+    // TODO core texture (animated coreTexture shown in the cultivation screen): flickering flames and rising embers (no texture yet, uses blank.png)
     public FireModifier() {
         ID = new ResourceLocation(Cultivationcraft.MODID, "concept.fire");
         CATEGORY = ELEMENTAL_CATEGORY;

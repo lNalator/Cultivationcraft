@@ -21,7 +21,7 @@ public class WarpModifier extends TechniqueModifier {
 
     int range = 6;
 
-    // TODO core design: an ender-like disappearance: the core flickers, vanishes and reappears with purple portal particles (review the current warp.png)
+    // TODO core texture (animated coreTexture shown in the cultivation screen): an ender-like disappearance: the core flickers, vanishes and reappears with purple portal particles (warp.png: 20 frames, to review)
     public WarpModifier() {
         ID = new ResourceLocation(Cultivationcraft.MODID, "concept.warp");
         unique = true;

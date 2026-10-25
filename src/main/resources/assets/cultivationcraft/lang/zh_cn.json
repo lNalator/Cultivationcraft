@@ -103,6 +103,15 @@
 
   "cultivationcraft.technique.divinesense": "气感",
   "cultivationcraft.technique.divinesense.description": "感应你周围的气，使你可以\"看到\" 大量聚集的气。",
+  "cultivationcraft.divinesense.menu": "气感",
+  "cultivationcraft.divinesense.menu.all": "全部",
+  "cultivationcraft.divinesense.menu.qisources": "灵气源",
+  "cultivationcraft.divinesense.menu.blocks": "灵物",
+  "cultivationcraft.divinesense.menu.creatures": "生灵",
+  "cultivationcraft.divinesense.menu.players": "修士",
+  "cultivationcraft.divinesense.menu.tribulations": "天劫",
+  "cultivationcraft.divinesense.menu.on": "开",
+  "cultivationcraft.divinesense.menu.off": "关",
 
   "cultivationcraft.technique.icewalk": "冰霜行者",
   "cultivationcraft.technique.icewalk.description": "当开启时，你脚下包括空气在内的方块将会被冻结。",

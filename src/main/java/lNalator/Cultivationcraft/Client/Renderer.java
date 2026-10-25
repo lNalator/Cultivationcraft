@@ -28,6 +28,14 @@ public class Renderer
     // Game tick Divine Sense last ran: it could end without its deactivate() running on the client
     // (techniques re-synced from the server, death...), which left the sources visible
     public static long QiSenseTick = -1;
+    // What Divine Sense shows, from its radial menu (see DivineSenseTechnique.SENSE_*)
+    public static int DivineSenseMask = 0;
+
+    // Divine Sense is active and shows this category
+    public static boolean senses(int category)
+    {
+        return QiSourcesVisible && (DivineSenseMask & category) != 0;
+    }
 
     public static void render(float partialTick)
     {

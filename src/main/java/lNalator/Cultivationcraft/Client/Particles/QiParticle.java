@@ -5,6 +5,7 @@ import lNalator.Cultivationcraft.Client.Renderers.QiSourceRenderer;
 import lNalator.Cultivationcraft.Common.Qi.Elements.Element;
 import lNalator.Cultivationcraft.Common.Qi.QiSource;
 import lNalator.Cultivationcraft.Common.Qi.QiSourceConfig;
+import lNalator.Cultivationcraft.Common.Qi.Techniques.DivineSenseTechnique;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
@@ -162,7 +163,7 @@ public class QiParticle extends TextureSheetParticle {
     @Override
     public void render(VertexConsumer buffer, Camera renderInfo, float partialTicks) {
         // Don't render particles if they are not visible
-        if (!Renderer.QiSourcesVisible || renderInfo.getPosition().distanceToSqr(x, y, z) > 16 * Renderer.QiSenseRadius * Renderer.QiSenseRadius) {
+        if (!Renderer.senses(DivineSenseTechnique.SENSE_QI_SOURCES) || renderInfo.getPosition().distanceToSqr(x, y, z) > 16 * Renderer.QiSenseRadius * Renderer.QiSenseRadius) {
             return;
         }
 
