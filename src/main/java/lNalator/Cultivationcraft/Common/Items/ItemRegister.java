@@ -3,7 +3,6 @@ package lNalator.Cultivationcraft.Common.Items;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import lNalator.Cultivationcraft.Common.Blocks.BlockRegister;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -21,12 +20,12 @@ public class ItemRegister {
     public static final RegistryObject<Item> JADE_SLIP = ITEMS.register("jade_slip", () -> new JadeSlipItem(new Item.Properties()));
     public static final RegistryObject<Item> ALCHEMY_REMNANTS = ITEMS.register("alchemy_remnants", () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> JADE_CHUNK = ITEMS.register("jade_chunk",
-            () -> new Item(new Item.Properties().tab(CreativeModeTab.TAB_MATERIALS)));
+            () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> SPIRIT_STONE = ITEMS.register("spirit_stone",
-            () -> new SpiritStoneItem(new Item.Properties().tab(CreativeModeTab.TAB_MATERIALS)));
+            () -> new SpiritStoneItem(new Item.Properties()));
 
     public static final RegistryObject<Item> ELEMENT_WAND = ITEMS.register("element_wand",
-            () -> new ElementWandItem(new Item.Properties().stacksTo(1).tab(CreativeModeTab.TAB_TOOLS)));
+            () -> new ElementWandItem(new Item.Properties().stacksTo(1)));
 
     public static void init(IEventBus bus) {
         ITEMS.register(bus);

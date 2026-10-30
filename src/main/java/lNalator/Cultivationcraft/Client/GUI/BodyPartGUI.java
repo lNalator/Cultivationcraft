@@ -1,8 +1,7 @@
 package lNalator.Cultivationcraft.Client.GUI;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 
 public class BodyPartGUI {
@@ -46,20 +45,18 @@ public class BodyPartGUI {
         return textureY;
     }
 
-    public void render(PoseStack PoseStack, int xPos, int yPos, boolean highlight, GuiComponent gui) {
-        RenderSystem.setShaderTexture(0, TEXTURE);
-
+    public void render(GuiGraphics guiGraphics, int xPos, int yPos, boolean highlight) {
         if (highlight) {
             RenderSystem.setShaderColor(0.5f, 1, 0.75f, 1);
         }
 
-        GuiComponent.blit(PoseStack, xPos, yPos, gui.getBlitOffset(), 0, 0, textureX, textureY, textureX, textureY);
+        guiGraphics.blit(TEXTURE, xPos, yPos, 0, 0, textureX, textureY, textureX, textureY);
 
         RenderSystem.setShaderColor(1, 1, 1, 1);
     }
 
     // Render based on base part
-    public void render(PoseStack PoseStack, int xPos, int yPos, boolean highlight, GuiComponent gui, BodyPartGUI base) {
+    public void render(GuiGraphics guiGraphics, int xPos, int yPos, boolean highlight, BodyPartGUI base) {
         float maxWidth = base.getTextureWidth() - getTextureWidth();
         float maxHeight = base.getTextureHeight() - getTextureHeight();
 
@@ -80,6 +77,6 @@ public class BodyPartGUI {
             yPos += maxHeight + getTextureHeight() * (y - 1) * 2 - 1;
         }
 
-        render(PoseStack, xPos, yPos, highlight, gui);
+        render(guiGraphics, xPos, yPos, highlight);
     }
 }

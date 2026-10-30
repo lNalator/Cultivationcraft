@@ -2,9 +2,8 @@ package lNalator.Cultivationcraft.Client.GUI;
 
 import lNalator.Cultivationcraft.Cultivationcraft;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 
 import java.awt.*;
@@ -177,36 +176,35 @@ public class DropdownList<T> {
         scrollOffset = Math.max(0, Math.min(maxScroll(), scrollOffset + amount));
     }
 
-    public void render(PoseStack PoseStack, int xpos, int ypos, int mouseX, int mouseY, GuiComponent gui) {
-        RenderSystem.setShaderTexture(0, TEXTURE);
+    public void render(GuiGraphics guiGraphics, int xpos, int ypos, int mouseX, int mouseY) {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
         // Draw the list open or closed
         if (isOpen) {
-            GuiComponent.blit(PoseStack, xpos, ypos, gui.getBlitOffset(), width + 1, 0, width, openHeight, 255, 255);
+            guiGraphics.blit(TEXTURE, xpos, ypos, width + 1, 0, width, openHeight, 255, 255);
 
-            drawScrollBar(PoseStack, xpos, ypos, mouseX, mouseY, gui);
+            drawScrollBar(guiGraphics, xpos, ypos, mouseX, mouseY);
         } else {
-            GuiComponent.blit(PoseStack, xpos, ypos, gui.getBlitOffset(), 0, 0, width, closedHeight, 255, 255);
+            guiGraphics.blit(TEXTURE, xpos, ypos, 0, 0, width, closedHeight, 255, 255);
         }
 
         // Draw the selected item
-        Minecraft.getInstance().font.draw(PoseStack, selected, xpos + 2, ypos + 2, Color.white.getRGB());
+        guiGraphics.drawString(Minecraft.getInstance().font, selected, xpos + 2, ypos + 2, Color.white.getRGB(), false);
 
         // Draw all items if open
         if (isOpen) {
-            renderListText(PoseStack, xpos, ypos, gui);
+            renderListText(guiGraphics, xpos, ypos);
         }
 
     }
 
-    public void drawScrollBar(PoseStack PoseStack, int xpos, int ypos, int mouseX, int mouseY, GuiComponent gui) {
+    public void drawScrollBar(GuiGraphics guiGraphics, int xpos, int ypos, int mouseX, int mouseY) {
         // Highlight the scroll buttons if mouse is over them
         if (mouseX - xpos >= scrollbarXStart && mouseX - xpos < width) {
             if (mouseY - ypos >= 0 && mouseY - ypos < closedHeight) {
-                GuiComponent.blit(PoseStack, xpos + scrollbarXStart, ypos, gui.getBlitOffset(), width * 2 + 2, 0, width - scrollbarXStart, closedHeight, 255, 255); 
+                guiGraphics.blit(TEXTURE, xpos + scrollbarXStart, ypos, width * 2 + 2, 0, width - scrollbarXStart, closedHeight, 255, 255); 
             }else if (mouseY - ypos >= scrollbarYDown && mouseY - ypos < openHeight) {
-                GuiComponent.blit(PoseStack, xpos + scrollbarXStart, ypos + scrollbarYDown, gui.getBlitOffset(), width * 2 + 2, scrollbarYDown, width - scrollbarXStart, closedHeight, 255, 255);
+                guiGraphics.blit(TEXTURE, xpos + scrollbarXStart, ypos + scrollbarYDown, width * 2 + 2, scrollbarYDown, width - scrollbarXStart, closedHeight, 255, 255);
             }
         }
 
@@ -214,18 +212,18 @@ public class DropdownList<T> {
         float percent = maxScroll() == 0 ? 0 : (float) scrollOffset / maxScroll();
         int scrollPosition = scrollBarTop + (int) ((scrollBarBottom - scrollBarTop) * percent);
 
-        GuiComponent.blit(PoseStack, xpos + scrollbarXStart, ypos + scrollPosition, gui.getBlitOffset(), width * 2 + 2, closedHeight, width - scrollbarXStart, scrollBarSize, 255, 255);
+        guiGraphics.blit(TEXTURE, xpos + scrollbarXStart, ypos + scrollPosition, width * 2 + 2, closedHeight, width - scrollbarXStart, scrollBarSize, 255, 255);
     }
 
     // Draw visible list items
-    protected void renderListText(PoseStack PoseStack, int xpos, int ypos, GuiComponent gui) {
+    protected void renderListText(GuiGraphics guiGraphics, int xpos, int ypos) {
         int i = 0;
 
         for (String name : items.keySet()) {
             if (!name.contentEquals(selected)) {
                 // Only start displaying list items from the scroll offset
                 if (scrollOffset <= i) {
-                    Minecraft.getInstance().font.draw(PoseStack, name, xpos + 2, ypos + 2 + (i + 1 - scrollOffset) * (closedHeight - 1), Color.white.getRGB());
+                    guiGraphics.drawString(Minecraft.getInstance().font, name, xpos + 2, ypos + 2 + (i + 1 - scrollOffset) * (closedHeight - 1), Color.white.getRGB(), false);
                 }
 
                 i++;

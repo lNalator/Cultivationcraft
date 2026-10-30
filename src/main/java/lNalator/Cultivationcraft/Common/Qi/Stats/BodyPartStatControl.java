@@ -21,7 +21,7 @@ public class BodyPartStatControl {
     public static PlayerStatControl getPlayerStatControl(Player player) {
         UUID playerID = player.getUUID();
 
-        if (player.level.isClientSide) {
+        if (player.level().isClientSide) {
             if (!stats.containsKey(playerID)) {
                 stats.put(playerID, new PlayerStatControl());
             }

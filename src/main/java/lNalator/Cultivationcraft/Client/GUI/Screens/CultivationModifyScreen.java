@@ -2,7 +2,7 @@ package lNalator.Cultivationcraft.Client.GUI.Screens;
 
 import lNalator.Cultivationcraft.Common.Qi.Cultivation.CultivationType;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueStats.TechniqueStatModification;
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 
@@ -19,7 +19,7 @@ public class CultivationModifyScreen extends TechniqueModifyScreen {
     }
 
     @Override
-    protected void drawStats(PoseStack PoseStack, int mouseX, int mouseY) {
+    protected void drawStats(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         if (cultivation.statsCanLevel() && selectedTech.getFirstStatChange() != null) {
             TechniqueStatModification modifications = getStatModification();
 
@@ -32,17 +32,17 @@ public class CultivationModifyScreen extends TechniqueModifyScreen {
                 ResourceLocation statLocation = stats.get(stat);
 
                 double value = modifications.getStatChange(statLocation);
-                drawStatChanges(PoseStack, stat, stats.get(stat), value);
+                drawStatChanges(guiGraphics, stat, stats.get(stat), value);
 
                 // Only draw button if this stat can level
                 if (selectedTech.getStatChangesPerLevel(statLocation) != null) {
-                    drawButton(PoseStack, stat, mouseX, mouseY);
+                    drawButton(guiGraphics, stat, mouseX, mouseY);
                 }
             }
         }
 
-        drawStats(cultivation, PoseStack, new ArrayList<>(), 0);
-        ResourceReadout.draw(PoseStack, font, Minecraft.getInstance().player,
+        drawStats(cultivation, guiGraphics, new ArrayList<>(), 0);
+        ResourceReadout.draw(guiGraphics, font, Minecraft.getInstance().player,
                 (width - xSize) / 2 + 20, (height - ySize) / 2 + 137, xSize - 40);
 
         stats = new ArrayList<>();
@@ -51,7 +51,7 @@ public class CultivationModifyScreen extends TechniqueModifyScreen {
         }
     }
 
-    protected void drawStats(CultivationType cultivating, PoseStack PoseStack, ArrayList<ResourceLocation> done, int location) {
+    protected void drawStats(CultivationType cultivating, GuiGraphics guiGraphics, ArrayList<ResourceLocation> done, int location) {
         stats = new ArrayList<>();
 
         for (ResourceLocation stat : cultivating.getPassive().getTechniqueStats()) {
@@ -66,11 +66,11 @@ public class CultivationModifyScreen extends TechniqueModifyScreen {
 
             double statValue = cultivating.getCultivationStat(Minecraft.getInstance().player, statLocation);
 
-            drawStat(PoseStack, stat + location, stats.get(stat), statValue);
+            drawStat(guiGraphics, stat + location, stats.get(stat), statValue);
         }
 
         if (cultivating.getPreviousCultivation() != null) {
-            drawStats(cultivating.getPreviousCultivation(), PoseStack, done, location + stats.size());
+            drawStats(cultivating.getPreviousCultivation(), guiGraphics, done, location + stats.size());
         }
     }
 }

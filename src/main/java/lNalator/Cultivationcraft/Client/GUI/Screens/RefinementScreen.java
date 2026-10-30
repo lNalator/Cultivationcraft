@@ -7,7 +7,7 @@ import lNalator.Cultivationcraft.Common.Containers.RefinementContainer;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.MeditateTechnique;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.world.entity.player.Inventory;
@@ -58,10 +58,10 @@ public class RefinementScreen extends AbstractContainerScreen<RefinementContaine
     }
 
     @Override
-    public void render(PoseStack PoseStack, int mouseX, int mouseY, float partialTicks) {
-        this.renderBackground(PoseStack);
-        super.render(PoseStack, mouseX, mouseY, partialTicks);
-        this.renderTooltip(PoseStack, mouseX, mouseY);
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+        this.renderBackground(guiGraphics);
+        super.render(guiGraphics, mouseX, mouseY, partialTicks);
+        this.renderTooltip(guiGraphics, mouseX, mouseY);
     }
 
     @Override
@@ -81,7 +81,7 @@ public class RefinementScreen extends AbstractContainerScreen<RefinementContaine
     }
 
     @Override
-    protected void renderLabels(PoseStack PoseStack, int mouseX, int mouseY) {
+    protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         final float PLAYER_LABEL_XPOS = 8;
         final float PLAYER_LABEL_YPOS = 178 - 94;
 
@@ -94,10 +94,10 @@ public class RefinementScreen extends AbstractContainerScreen<RefinementContaine
         String testString = Component.translatable("cultivationcraft.gui.refinement").getString();
 
         float BAG_LABEL_XPOS = (178 / 2.0F) - font.width(testString) / 2.0F;
-        font.draw(PoseStack, testString, BAG_LABEL_XPOS, BAG_LABEL_YPOS, Color.darkGray.getRGB());
+        guiGraphics.drawString(font, testString, BAG_LABEL_XPOS, BAG_LABEL_YPOS, Color.darkGray.getRGB(), false);
 
-        font.draw(PoseStack, this.playerInventoryTitle.getString(),
-                PLAYER_LABEL_XPOS, PLAYER_LABEL_YPOS, Color.darkGray.getRGB());
+        guiGraphics.drawString(font, this.playerInventoryTitle.getString(),
+                PLAYER_LABEL_XPOS, PLAYER_LABEL_YPOS, Color.darkGray.getRGB(), false);
 
         String progress;
 
@@ -121,7 +121,7 @@ public class RefinementScreen extends AbstractContainerScreen<RefinementContaine
         final int margin = 8;
         float y = STATUS_Y + panelToLabelY;
         for (FormattedCharSequence line : font.split(Component.literal(progress), imageWidth - margin * 2)) {
-            font.draw(PoseStack, line, panelToLabelX + (imageWidth - font.width(line)) / 2.0F, y, color);
+            guiGraphics.drawString(font, line, panelToLabelX + (imageWidth - font.width(line)) / 2.0F, y, color, false);
             y += font.lineHeight;
         }
     }
@@ -137,42 +137,40 @@ public class RefinementScreen extends AbstractContainerScreen<RefinementContaine
     }
 
     @Override
-    protected void renderBg(PoseStack PoseStack, float partialTicks, int mouseX, int mouseY) {
-        drawGuiBackgroundLayer(PoseStack, partialTicks, mouseX, mouseY);
+    protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
+        drawGuiBackgroundLayer(guiGraphics, partialTicks, mouseX, mouseY);
 
-        RenderSystem.setShaderTexture(0, TEXTURE);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
         int edgeSpacingX = (this.width - this.imageWidth) / 2;
         int edgeSpacingY = (this.height - this.imageHeight) / 2;
         // Original overlay: top part (slot, bar) in place, inventory part pushed down by EXTRA_Y
         final int split = 90;
-        this.blit(PoseStack, edgeSpacingX + EXTRA_X, edgeSpacingY + TOP_Y, 0, 0, 256, split);
-        this.blit(PoseStack, edgeSpacingX + EXTRA_X, edgeSpacingY + split + EXTRA_Y, 0, split, 256, 178 - split);
+        guiGraphics.blit(TEXTURE, edgeSpacingX + EXTRA_X, edgeSpacingY + TOP_Y, 0, 0, 256, split);
+        guiGraphics.blit(TEXTURE, edgeSpacingX + EXTRA_X, edgeSpacingY + split + EXTRA_Y, 0, split, 256, 178 - split);
 
         // Draw the progress bar based on refinement progress
         float progress = menu.getRefinementProgress() * PROGRESS_BAR_X_SIZE;
 
         // If progress is greater than 0 draw the progress bar
         if (progress > 0) {
-            this.blit(PoseStack, edgeSpacingX + PROGRESS_BAR_X_POS, edgeSpacingY + PROGRESS_BAR_Y_POS, PROGRESS_BAR_U, PROGRESS_BAR_V, (int) progress, PROGRESS_BAR_Y_SIZE); 
+            guiGraphics.blit(TEXTURE, edgeSpacingX + PROGRESS_BAR_X_POS, edgeSpacingY + PROGRESS_BAR_Y_POS, PROGRESS_BAR_U, PROGRESS_BAR_V, (int) progress, PROGRESS_BAR_Y_SIZE); 
         }// If progress is less than 0 draw the progress to unbind bar
         else {
-            this.blit(PoseStack, edgeSpacingX + PROGRESS_BAR_X_POS + PROGRESS_BAR_X_SIZE - (int) (progress * -1), edgeSpacingY + PROGRESS_BAR_Y_POS,
+            guiGraphics.blit(TEXTURE, edgeSpacingX + PROGRESS_BAR_X_POS + PROGRESS_BAR_X_SIZE - (int) (progress * -1), edgeSpacingY + PROGRESS_BAR_Y_POS,
                     PROGRESS_BAR_U, PROGRESS_BAR_V - PROGRESS_BAR_Y_SIZE,
                     (int) progress * -1, PROGRESS_BAR_Y_SIZE);
         }
     }
 
-    protected void drawGuiBackgroundLayer(PoseStack PoseStack, float partialTicks, int mouseX, int mouseY) {
+    protected void drawGuiBackgroundLayer(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
         // Draw the generic tab screen
-        RenderSystem.setShaderTexture(0, GenericTabScreen.tabTexture);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
         int edgeSpacingX = (this.width - this.imageWidth) / 2;
         int edgeSpacingY = (this.height - this.imageHeight) / 2;
 
-        GenericTabScreen.drawPanel(PoseStack, this, tab, mouseX, mouseY, edgeSpacingX, edgeSpacingY);
+        GenericTabScreen.drawPanel(guiGraphics, tab, mouseX, mouseY, edgeSpacingX, edgeSpacingY);
     }
 
     protected static final ResourceLocation TEXTURE = new ResourceLocation(Cultivationcraft.MODID, "textures/gui/refinement.png");

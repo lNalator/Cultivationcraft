@@ -97,7 +97,7 @@ public class ChunkQiSources implements IChunkQiSources {
     protected boolean canCreate(Level level, Vec3 pos, int range) {
         for (int x = -range; x <= range; x += 16) {
             for (int z = -range; z <= range; z += 16) {
-                ChunkPos chunkPos = new ChunkPos(new BlockPos(pos.x + x, pos.y, pos.z + z));
+                ChunkPos chunkPos = new ChunkPos(BlockPos.containing(pos.x + x, pos.y, pos.z + z));
                 if (!level.hasChunk(chunkPos.x, chunkPos.z)) {
                     return false;
                 }
@@ -113,7 +113,7 @@ public class ChunkQiSources implements IChunkQiSources {
         // Try to mutate this QiSource
         element = Elements.getElement(element).getMutation().getResourceLocation();
 
-        QiSource newSource = new QiSource(new BlockPos(pos), size, element, QiSourceConfig.generateRandomQiStorage(), QiSourceConfig.generateRandomQiRegen());
+        QiSource newSource = new QiSource(BlockPos.containing(pos), size, element, QiSourceConfig.generateRandomQiStorage(), QiSourceConfig.generateRandomQiRegen());
         QiSources.add(newSource);
 
         // TODO: Unsure if this should be done or not
@@ -142,7 +142,7 @@ public class ChunkQiSources implements IChunkQiSources {
             for (int y = -range; y <= range; y++) {
                 for (int z = -range; z <= range; z++) {
                     if (new Vec3(x, y, z).length() < range) {
-                        ResourceLocation element = BlockElements.getMaterialElement(level.getBlockState(new BlockPos(pos.add(x, y, z))).getMaterial());
+                        ResourceLocation element = BlockElements.getBlockElement(level.getBlockState(BlockPos.containing(pos.add(x, y, z))));
 
                         // Don't do anything if this element is not contained in this dimensions ruleset
                         if (rules.contains(element)) {

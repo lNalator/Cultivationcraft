@@ -177,7 +177,7 @@ public class PlantCatalogCommands {
     }
 
     private static int showHelp(CommandSourceStack src, String section) {
-        src.sendSuccess(Component.literal("Testing commands: <required>, [optional trailing arguments]. Press Tab for values; hover suggestions for details."), false);
+        src.sendSuccess(() -> Component.literal("Testing commands: <required>, [optional trailing arguments]. Press Tab for values; hover suggestions for details."), false);
         if (section.equals("all")) {
             PillCommands.help(src);
         }
@@ -194,13 +194,13 @@ public class PlantCatalogCommands {
         if (section.equals("all") || section.equals("qisource")) {
             usage(src, "/cultivation qisource here <element> [size] [storage_fraction] [regen_ticks]", "Create at your position. Omitted numbers are randomized.");
             usage(src, "/cultivation qisource at <x> <y> <z> <element> [size] [storage_fraction] [regen_ticks]", "Create at a loaded position; ~ coordinates work.");
-            src.sendSuccess(Component.literal("size = radius in blocks; storage_fraction = capacity scale 0-1; regen_ticks = ticks for a full refill (20 ticks/second)."), false);
+            src.sendSuccess(() -> Component.literal("size = radius in blocks; storage_fraction = capacity scale 0-1; regen_ticks = ticks for a full refill (20 ticks/second)."), false);
         }
         return 1;
     }
 
     private static void usage(CommandSourceStack src, String syntax, String description) {
-        src.sendSuccess(Component.literal(syntax + " - " + description), false);
+        src.sendSuccess(() -> Component.literal(syntax + " - " + description), false);
     }
 
     private static boolean validElement(CommandSourceStack src, ResourceLocation element) {
@@ -226,14 +226,15 @@ public class PlantCatalogCommands {
                 continue;
             }
             String hex = String.format("%06X", e.genome.colorRGB());
-            src.sendSuccess(Component.literal("[" + e.id + "] T" + e.genome.tier() + " " + e.displayName + " elem=" + e.genome.qiElement() + " color=#" + hex)
+            src.sendSuccess(() -> Component.literal("[" + e.id + "] T" + e.genome.tier() + " " + e.displayName + " elem=" + e.genome.qiElement() + " color=#" + hex)
                     .withStyle(style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND,
                     "/cultivation giveplant id @s " + e.id + " false 1"))
                     .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
                             Component.literal("Click to prepare giveplant for this variant")))), false);
             shown++;
         }
-        src.sendSuccess(Component.literal(shown + " matching plants. Click a row to prepare giveplant; /cultivation plantcatalog help explains filters."), false);
+        Component message = Component.literal(shown + " matching plants. Click a row to prepare giveplant; /cultivation plantcatalog help explains filters.");
+        src.sendSuccess(() -> message, false);
         return shown;
     }
 
@@ -251,7 +252,8 @@ public class PlantCatalogCommands {
         if (!added) {
             player.drop(stack, false);
         }
-        src.sendSuccess(Component.literal("Gave " + count + "x [" + id + "] " + entry.displayName + (host ? " (host)" : "")), true);
+        Component message = Component.literal("Gave " + count + "x [" + id + "] " + entry.displayName + (host ? " (host)" : ""));
+        src.sendSuccess(() -> message, true);
         return 1;
     }
 
@@ -282,7 +284,8 @@ public class PlantCatalogCommands {
         if (!added) {
             player.drop(stack, false);
         }
-        src.sendSuccess(Component.literal("Gave " + count + "x [" + entry.id + "] " + entry.displayName + (host ? " (host)" : "")), true);
+        Component message = Component.literal("Gave " + count + "x [" + entry.id + "] " + entry.displayName + (host ? " (host)" : ""));
+        src.sendSuccess(() -> message, true);
         return 1;
     }
 
@@ -328,7 +331,7 @@ public class PlantCatalogCommands {
         var chunkCap = ChunkQiSources.getChunkQiSources(level.getChunkAt(pos));
         chunkCap.getQiSources().add(source);
         PacketHandler.sendChunkQiSourcesToClient(level.getChunkAt(pos));
-        src.sendSuccess(Component.literal("Added QiSource at " + pos.getX() + "," + pos.getY() + "," + pos.getZ() + " elem=" + element + " size=" + s + " capacity=" + source.getQiMax() + " regen_ticks=" + rg), true);
+        src.sendSuccess(() -> Component.literal("Added QiSource at " + pos.getX() + "," + pos.getY() + "," + pos.getZ() + " elem=" + element + " size=" + s + " capacity=" + source.getQiMax() + " regen_ticks=" + rg), true);
         return 1;
     }
 }

@@ -45,7 +45,7 @@ public class MovementOverrideTechnique extends Technique {
         currentSpeed = currentSpeed.lerp(targetSpeed, momentumFactor);
 
         // Adds friction when in air so that speed doesn't increase exponentially
-        if (!player.isOnGround()) {
+        if (!player.onGround()) {
             player.setDeltaMovement(player.getDeltaMovement().subtract(oldSpeed.scale(0.8))); 
         }else {
             player.setDeltaMovement(player.getDeltaMovement().subtract(oldSpeed.multiply(0, 0.8, 0)));

@@ -4,7 +4,7 @@ import lNalator.Cultivationcraft.Cultivationcraft;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.CultivatorStats;
 import lNalator.Cultivationcraft.Common.Config;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.LivingEntity;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorTechniques.CultivatorTechniques;
@@ -23,7 +23,9 @@ import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers.Techniq
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.CombatRules;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
@@ -169,11 +171,11 @@ public class Damage {
 
         float multiplier = 1;
 
-        if (entity.getType().is(TagKey.create(Registry.ENTITY_TYPE_REGISTRY, new ResourceLocation(Cultivationcraft.MODID, "resists/" + element)))) {
+        if (entity.getType().is(TagKey.create(Registries.ENTITY_TYPE, new ResourceLocation(Cultivationcraft.MODID, "resists/" + element)))) {
             multiplier *= 0.5f;
         }
 
-        if (entity.getType().is(TagKey.create(Registry.ENTITY_TYPE_REGISTRY, new ResourceLocation(Cultivationcraft.MODID, "weak/" + element)))) {
+        if (entity.getType().is(TagKey.create(Registries.ENTITY_TYPE, new ResourceLocation(Cultivationcraft.MODID, "weak/" + element)))) {
             multiplier *= 1.5f;
         }
 
@@ -196,7 +198,7 @@ public class Damage {
             float heal = resistedDamage * -1;
 
             // Cap amount lava can heal to 2hp a second
-            if (event.getSource().getMsgId().compareTo(DamageSource.LAVA.getMsgId()) == 0 && heal > 0.2f) {
+            if (event.getSource().is(DamageTypes.LAVA) && heal > 0.2f) {
                 heal = 0.2f;
             }
 
@@ -209,9 +211,9 @@ public class Damage {
         if (event.getEntity().hurtTime == 0 && event.getEntity().isAlive()) {
             QuestHandler.progressQuest((Player) event.getEntity(), Quest.DAMAGE_TAKEN, resistedDamage);
 
-            QuestHandler.progressQuest((Player) event.getEntity(), Quest.DAMAGE_TAKEN, resistedDamage, source.msgId);
+            QuestHandler.progressQuest((Player) event.getEntity(), Quest.DAMAGE_TAKEN, resistedDamage, source.getMsgId());
 
-            if (source.isExplosion()) {
+            if (source.is(DamageTypeTags.IS_EXPLOSION)) {
                 QuestHandler.progressQuest((Player) event.getEntity(), Quest.EXPLOSION_DAMAGE_TAKEN, resistedDamage);
             }
 
@@ -238,19 +240,19 @@ public class Damage {
     }
 
     protected static float armorAbsorption(Player player, QiDamageSource source, float amount) {
-        if (!source.isBypassArmor()) {
+        if (!source.is(DamageTypeTags.BYPASSES_ARMOR)) {
             amount = CombatRules.getDamageAfterAbsorb(amount, (float) player.getArmorValue(), (float) player.getAttributeValue(Attributes.ARMOR_TOUGHNESS));
         }
 
-        if (!source.isBypassMagic()) {
-            if (player.hasEffect(MobEffects.DAMAGE_RESISTANCE) && source != DamageSource.OUT_OF_WORLD) {
+        if (!source.is(DamageTypeTags.BYPASSES_EFFECTS)) {
+            if (player.hasEffect(MobEffects.DAMAGE_RESISTANCE) && !source.is(DamageTypeTags.BYPASSES_RESISTANCE)) {
                 int i = (player.getEffect(MobEffects.DAMAGE_RESISTANCE).getAmplifier() + 1) * 5;
                 int j = 25 - i;
                 float f = amount * (float) j;
                 amount = Math.max(f / 25.0F, 0.0F);
             }
 
-            if (!source.isBypassEnchantments()) {
+            if (!source.is(DamageTypeTags.BYPASSES_ENCHANTMENTS)) {
                 int k = EnchantmentHelper.getDamageProtection(player.getArmorSlots(), source);
                 if (k > 0) {
                     amount = CombatRules.getDamageAfterMagicAbsorb(amount, (float) k);

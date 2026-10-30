@@ -47,7 +47,7 @@ public class GlideTechnique extends PassiveTechnique {
         Player player = event.player;
 
         // Do nothing if the player is not in the air
-        if (player.isOnGround() || player.isInWater()) {
+        if (player.onGround() || player.isInWater()) {
             return;
         }
 

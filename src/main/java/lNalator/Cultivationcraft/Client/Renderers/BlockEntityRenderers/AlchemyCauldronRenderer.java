@@ -1,8 +1,10 @@
 package lNalator.Cultivationcraft.Client.Renderers.BlockEntityRenderers;
 
+import net.minecraft.world.item.ItemDisplayContext;
+import com.mojang.math.Axis;
 import lNalator.Cultivationcraft.Common.Blocks.entity.AlchemyCauldronBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Vector3f;
+import org.joml.Vector3f;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
@@ -42,9 +44,9 @@ public class AlchemyCauldronRenderer implements BlockEntityRenderer<AlchemyCauld
             pose.translate(0.5 + Math.cos(angle) * radius,
                     0.82 + Math.sin(time * 0.05 + phase) * 0.065,
                     0.5 + Math.sin(angle) * radius);
-            pose.mulPose(Vector3f.YP.rotationDegrees((float) ((time * 1.5 + slot * 40) % 360)));
+            pose.mulPose(Axis.YP.rotationDegrees((float) ((time * 1.5 + slot * 40) % 360)));
             pose.scale(0.22f, 0.22f, 0.22f);
-            items.renderStatic(stack, ItemTransforms.TransformType.GROUND, light, overlay, pose, buffers,
+            items.renderStatic(stack, ItemDisplayContext.GROUND, light, overlay, pose, buffers, cauldron.getLevel(),
                     (int) cauldron.getBlockPos().asLong() + slot);
             pose.popPose();
         }

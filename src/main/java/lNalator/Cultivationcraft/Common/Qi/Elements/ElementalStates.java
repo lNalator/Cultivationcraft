@@ -87,7 +87,7 @@ public final class ElementalStates {
 
     // One Ice hit: +1 Chill, or Frozen on the 5th level (design E4)
     public static void addChill(LivingEntity target, Entity source) {
-        if (target.level.isClientSide || target.hasEffect(FROZEN.get()) || target.hasEffect(FREEZE_IMMUNE.get())) {
+        if (target.level().isClientSide || target.hasEffect(FROZEN.get()) || target.hasEffect(FREEZE_IMMUNE.get())) {
             return;
         }
 
@@ -131,7 +131,7 @@ public final class ElementalStates {
             entity.clearFire();
         }
 
-        if (entity.level.isClientSide) {
+        if (entity.level().isClientSide) {
             return;
         }
 

@@ -37,7 +37,7 @@ public class ElementWandItem extends Item {
     protected static void hit(Player player, LivingEntity target, ItemStack stack) {
         // Skip invulnerability frames so effects can be chained quickly
         target.invulnerableTime = 0;
-        target.hurt(new QiDamageSource("player", player, element(stack), true), DAMAGE);
+        target.hurt(new QiDamageSource(player.level(), "player", player, element(stack), true), DAMAGE);
     }
 
     @Override
@@ -64,7 +64,7 @@ public class ElementWandItem extends Item {
     // Sneak + left-click (any target or the air) = previous element. Every left-click swings, and the server sees the swing.
     @Override
     public boolean onEntitySwing(ItemStack stack, LivingEntity entity) {
-        if (!entity.level.isClientSide && entity instanceof Player player && player.isShiftKeyDown()) {
+        if (!entity.level().isClientSide && entity instanceof Player player && player.isShiftKeyDown()) {
             cycle(player, stack, -1);
         }
 
@@ -89,11 +89,11 @@ public class ElementWandItem extends Item {
             return InteractionResult.PASS;
         }
 
-        if (!player.level.isClientSide) {
+        if (!player.level().isClientSide) {
             hit(player, target, stack);
         }
 
-        return InteractionResult.sidedSuccess(player.level.isClientSide);
+        return InteractionResult.sidedSuccess(player.level().isClientSide);
     }
 
     @Override

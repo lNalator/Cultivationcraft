@@ -24,13 +24,13 @@ public class clientRegister {
 
         @SubscribeEvent
         public static void onParticleFactoryRegistration(RegisterParticleProvidersEvent event) {
-            event.register(Register.qiParticleType.get(), QiParticle.Factory::new);
-            event.register(Register.bloodParticleType.get(), BloodParticle.Factory::new);
-            event.register(Register.gaseousBloodParticleType.get(), GaseousBloodParticle.Factory::new);
-            event.register(Register.spitParticleType.get(), SpitParticle.Factory::new);
-            event.register(Register.waterParticleType.get(), WaterParticle.Factory::new);
-            event.register(Register.windParticleType.get(), WindParticle.Factory::new);
-            event.register(Register.fireParticleType.get(), FireParticle.Factory::new);
+            event.registerSpriteSet(Register.qiParticleType.get(), QiParticle.Factory::new);
+            event.registerSpriteSet(Register.bloodParticleType.get(), BloodParticle.Factory::new);
+            event.registerSpriteSet(Register.gaseousBloodParticleType.get(), GaseousBloodParticle.Factory::new);
+            event.registerSpriteSet(Register.spitParticleType.get(), SpitParticle.Factory::new);
+            event.registerSpriteSet(Register.waterParticleType.get(), WaterParticle.Factory::new);
+            event.registerSpriteSet(Register.windParticleType.get(), WindParticle.Factory::new);
+            event.registerSpriteSet(Register.fireParticleType.get(), FireParticle.Factory::new);
         }
 
         @SubscribeEvent

@@ -1,5 +1,7 @@
 package lNalator.Cultivationcraft.Client.Renderers;
 
+import net.minecraft.world.item.ItemDisplayContext;
+import com.mojang.math.Axis;
 import lNalator.Cultivationcraft.Common.FlyingSwordEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 
@@ -19,7 +21,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import com.mojang.math.Vector3f;
+import org.joml.Vector3f;
 import net.minecraft.world.phys.Vec3;
 
 public class FlyingSwordRenderer extends EntityRenderer<FlyingSwordEntity> {
@@ -54,7 +56,7 @@ public class FlyingSwordRenderer extends EntityRenderer<FlyingSwordEntity> {
         ItemStack itemstack = entityIn.getItem();
         int i = itemstack.isEmpty() ? 187 : Item.getId(itemstack.getItem()) + itemstack.getDamageValue();
         this.random.setSeed((long) i);
-        BakedModel ibakedmodel = this.itemRenderer.getModel(itemstack, entityIn.level, (LivingEntity) null, 0);
+        BakedModel ibakedmodel = this.itemRenderer.getModel(itemstack, entityIn.level(), (LivingEntity) null, 0);
         boolean flag = ibakedmodel.isGui3d();
         int j = this.getModelCount(itemstack);
 
@@ -69,12 +71,12 @@ public class FlyingSwordRenderer extends EntityRenderer<FlyingSwordEntity> {
         Vec3 resizer = entityIn.getSize();
         PoseStackIn.scale((float) resizer.x, (float) resizer.y, (float) resizer.z);
 
-        float f2 = ibakedmodel.getTransforms().getTransform(ItemTransforms.TransformType.GROUND).scale.y() * (float) resizer.y;
+        float f2 = ibakedmodel.getTransforms().getTransform(ItemDisplayContext.GROUND).scale.y() * (float) resizer.y;
         PoseStackIn.translate(0.0D, (double) (f1 + 0.25F * f2), 0.0D);
 
         // Rotate model to match items pitch and yaw
-        PoseStackIn.mulPose(Vector3f.YP.rotation(entityIn.getYRot()));
-        PoseStackIn.mulPose(Vector3f.ZP.rotation(entityIn.getXRot()));
+        PoseStackIn.mulPose(Axis.YP.rotation(entityIn.getYRot()));
+        PoseStackIn.mulPose(Axis.ZP.rotation(entityIn.getXRot()));
 
         if (!flag) {
             float f7 = -0.0F * (float) (j - 1) * 0.5F;
@@ -98,7 +100,7 @@ public class FlyingSwordRenderer extends EntityRenderer<FlyingSwordEntity> {
                 }
             }
 
-            this.itemRenderer.render(itemstack, ItemTransforms.TransformType.GROUND, false, PoseStackIn, bufferIn, packedLightIn, OverlayTexture.NO_OVERLAY, ibakedmodel);
+            this.itemRenderer.render(itemstack, ItemDisplayContext.GROUND, false, PoseStackIn, bufferIn, packedLightIn, OverlayTexture.NO_OVERLAY, ibakedmodel);
             PoseStackIn.popPose();
             if (!flag) {
                 PoseStackIn.translate(0.0, 0.0, 0.09375F);

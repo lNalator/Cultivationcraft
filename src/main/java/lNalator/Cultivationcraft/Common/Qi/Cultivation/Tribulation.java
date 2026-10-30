@@ -44,7 +44,7 @@ public class Tribulation
     public boolean tick(Player player)
     {
         // Do not do tribulation unless in a dimension with a sky
-        if (player.level.dimensionType().hasCeiling() || !player.level.dimensionType().hasSkyLight())
+        if (player.level().dimensionType().hasCeiling() || !player.level().dimensionType().hasSkyLight())
         {
             reset();
             return false;
@@ -56,7 +56,7 @@ public class Tribulation
 
         tick++;
 
-        if (player.level.isClientSide)
+        if (player.level().isClientSide)
             return false;
 
         // The storm above the player, for everyone around (see TribulationRenderer)
@@ -67,7 +67,7 @@ public class Tribulation
         {
             int strength = (int)(lightningPower * (1 + lightningStrikes * lightningPowerModifier));
 
-            lightning(player.blockPosition(), strength, (ServerLevel) player.level);
+            lightning(player.blockPosition(), strength, (ServerLevel) player.level());
         }
 
         return false;
@@ -78,7 +78,7 @@ public class Tribulation
     {
         TribulationPacket packet = new TribulationPacket(player.getId(), player.position(), tick, lightningStrikes);
 
-        for (ServerPlayer other : ((ServerLevel) player.level).players())
+        for (ServerPlayer other : ((ServerLevel) player.level()).players())
         {
             double range = VISIBLE_RANGE;
 
@@ -100,7 +100,7 @@ public class Tribulation
                 BlockPos blockpos = new BlockPos(targetPos.getX(), y, targetPos.getZ());
                 BlockState block = level.getBlockState(blockpos);
 
-                if (!block.isAir() && !block.getMaterial().isLiquid()) {
+                if (!block.isAir() && !block.liquid()) {
                     float strength = Math.min(block.getDestroySpeed(level, blockpos), 2) * 0.5f;
 
                     // If the lightning does not have enough enough power left to break through the block, spawn the lightning on the block and return

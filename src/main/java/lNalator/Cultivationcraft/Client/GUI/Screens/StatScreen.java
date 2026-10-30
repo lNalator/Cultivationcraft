@@ -10,7 +10,7 @@ import lNalator.Cultivationcraft.Common.Qi.BodyParts.BodyPart;
 import lNalator.Cultivationcraft.Common.Qi.BodyParts.BodyPartNames;
 import lNalator.Cultivationcraft.Common.Qi.Stats.BodyPartStatControl;
 import lNalator.Cultivationcraft.Cultivationcraft;
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
@@ -68,10 +68,10 @@ public class StatScreen extends GenericTabScreen {
     }
 
     @Override
-    public void render(PoseStack PoseStack, int mouseX, int mouseY, float partialTicks) {
-        super.render(PoseStack, mouseX, mouseY, partialTicks);
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+        super.render(guiGraphics, mouseX, mouseY, partialTicks);
 
-        drawBody(PoseStack);
+        drawBody(guiGraphics);
 
         int edgeSpacingX = (this.width - this.xSize) / 2;
         int edgeSpacingY = (this.height - this.ySize) / 2;
@@ -79,13 +79,13 @@ public class StatScreen extends GenericTabScreen {
         stats.setPos(edgeSpacingX + statTextX, edgeSpacingY + statTextY);
         stats.setSize(statTextWidth, statTextHeight);
         stats.setText(statString);
-        stats.render(this, font, PoseStack, mouseX, mouseY);
+        stats.render(guiGraphics, font, mouseX, mouseY);
 
-        ResourceReadout.draw(PoseStack, font, genericClientFunctions.getPlayer(),
+        ResourceReadout.draw(guiGraphics, font, genericClientFunctions.getPlayer(),
                 edgeSpacingX + statTextX, edgeSpacingY + 137, statTextWidth);
     }
 
-    protected void drawBody(PoseStack PoseStack) {
+    protected void drawBody(GuiGraphics guiGraphics) {
         int edgeSpacingX = (this.width - this.xSize) / 2;
         int edgeSpacingY = (this.height - this.ySize) / 2;
 
@@ -104,21 +104,21 @@ public class StatScreen extends GenericTabScreen {
             base = BodyPartGUIs.getGUI(modifications.getModification(BodyPartNames.bodyPosition).getID()).get(0);
         }
 
-        base.render(PoseStack, bodyPosX, bodyPosY, false, this);
+        base.render(guiGraphics, bodyPosX, bodyPosY, false);
 
         // Draw generic body parts if alterations don't exist
         if (!modifications.hasModification(BodyPartNames.headPosition)) {
-            BodyPartGUIs.getGUI(BodyPartNames.DefaultHead).get(0).render(PoseStack, bodyPosX, bodyPosY, false, this, base);
+            BodyPartGUIs.getGUI(BodyPartNames.DefaultHead).get(0).render(guiGraphics, bodyPosX, bodyPosY, false, base);
         }
 
         if (!modifications.hasModification(BodyPartNames.armPosition)) {
-            BodyPartGUIs.getGUI(BodyPartNames.DefaultRightArm).get(0).render(PoseStack, bodyPosX, bodyPosY, false, this, base);
-            BodyPartGUIs.getGUI(BodyPartNames.DefaultLeftArm).get(0).render(PoseStack, bodyPosX, bodyPosY, false, this, base);
+            BodyPartGUIs.getGUI(BodyPartNames.DefaultRightArm).get(0).render(guiGraphics, bodyPosX, bodyPosY, false, base);
+            BodyPartGUIs.getGUI(BodyPartNames.DefaultLeftArm).get(0).render(guiGraphics, bodyPosX, bodyPosY, false, base);
         }
 
         if (!modifications.hasModification(BodyPartNames.legPosition)) {
-            BodyPartGUIs.getGUI(BodyPartNames.DefaultRightLeg).get(0).render(PoseStack, bodyPosX, bodyPosY, false, this, base);
-            BodyPartGUIs.getGUI(BodyPartNames.DefaultLeftLeg).get(0).render(PoseStack, bodyPosX, bodyPosY, false, this, base);
+            BodyPartGUIs.getGUI(BodyPartNames.DefaultRightLeg).get(0).render(guiGraphics, bodyPosX, bodyPosY, false, base);
+            BodyPartGUIs.getGUI(BodyPartNames.DefaultLeftLeg).get(0).render(guiGraphics, bodyPosX, bodyPosY, false, base);
         }
 
         // Loop through and draw all other body part GUIs if they exist
@@ -129,7 +129,7 @@ public class StatScreen extends GenericTabScreen {
 
                 for (BodyPartGUI gui : guis) {
                     if (gui != null) {
-                        gui.render(PoseStack, bodyPosX, bodyPosY, false, this, base);
+                        gui.render(guiGraphics, bodyPosX, bodyPosY, false, base);
                     }
                 }
             }

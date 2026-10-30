@@ -5,9 +5,8 @@ import lNalator.Cultivationcraft.Common.Qi.Cultivation.CoreFormingCultivation;
 import lNalator.Cultivationcraft.Common.Qi.Cultivation.CultivationType;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers.TechniqueModifier;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.screens.Screen;
 
 public class CoreFormingScreen extends CultivationTypeScreen {
 
@@ -24,8 +23,7 @@ public class CoreFormingScreen extends CultivationTypeScreen {
         addConceptButton();
     }
 
-    public void render(PoseStack PoseStack, float partialTicks, int xPos, int yPos, Screen screen, CultivationType cultivation, Font font) {
-        RenderSystem.setShaderTexture(0, TEXTURE);
+    public void render(GuiGraphics guiGraphics, float partialTicks, int xPos, int yPos, CultivationType cultivation, Font font) {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
         CultivationType cult = cultivation;
@@ -38,14 +36,14 @@ public class CoreFormingScreen extends CultivationTypeScreen {
         }
 
         while (cult instanceof CoreFormingCultivation) {
-            renderCore(PoseStack, partialTicks, xPos + midX - (xSize / 2), yPos + midY, screen, ((CoreFormingCultivation) cult).getFocus(), coreNumber / maxCore);
+            renderCore(guiGraphics, partialTicks, xPos + midX - (xSize / 2), yPos + midY, ((CoreFormingCultivation) cult).getFocus(), coreNumber / maxCore);
 
             coreNumber++;
             cult = cult.getPreviousCultivation();
         }
     }
 
-    public void renderCore(PoseStack PoseStack, float partialTicks, float xPos, float yPos, Screen screen, TechniqueModifier focus, double rotationPos) {
+    public void renderCore(GuiGraphics guiGraphics, float partialTicks, float xPos, float yPos, TechniqueModifier focus, double rotationPos) {
         // Rotate the core if it is not the first one
         if (rotationPos > 0) {
             // Determine the starting angle of the core
@@ -60,6 +58,6 @@ public class CoreFormingScreen extends CultivationTypeScreen {
             yPos += Math.sin(rotationPos) * coreRotationDiameter;
         }
 
-        focus.getCoreTexture().render(PoseStack, xPos, yPos, xSize, ySize, screen.getBlitOffset());
+        focus.getCoreTexture().render(guiGraphics.pose(), xPos, yPos, xSize, ySize, 0);
     }
 }

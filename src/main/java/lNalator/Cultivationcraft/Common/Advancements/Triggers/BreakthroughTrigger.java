@@ -17,7 +17,7 @@ public class BreakthroughTrigger extends SimpleCriterionTrigger<BreakthroughTrig
     }
 
     @Override
-    public BreakthroughTrigger.Instance createInstance(JsonObject json, EntityPredicate.Composite composite, DeserializationContext context) {
+    public BreakthroughTrigger.Instance createInstance(JsonObject json, ContextAwarePredicate composite, DeserializationContext context) {
         boolean tribulation = GsonHelper.getAsBoolean(json, "tribulation");
         return new BreakthroughTrigger.Instance(composite, tribulation);
     }
@@ -32,7 +32,7 @@ public class BreakthroughTrigger extends SimpleCriterionTrigger<BreakthroughTrig
 
         private final Boolean tribulation;
 
-        public Instance(EntityPredicate.Composite composite, boolean trib) {
+        public Instance(ContextAwarePredicate composite, boolean trib) {
             super(ID, composite);
             this.tribulation = trib;
         }

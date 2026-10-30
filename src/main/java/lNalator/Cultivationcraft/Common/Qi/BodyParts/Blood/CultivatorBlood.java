@@ -25,7 +25,7 @@ public class CultivatorBlood extends Blood {
 
     @Override
     public void naturalHealing(Player player) {
-        boolean flag = player.level.getGameRules().getBoolean(GameRules.RULE_NATURAL_REGENERATION);
+        boolean flag = player.level().getGameRules().getBoolean(GameRules.RULE_NATURAL_REGENERATION);
         QiFoodStats food = (QiFoodStats) player.getFoodData();
 
         // If the player has stamina and is hurt, then heal
@@ -33,7 +33,7 @@ public class CultivatorBlood extends Blood {
             // Get player regen, divided by 20 to convert seconds into ticks
             float regen = BodyPartStatControl.getStats(player).getStat(StatIDs.healthRegen) / 20;
 
-            if (!player.level.isClientSide) {
+            if (!player.level().isClientSide) {
                 QuestHandler.progressQuest(player, Quest.HEAL, regen);
             }
 
@@ -47,7 +47,7 @@ public class CultivatorBlood extends Blood {
     // Called when player takes damage
     public void onHit(Player player, Vec3 source, double amount) {
         // Send a block spawn packet to all clients if called on server
-        if (!player.level.isClientSide) {
+        if (!player.level().isClientSide) {
             PacketHandler.sendBloodSpawnToClient(player.getUUID(), source, amount);
             return;
         }
@@ -69,7 +69,7 @@ public class CultivatorBlood extends Blood {
 
             float height = PoseHandler.getHeightAdjustment(player.getUUID());
 
-            player.level.addParticle(particle, player.getX(), player.getY() + height, player.getZ(), direction.x, direction.y, direction.z);
+            player.level().addParticle(particle, player.getX(), player.getY() + height, player.getZ(), direction.x, direction.y, direction.z);
         }
     }
 

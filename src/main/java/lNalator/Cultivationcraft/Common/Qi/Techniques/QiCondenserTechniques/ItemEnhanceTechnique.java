@@ -81,7 +81,7 @@ public class ItemEnhanceTechnique extends AttackTechnique {
         }
 
         // Make a new QiDamageSource of this techniques element
-        QiDamageSource newSource = new QiDamageSource(event.getSource().getMsgId(), event.getSource().getEntity(), getElement(), true);
+        QiDamageSource newSource = new QiDamageSource(attackingPlayer.level(), event.getSource().getMsgId(), event.getSource().getEntity(), getElement(), true);
 
         float damage = event.getAmount() + (float) getTechniqueStat(DefaultTechniqueStatIDs.damage, attackingPlayer);
 

@@ -40,7 +40,7 @@ public class FireBreath extends Breath {
     // Returns whether the specified block is mineable
     public boolean canBeMined(Player player, BlockPos pos, Direction direction, Technique source) {
         BlockPos blockpos1 = pos.relative(direction);
-        if (BaseFireBlock.canBePlacedAt(player.level, blockpos1, player.getDirection())) {
+        if (BaseFireBlock.canBePlacedAt(player.level(), blockpos1, player.getDirection())) {
             ClientPacketHandler.sendAttackToServer(player.getUUID(), HitResult.Type.BLOCK, new Vec3(pos.getX(), pos.getY(), pos.getZ()), player.getUUID(), direction, CultivatorControl.getTechnique(player, source));
         }
 
@@ -50,9 +50,9 @@ public class FireBreath extends Breath {
     // Returns whether this block should be destroyed on hit or not
     public boolean doBlockAttack(Player player, BlockPos pos, Direction direction) {
         BlockPos blockpos1 = pos.relative(direction);
-        if (BaseFireBlock.canBePlacedAt(player.level, blockpos1, player.getDirection())) {
-            BlockState blockstate1 = BaseFireBlock.getState(player.level, blockpos1);
-            player.level.setBlock(blockpos1, blockstate1, 11);
+        if (BaseFireBlock.canBePlacedAt(player.level(), blockpos1, player.getDirection())) {
+            BlockState blockstate1 = BaseFireBlock.getState(player.level(), blockpos1);
+            player.level().setBlock(blockpos1, blockstate1, 11);
         }
 
         return false;

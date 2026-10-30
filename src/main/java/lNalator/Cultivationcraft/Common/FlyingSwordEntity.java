@@ -15,6 +15,7 @@ import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueStats.DefaultTech
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -169,7 +170,7 @@ public class FlyingSwordEntity extends ItemEntity {
     }
 
     protected void generateDecay() {
-        if (!level.isClientSide) {
+        if (!level().isClientSide) {
             Random test = new Random();
             test.setSeed(getItem().hashCode());
 
@@ -190,7 +191,7 @@ public class FlyingSwordEntity extends ItemEntity {
             UUID ownerID = getItem().getTag().getUUID("Owner");
 
             if (ownerID != null) {
-                owner = this.level.getPlayerByUUID(ownerID);
+                owner = this.level().getPlayerByUUID(ownerID);
 
                 // if owner exists, grab this cultivator's stats
                 if (owner != null) {
@@ -376,7 +377,7 @@ public class FlyingSwordEntity extends ItemEntity {
         double scale = (formation != null && owner != null ? formation.getSize(owner).x : 1) - 1;
         box = box.inflate(box.getXsize() * scale / 2, box.getYsize() * scale / 2, box.getZsize() * scale / 2);
 
-        List<Entity> collisionEntities = this.level.getEntities(this, box);
+        List<Entity> collisionEntities = this.level().getEntities(this, box);
 
         // If there are entities within this entities bounding box
         if (!collisionEntities.isEmpty()) {
@@ -416,7 +417,7 @@ public class FlyingSwordEntity extends ItemEntity {
     }
 
     protected void handleBlockCollisions() {
-        BlockPos blockPosition = new BlockPos(position());
+        BlockPos blockPosition = BlockPos.containing(position());
         BlockState collisionBlock = owner.getCommandSenderWorld().getBlockState(blockPosition);
 
         if (Misc.blockExists(collisionBlock.getBlock())) {
@@ -520,7 +521,7 @@ public class FlyingSwordEntity extends ItemEntity {
                 handleCollisions();
 
                 // Set this entity to radiate Qi for clients
-                if (this.level.isClientSide) {
+                if (this.level().isClientSide) {
                     QiGlowRenderer.setQiVisible(this, Elements.getElement(formation.getElement())); 
                 }else {
                     Technique.tickTechniqueModifiers(owner, position(), formation.getElement());
@@ -538,7 +539,7 @@ public class FlyingSwordEntity extends ItemEntity {
             updateMotion();
 
             // Calculate items Pitch and Yaw for rendering purposes, only on client
-            if (this.level.isClientSide()) {
+            if (this.level().isClientSide()) {
                 calculatePitchAndYaw();
             }
 
@@ -619,7 +620,7 @@ public class FlyingSwordEntity extends ItemEntity {
     }
 
     @Override
-    public Packet<?> getAddEntityPacket() {
+    public Packet<ClientGamePacketListener> getAddEntityPacket() {
         return NetworkHooks.getEntitySpawningPacket(this);
     }
 
@@ -632,7 +633,7 @@ public class FlyingSwordEntity extends ItemEntity {
             return;
         }
 
-        if (!this.level.isClientSide) {
+        if (!this.level().isClientSide) {
             ItemStack itemstack = this.getItem();
             Item item = itemstack.getItem();
             int i = itemstack.getCount();
@@ -665,7 +666,7 @@ public class FlyingSwordEntity extends ItemEntity {
 
         /*
         // Only attempt a harvest on the server
-        if (!this.level.isClientSide)
+        if (!this.level().isClientSide)
         {
             ServerPlayer serverOwner = ((ServerPlayer)owner);
             GameType gameType = serverOwner.interactionManager.getGameType();
@@ -748,12 +749,12 @@ public class FlyingSwordEntity extends ItemEntity {
 
                 // Knockback
                 int i = getItem().getEnchantmentLevel(Enchantments.KNOCKBACK);
-                owner.level.playSound((Player) null, getX(), getY(), getZ(), SoundEvents.PLAYER_ATTACK_KNOCKBACK, owner.getSoundSource(), 1.0F, 1.0F);
+                owner.level().playSound((Player) null, getX(), getY(), getZ(), SoundEvents.PLAYER_ATTACK_KNOCKBACK, owner.getSoundSource(), 1.0F, 1.0F);
                 ++i;
 
                 // Knockback target
                 Vec3 Vec3 = targetEntity.getDeltaMovement();
-                boolean flag5 = targetEntity.hurt(new QiDamageSource("player", this, formation.getElement(), true), f);
+                boolean flag5 = targetEntity.hurt(new QiDamageSource(level(), "player", this, formation.getElement(), true), f);
 
                 formation.levelUp(owner, f);
 
@@ -771,7 +772,7 @@ public class FlyingSwordEntity extends ItemEntity {
                         targetEntity.setDeltaMovement(Vec3);
                     }
 
-                    owner.level.playSound((Player) null, getX(), getY(), getZ(), SoundEvents.PLAYER_ATTACK_STRONG, owner.getSoundSource(), 1.0F, 1.0F);
+                    owner.level().playSound((Player) null, getX(), getY(), getZ(), SoundEvents.PLAYER_ATTACK_STRONG, owner.getSoundSource(), 1.0F, 1.0F);
 
                     if (f1 > 0.0F) {
                         owner.magicCrit(targetEntity);
@@ -798,9 +799,9 @@ public class FlyingSwordEntity extends ItemEntity {
                             CultivationAdvancements.FLYING_SWORD_ATTACk.trigger((ServerPlayer) owner, ((LivingEntity) targetEntity).getHealth() <= 0);
                         }
 
-                        if (owner.level instanceof ServerLevel && rawDamage > 2.0F) {
+                        if (owner.level() instanceof ServerLevel && rawDamage > 2.0F) {
                             int k = (int) ((double) rawDamage * 0.5D);
-                            ((ServerLevel) owner.level).sendParticles(ParticleTypes.DAMAGE_INDICATOR, targetEntity.getX(), targetEntity.getY(0.5D), targetEntity.getZ(), k, 0.1D, 0.0D, 0.1D, 0.2D);
+                            ((ServerLevel) owner.level()).sendParticles(ParticleTypes.DAMAGE_INDICATOR, targetEntity.getX(), targetEntity.getY(0.5D), targetEntity.getZ(), k, 0.1D, 0.0D, 0.1D, 0.2D);
                         }
                     }
                 }

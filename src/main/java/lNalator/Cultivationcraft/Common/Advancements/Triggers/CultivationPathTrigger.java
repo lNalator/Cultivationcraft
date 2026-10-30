@@ -17,7 +17,7 @@ public class CultivationPathTrigger extends SimpleCriterionTrigger<CultivationPa
     }
 
     @Override
-    public CultivationPathTrigger.Instance createInstance(JsonObject json, EntityPredicate.Composite composite, DeserializationContext context) {
+    public CultivationPathTrigger.Instance createInstance(JsonObject json, ContextAwarePredicate composite, DeserializationContext context) {
         Integer chosenPath = GsonHelper.getAsInt(json, "chosen_path");
         return new CultivationPathTrigger.Instance(composite, chosenPath);
     }
@@ -32,7 +32,7 @@ public class CultivationPathTrigger extends SimpleCriterionTrigger<CultivationPa
 
         private final Integer chosenPath;
 
-        public Instance(EntityPredicate.Composite composite, Integer chosen_path) {
+        public Instance(ContextAwarePredicate composite, Integer chosen_path) {
             super(ID, composite);
             this.chosenPath = chosen_path;
         }

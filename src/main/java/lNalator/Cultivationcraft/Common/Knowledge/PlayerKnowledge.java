@@ -52,7 +52,7 @@ public final class PlayerKnowledge {
     }
 
     public static boolean knowsRecipe(ServerPlayer player, PillDefinition pill) {
-        return PillEffects.data(player).getBoolean("Recipe:" + PillCatalog.get(player.getLevel()).key(pill));
+        return PillEffects.data(player).getBoolean("Recipe:" + PillCatalog.get(player.serverLevel()).key(pill));
     }
 
     public static ItemStack create(ServerLevel level, KnowledgeEntry entry, RandomSource random) {
@@ -103,7 +103,7 @@ public final class PlayerKnowledge {
         data.putString("Notice", id + ":blocked");
         stack.shrink(1);
         sync(player);
-        player.displayClientMessage(Component.translatable("cultivationcraft.jade.learned", entry.resolveTitle(entry.title(), player.getLevel())), false);
+        player.displayClientMessage(Component.translatable("cultivationcraft.jade.learned", entry.resolveTitle(entry.title(), player.serverLevel())), false);
     }
 
     public static void sync(ServerPlayer player) {
@@ -115,10 +115,10 @@ public final class PlayerKnowledge {
             String body = entry.text();
             PillDefinition pill = PillDefinition.get(entry.recipe());
             if (pill != null) {
-                PillEffects.data(player).putBoolean("Recipe:" + PillCatalog.get(player.getLevel()).key(pill), true);
+                PillEffects.data(player).putBoolean("Recipe:" + PillCatalog.get(player.serverLevel()).key(pill), true);
                 body += recipeText(pill);
             }
-            pages.add(new KnowledgePagesPacket.Page(entry.id().toString(), entry.resolveTitle(entry.title(), player.getLevel()), body, category(entry, pill),
+            pages.add(new KnowledgePagesPacket.Page(entry.id().toString(), entry.resolveTitle(entry.title(), player.serverLevel()), body, category(entry, pill),
                     entry.translationKey(), entry.operatorOnly(), entry.cultivationType(), entry.aliases()));
         }
         PacketHandler.sendCultivatorStatsToClient(player);

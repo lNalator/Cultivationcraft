@@ -125,7 +125,7 @@ public class TechniqueModifier {
 
     // Mass concepts only act on a real fall of over 2 blocks, not while swimming, climbing, gliding, riding or flying
     public static boolean massApplies(Player player) {
-        return player.fallDistance > 2 && !player.isOnGround() && player.getDeltaMovement().y < 0 && !player.isInWater() && !player.isInLava()
+        return player.fallDistance > 2 && !player.onGround() && player.getDeltaMovement().y < 0 && !player.isInWater() && !player.isInLava()
                 && !player.onClimbable() && !player.isFallFlying() && !player.isPassenger() && !player.getAbilities().flying;
     }
 

@@ -4,7 +4,7 @@ import lNalator.Cultivationcraft.Common.Qi.Quests.Quest;
 import lNalator.Cultivationcraft.Common.Qi.Quests.QuestHandler;
 import lNalator.Cultivationcraft.Common.Qi.QiSource;
 import lNalator.Cultivationcraft.Common.Qi.QiSourceConfig;
-import com.mojang.math.Vector3f;
+import org.joml.Vector3f;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 
@@ -51,7 +51,7 @@ public class QiBlood extends Blood {
             heal = toHeal;
         }
 
-        if (!player.level.isClientSide) {
+        if (!player.level().isClientSide) {
             QuestHandler.progressQuest(player, Quest.HEAL, heal);
         }
 

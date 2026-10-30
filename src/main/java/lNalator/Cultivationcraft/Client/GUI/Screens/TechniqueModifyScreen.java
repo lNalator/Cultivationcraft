@@ -8,7 +8,7 @@ import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueStats.DefaultTech
 import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueStats.TechniqueStatModification;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import lNalator.Cultivationcraft.Network.ClientPacketHandler;
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -105,10 +105,10 @@ public class TechniqueModifyScreen extends GenericTabScreen {
     }
 
     @Override
-    public void render(PoseStack PoseStack, int mouseX, int mouseY, float partialTicks) {
-        super.render(PoseStack, mouseX, mouseY, partialTicks);
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+        super.render(guiGraphics, mouseX, mouseY, partialTicks);
 
-        drawGuiForgroundLayer(PoseStack, partialTicks, mouseX, mouseY);
+        drawGuiForgroundLayer(guiGraphics, partialTicks, mouseX, mouseY);
     }
 
     protected ResourceLocation updateFocus() {
@@ -141,7 +141,7 @@ public class TechniqueModifyScreen extends GenericTabScreen {
         return modifications;
     }
 
-    protected void drawGuiForgroundLayer(PoseStack PoseStack, float partialTicks, int mouseX, int mouseY) {
+    protected void drawGuiForgroundLayer(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
         int edgeSpacingX = (this.width - this.xSize) / 2;
         int edgeSpacingY = (this.height - this.ySize) / 2;
 
@@ -152,48 +152,48 @@ public class TechniqueModifyScreen extends GenericTabScreen {
 
         String inspiration = currentInspiration + "/" + maxInspiration;
 
-        font.draw(PoseStack, inspiration, edgeSpacingX + this.xSize - inspirationXPos - font.width(inspiration), edgeSpacingY + inspirationYPos, Color.white.getRGB());
+        guiGraphics.drawString(font, inspiration, edgeSpacingX + this.xSize - inspirationXPos - font.width(inspiration), edgeSpacingY + inspirationYPos, Color.white.getRGB(), false);
 
-        drawStats(PoseStack, mouseX, mouseY);
+        drawStats(guiGraphics, mouseX, mouseY);
     }
 
-    protected void drawStats(PoseStack PoseStack, int mouseX, int mouseY) {
+    protected void drawStats(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         TechniqueStatModification modifications = getStatModification();
 
         for (int stat = 0; stat < stats.size(); stat++) {
             double statValue = selectedTech.getDisplayedStat(stats.get(stat), Minecraft.getInstance().player);
-            drawStat(PoseStack, stat, stats.get(stat), statValue);
+            drawStat(guiGraphics, stat, stats.get(stat), statValue);
 
             if (modifications != null) {
-                drawStatChanges(PoseStack, stat, stats.get(stat), modifications.getStatChange(stats.get(stat)));
+                drawStatChanges(guiGraphics, stat, stats.get(stat), modifications.getStatChange(stats.get(stat)));
             }
 
             // Only draw button if this stat can level
             if (selectedTech.getStatChangesPerLevel(stats.get(stat)) != null) {
-                drawButton(PoseStack, stat, mouseX, mouseY);
+                drawButton(guiGraphics, stat, mouseX, mouseY);
             }
         }
     }
 
-    protected void drawStat(PoseStack PoseStack, int pos, ResourceLocation stat, double statValue) {
+    protected void drawStat(GuiGraphics guiGraphics, int pos, ResourceLocation stat, double statValue) {
         int edgeSpacingX = (this.width - this.xSize) / 2;
         int edgeSpacingY = (this.height - this.ySize) / 2;
 
         statValue = (int) (statValue * 1000) / 1000.0;
 
-        font.draw(PoseStack, selectedTech.getStatName(stat, Minecraft.getInstance().player), edgeSpacingX + statXPos, edgeSpacingY + statYPos + statYSpacing * pos, Color.black.getRGB());
-        font.draw(PoseStack, "" + statValue, edgeSpacingX + this.xSize - statXPosFromRight - font.width("" + statValue), edgeSpacingY + statYPos + statYSpacing * pos, Color.WHITE.getRGB());
+        guiGraphics.drawString(font, selectedTech.getStatName(stat, Minecraft.getInstance().player), edgeSpacingX + statXPos, edgeSpacingY + statYPos + statYSpacing * pos, Color.black.getRGB(), false);
+        guiGraphics.drawString(font, "" + statValue, edgeSpacingX + this.xSize - statXPosFromRight - font.width("" + statValue), edgeSpacingY + statYPos + statYSpacing * pos, Color.WHITE.getRGB(), false);
     }
 
-    protected void drawButton(PoseStack PoseStack, int pos, int mouseX, int mouseY) {
+    protected void drawButton(GuiGraphics guiGraphics, int pos, int mouseX, int mouseY) {
         int edgeSpacingX = (this.width - this.xSize) / 2;
         int edgeSpacingY = (this.height - this.ySize) / 2;
 
         buttons[pos].setPos(edgeSpacingX + this.xSize - buttonXPosFromRight - buttons[pos].width, edgeSpacingY + statYPos + statYSpacing * pos - 2);
-        buttons[pos].render(PoseStack, mouseX, mouseY, this);
+        buttons[pos].render(guiGraphics, mouseX, mouseY);
     }
 
-    protected void drawStatChanges(PoseStack PoseStack, int pos, ResourceLocation stat, double value) {
+    protected void drawStatChanges(GuiGraphics guiGraphics, int pos, ResourceLocation stat, double value) {
         if (value != 0) {
             int edgeSpacingX = (this.width - this.xSize) / 2;
             int edgeSpacingY = (this.height - this.ySize) / 2;
@@ -213,7 +213,7 @@ public class TechniqueModifyScreen extends GenericTabScreen {
 
             amount += value + ")";
 
-            font.draw(PoseStack, amount, edgeSpacingX + this.xSize - statXPosFromRight, edgeSpacingY + statYPos + statYSpacing * pos, col.getRGB());
+            guiGraphics.drawString(font, amount, edgeSpacingX + this.xSize - statXPosFromRight, edgeSpacingY + statYPos + statYSpacing * pos, col.getRGB(), false);
         }
     }
 }

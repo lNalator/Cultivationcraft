@@ -13,9 +13,9 @@ public class PhotosynthesisFoodStats extends QiFoodStats {
             return;
         }
 
-        if (player.level.canSeeSky(player.blockPosition())) {
-            if (player.level.getSkyDarken() < 3) {
-                increaseFoodLevel(0.01f - (player.level.getSkyDarken() / 4f) * 0.01f, 0.8f);
+        if (player.level().canSeeSky(player.blockPosition())) {
+            if (player.level().getSkyDarken() < 3) {
+                increaseFoodLevel(0.01f - (player.level().getSkyDarken() / 4f) * 0.01f, 0.8f);
             }
         }
 

@@ -20,7 +20,7 @@ public class WindElement extends Element {
     }
 
     public void applyStatusEffect(QiDamageSource source, Entity target, float damageAmount) {
-        if (target.level.isClientSide) {
+        if (target.level().isClientSide) {
             return;
         }
 

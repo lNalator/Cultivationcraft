@@ -1,9 +1,11 @@
 package lNalator.Cultivationcraft.Client.Renderers.BlockEntityRenderers;
 
+import net.minecraft.world.item.ItemDisplayContext;
+import com.mojang.math.Axis;
 import lNalator.Cultivationcraft.Common.Blocks.custom.FrozenBlock;
 import lNalator.Cultivationcraft.Common.Blocks.entity.FrozenBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Vector3f;
+import org.joml.Vector3f;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -53,20 +55,20 @@ public class FrozenBlockEntityRenderer implements BlockEntityRenderer<FrozenBloc
         float f = 0F;
         if (oldBlockState.getBlock() instanceof BannerBlock) {
             f = (float) -oldBlockState.getValue(BannerBlock.ROTATION);
-            pPoseStack.mulPose(Vector3f.YP.rotationDegrees((f * 360) / 16F));
+            pPoseStack.mulPose(Axis.YP.rotationDegrees((f * 360) / 16F));
 
         } else if (oldBlockState.getBlock() instanceof WallBannerBlock) {
             f = -oldBlockState.getValue(WallBannerBlock.FACING).toYRot();
-            pPoseStack.mulPose(Vector3f.YP.rotationDegrees(-((f * 360) / 16F)));
+            pPoseStack.mulPose(Axis.YP.rotationDegrees(-((f * 360) / 16F)));
         } else if (oldBlockState.getBlock() instanceof SkullBlock) {
             f = oldBlockState.getValue(SkullBlock.ROTATION);
-            pPoseStack.mulPose(Vector3f.YP.rotationDegrees(getDirection(f)));
+            pPoseStack.mulPose(Axis.YP.rotationDegrees(getDirection(f)));
         }
 
         if (!pBlockEntity.isSecondBlock()) {
-            itemRenderer.renderStatic(itemStack, ItemTransforms.TransformType.NONE,
+            itemRenderer.renderStatic(itemStack, ItemDisplayContext.NONE,
                     getLightLevel(Objects.requireNonNull(pBlockEntity.getLevel()), pBlockEntity.getBlockPos()),
-                    pPackedOverlay, pPoseStack, pBufferSource, 1);
+                    pPackedOverlay, pPoseStack, pBufferSource, pBlockEntity.getLevel(), 1);
         }
         pPoseStack.popPose();
     }
@@ -102,7 +104,7 @@ public class FrozenBlockEntityRenderer implements BlockEntityRenderer<FrozenBloc
 
     private void renderSpecial(FrozenBlockEntity pBlockEntity, PoseStack pPoseStack) {
         float f = pBlockEntity.getBlockState().getValue(FrozenBlock.FACING).toYRot();
-        pPoseStack.mulPose(Vector3f.YP.rotationDegrees(-f));
+        pPoseStack.mulPose(Axis.YP.rotationDegrees(-f));
 
         switch (pBlockEntity.getBlockState().getValue(FrozenBlock.FACING)) {
             case NORTH ->

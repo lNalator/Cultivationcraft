@@ -71,7 +71,7 @@ public class BounceTechnique extends Technique {
             return;
         }
 
-        if (event.player.isOnGround() && Physics.getDelta(event.player).y <= 0) {
+        if (event.player.onGround() && Physics.getDelta(event.player).y <= 0) {
             return;
         }
 

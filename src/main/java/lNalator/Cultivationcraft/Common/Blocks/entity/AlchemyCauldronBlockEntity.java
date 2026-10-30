@@ -138,7 +138,7 @@ public class AlchemyCauldronBlockEntity extends BaseContainerBlockEntity {
         int accepted = Math.min(amount, Integer.MAX_VALUE - storedQi);
         if (accepted > 0) {
             storedQi += accepted;
-            lastRefiner = refiner != null && refiner.level == level ? refiner.getUUID() : null;
+            lastRefiner = refiner != null && refiner.level() == level ? refiner.getUUID() : null;
             receivingUntil = level.getGameTime() + 40;
             nextQiDecayTick = level.getGameTime() + qiDecayInterval();
             setChanged();

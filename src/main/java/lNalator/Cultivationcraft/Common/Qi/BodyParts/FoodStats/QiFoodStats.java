@@ -8,9 +8,8 @@ import lNalator.Cultivationcraft.Common.Qi.Stats.BodyPartStatControl;
 import lNalator.Cultivationcraft.Common.Qi.Stats.StatIDs;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import lNalator.Cultivationcraft.StaminaHandler;
-import com.mojang.math.Vector3f;
+import org.joml.Vector3f;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodData;
 import net.minecraft.world.item.ItemStack;
@@ -90,8 +89,8 @@ public class QiFoodStats extends FoodData {
         if (this.foodLevel <= 0) {
             ++this.tickTimer;
             if (this.tickTimer >= 80) {
-                if (player.getHealth() > 10.0F || player.level.getDifficulty() == Difficulty.HARD || player.getHealth() > 1.0F && player.level.getDifficulty() == Difficulty.NORMAL) {
-                    player.hurt(DamageSource.STARVE, 1.0F);
+                if (player.getHealth() > 10.0F || player.level().getDifficulty() == Difficulty.HARD || player.getHealth() > 1.0F && player.level().getDifficulty() == Difficulty.NORMAL) {
+                    player.hurt(player.damageSources().starve(), 1.0F);
                 }
 
                 this.tickTimer = 0;
@@ -122,11 +121,11 @@ public class QiFoodStats extends FoodData {
 
             if (getSaturationLevel() > 0.0F)
                 setSaturation(Math.max(getSaturationLevel() - staminaUse, 0.0F));
-            else if (player.level.getDifficulty() != Difficulty.PEACEFUL)
+            else if (player.level().getDifficulty() != Difficulty.PEACEFUL)
                 setFoodLevel(Math.max(getTrueFoodLevel() - staminaUse, 0));
         }*/
         // Reduce stamina immediately rather than in units of 1
-        Difficulty difficulty = player.level.getDifficulty();
+        Difficulty difficulty = player.level().getDifficulty();
         if (exhaustionLevel > 0F) {
             float change = (exhaustionLevel / 4F) * staminaUse;
             exhaustionLevel = 0F;

@@ -54,13 +54,13 @@ public class CultivatorAttackLogic {
 
         // If player does no damage (?) then play a corresponding sound and do nothing
         if (!toAttack.hurt(QiDamageSource.playerAttack(player, element, source, true), damage)) {
-            player.level.playSound((Player) null, player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_ATTACK_NODAMAGE, player.getSoundSource(), 1.0F, 1.0F);
+            player.level().playSound((Player) null, player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_ATTACK_NODAMAGE, player.getSoundSource(), 1.0F, 1.0F);
             return false;
         }
 
         // Play attack sound
         if (attackSound != null) {
-            player.level.playSound((Player) null, player.getX(), player.getY(), player.getZ(), attackSound, player.getSoundSource(), 1.0F, 1.0F);
+            player.level().playSound((Player) null, player.getX(), player.getY(), player.getZ(), attackSound, player.getSoundSource(), 1.0F, 1.0F);
         }
 
         // Apply knockback to attacked entity
@@ -110,9 +110,9 @@ public class CultivatorAttackLogic {
             float rawDamage = entityHealth - ((LivingEntity) toAttack).getHealth();
             player.awardStat(Stats.DAMAGE_DEALT, Math.round(rawDamage * 10.0F));
 
-            if (player.level instanceof ServerLevel && rawDamage > 2.0F) {
+            if (player.level() instanceof ServerLevel && rawDamage > 2.0F) {
                 int k = (int) ((double) rawDamage * 0.5D);
-                ((ServerLevel) player.level).sendParticles(ParticleTypes.DAMAGE_INDICATOR, toAttack.getX(), toAttack.getY(0.5D), toAttack.getZ(), k, 0.1D, 0.0D, 0.1D, 0.2D);
+                ((ServerLevel) player.level()).sendParticles(ParticleTypes.DAMAGE_INDICATOR, toAttack.getX(), toAttack.getY(0.5D), toAttack.getZ(), k, 0.1D, 0.0D, 0.1D, 0.2D);
             }
         }
 

@@ -14,7 +14,7 @@ import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.BufferUploader;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
-import com.mojang.math.Matrix4f;
+import org.joml.Matrix4f;
 
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.CultivatorStats;
 import lNalator.Cultivationcraft.Common.Blocks.Plants.ProceduralPlantBlock;
@@ -29,7 +29,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
@@ -58,7 +58,7 @@ import net.minecraftforge.fml.common.Mod;
 @Mod.EventBusSubscriber(modid = Cultivationcraft.MODID, value = Dist.CLIENT)
 public final class DivineSenseBlockRenderer {
 
-    public static final TagKey<Block> VISIBLE_BLOCKS = TagKey.create(Registry.BLOCK_REGISTRY,
+    public static final TagKey<Block> VISIBLE_BLOCKS = TagKey.create(Registries.BLOCK,
             new ResourceLocation(Cultivationcraft.MODID, "divine_sense_visible"));
 
     private record ScanSection(BlockPos origin, double distanceSquared) {
@@ -396,7 +396,7 @@ public final class DivineSenseBlockRenderer {
         glowing.clear();
         for (Entity entity : sensedEntities) {
             // Players only show their hitbox (see renderPlayerHitboxes)
-            if (entity instanceof Player || entity.isRemoved() || entity.level != mc.level) {
+            if (entity instanceof Player || entity.isRemoved() || entity.level() != mc.level) {
                 continue;
             }
             double distance = entity.getBoundingBox().getCenter().distanceTo(origin);
@@ -413,7 +413,7 @@ public final class DivineSenseBlockRenderer {
         float partialTick = event.getPartialTick();
         var matrix = event.getPoseStack().last().pose();
         for (Entity entity : sensedEntities) {
-            if (!(entity instanceof Player target) || entity.isRemoved() || entity.level != mc.level) {
+            if (!(entity instanceof Player target) || entity.isRemoved() || entity.level() != mc.level) {
                 continue;
             }
             // Interpolated, so the hitbox follows the player smoothly between ticks and scans
@@ -453,7 +453,7 @@ public final class DivineSenseBlockRenderer {
 
     // The outline colour of an entity sensed by Divine Sense, -1 if it is not sensed
     public static int glowColor(Entity entity) {
-        if (!entity.level.isClientSide || Minecraft.getInstance().options.hideGui) {
+        if (!entity.level().isClientSide || Minecraft.getInstance().options.hideGui) {
             return -1;
         }
         Integer color = glowing.get(entity.getId());

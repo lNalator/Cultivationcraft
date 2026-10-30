@@ -82,7 +82,7 @@ public class CommonListeners {
         if (event.player.getCommandSenderWorld().isClientSide()) {
             ClientListeners.playerTick(event);
 
-            if (event.player.isOnGround()) {
+            if (event.player.onGround()) {
                 Vec3 movement = new Vec3(event.player.getDeltaMovement().x, 0, event.player.getDeltaMovement().z);
                 QuestHandler.progressQuest(event.player, Quest.WALK, movement.length());
             }
@@ -94,7 +94,7 @@ public class CommonListeners {
             ServerListeners.playerTick(event);
 
             // Slow fall quest (Levitation): falling slowly, from the Slow Falling effect or Levitation itself
-            if (event.phase == TickEvent.Phase.END && !event.player.isOnGround() && event.player.getDeltaMovement().y < 0
+            if (event.phase == TickEvent.Phase.END && !event.player.onGround() && event.player.getDeltaMovement().y < 0
                     && (event.player.hasEffect(MobEffects.SLOW_FALLING) || (LevitationModifier.hasLevitation(event.player) && TechniqueModifier.massApplies(event.player) && !event.player.isShiftKeyDown()))) {
                 QuestHandler.progressQuest(event.player, Quest.SLOW_FALL, 1.0 / 20.0);
             }
@@ -119,7 +119,7 @@ public class CommonListeners {
     // Levitation: no fall damage, except the distance fallen while sneaking
     @SubscribeEvent
     public static void livingFall(LivingFallEvent event) {
-        if (event.getEntity() instanceof Player player && !player.level.isClientSide) {
+        if (event.getEntity() instanceof Player player && !player.level().isClientSide) {
             event.setDistance(LevitationModifier.damagingFall(player, event.getDistance()));
         }
     }

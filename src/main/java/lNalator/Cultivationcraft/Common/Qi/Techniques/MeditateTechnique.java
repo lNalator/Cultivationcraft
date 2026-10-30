@@ -73,7 +73,7 @@ public class MeditateTechnique extends MovementOverrideTechnique {
         if (stats.getCultivationType() == CultivationTypes.QI_CONDENSER) {
             CultivationType cultivation = stats.getCultivation();
 
-            List<QiSource> sources = ChunkQiSources.getQiSourcesInRange(event.player.level, event.player.position(), (int) cultivation.getCultivationStat(event.player, DefaultCultivationStatIDs.qiAbsorbRange));
+            List<QiSource> sources = ChunkQiSources.getQiSourcesInRange(event.player.level(), event.player.position(), (int) cultivation.getCultivationStat(event.player, DefaultCultivationStatIDs.qiAbsorbRange));
 
             // Poison unlock: meditating while poisoned
             if (event.player.hasEffect(MobEffects.POISON)) {
@@ -137,7 +137,7 @@ public class MeditateTechnique extends MovementOverrideTechnique {
 
             PacketHandler.sendCultivatorStatsToClient(event.player);
         } else if (stats.getCultivationType() == CultivationTypes.BODY_CULTIVATOR) {
-            List<QiSource> sources = ChunkQiSources.getQiSourcesInRange(event.player.level, event.player.position(), (int) BodyPartStatControl.getPlayerStatControl(event.player).getStats().getStat(StatIDs.qiAbsorbRange));
+            List<QiSource> sources = ChunkQiSources.getQiSourcesInRange(event.player.level(), event.player.position(), (int) BodyPartStatControl.getPlayerStatControl(event.player).getStats().getStat(StatIDs.qiAbsorbRange));
 
             // If meditating in a Qi Source, increase the quest by 1 second
             if (sources.size() > 0) {

@@ -1,5 +1,7 @@
 package lNalator.Cultivationcraft.Client.Renderers;
 
+import net.minecraft.world.item.ItemDisplayContext;
+import com.mojang.math.Axis;
 import lNalator.Cultivationcraft.Common.Refinement.RefinementHandlers;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -8,8 +10,8 @@ import com.mojang.blaze3d.vertex.BufferUploader;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexFormat;
-import com.mojang.math.Matrix4f;
-import com.mojang.math.Vector3f;
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.GameRenderer;
@@ -144,11 +146,11 @@ public final class RefinementItemRenderer {
                 pose.pushPose();
                 try {
                     pose.translate(target.x - camera.x, target.y - camera.y, target.z - camera.z);
-                    pose.mulPose(Vector3f.YP.rotationDegrees((float) ((time - entry.getValue().started) * 1.2 % 360)));
+                    pose.mulPose(Axis.YP.rotationDegrees((float) ((time - entry.getValue().started) * 1.2 % 360)));
                     pose.scale(.65f, .65f, .65f);
-                    mc.getItemRenderer().renderStatic(entry.getValue().item, ItemTransforms.TransformType.FIXED,
-                            LevelRenderer.getLightColor(mc.level, new BlockPos(target)), OverlayTexture.NO_OVERLAY,
-                            pose, ITEMS, player.getId());
+                    mc.getItemRenderer().renderStatic(entry.getValue().item, ItemDisplayContext.FIXED,
+                            LevelRenderer.getLightColor(mc.level, BlockPos.containing(target)), OverlayTexture.NO_OVERLAY,
+                            pose, ITEMS, mc.level, player.getId());
                 } finally {
                     pose.popPose();
                 }
@@ -163,8 +165,8 @@ public final class RefinementItemRenderer {
             RenderSystem.setShaderColor(1, 1, 1, 1);
             Vector3f rightAxis = new Vector3f(1, 0, 0);
             Vector3f upAxis = new Vector3f(0, 1, 0);
-            rightAxis.transform(event.getCamera().rotation());
-            upAxis.transform(event.getCamera().rotation());
+            rightAxis.rotate(event.getCamera().rotation());
+            upAxis.rotate(event.getCamera().rotation());
             Vec3 right = new Vec3(rightAxis.x(), rightAxis.y(), rightAxis.z());
             Vec3 up = new Vec3(upAxis.x(), upAxis.y(), upAxis.z());
             MOTES.begin(VertexFormat.Mode.TRIANGLES, DefaultVertexFormat.POSITION_COLOR);

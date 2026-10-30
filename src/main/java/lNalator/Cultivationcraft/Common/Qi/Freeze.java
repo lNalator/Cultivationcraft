@@ -102,7 +102,7 @@ public class Freeze {
         FrozenBlockEntity frozen = (FrozenBlockEntity)world.getBlockEntity(pos);
 
         // Only set half blocks for air blocks
-        if (toFreeze.getMaterial() == Material.AIR && dir != Direction.DOWN)
+        if (toFreeze.isAir() && dir != Direction.DOWN)
             frozen.setRamp(dir);
 
         if (client)

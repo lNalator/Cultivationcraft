@@ -193,7 +193,7 @@ public class AttackPacket extends Packet {
             // Create a large bounding box at the specified position then search for a list of entities at that location
             AABB scan = new AABB(targetPos.x - range * 2, targetPos.y - range * 2, targetPos.z - range * 2, targetPos.x + range * 2, targetPos.y + range * 2, targetPos.z + range * 2);
 
-            List<Entity> entities = pEntity.level.getEntitiesOfClass(Entity.class, scan);
+            List<Entity> entities = pEntity.level().getEntitiesOfClass(Entity.class, scan);
 
             // If entities have been found, search through and try to find one with the targetID
             if (!entities.isEmpty()) {

@@ -20,7 +20,7 @@ public final class JadeSlipCommands {
         event.getDispatcher().register(Commands.literal("cultivation").requires(source -> source.hasPermission(2))
                 .then(Commands.literal("givejadeslip")
                         .executes(context -> {
-                            context.getSource().sendSuccess(Component.literal(
+                            context.getSource().sendSuccess(() -> Component.literal(
                                     "/cultivation givejadeslip <player> <entry> - Tab searches entry IDs, recipe names and titles. Recipes use recipes/<pill_id>."), false);
                             return 1;
                         }).then(Commands.argument("player", EntityArgument.player())
@@ -52,7 +52,7 @@ public final class JadeSlipCommands {
                                         context.getSource().sendFailure(Component.translatable("cultivationcraft.jade.missing_recipe", entry.id(), entry.recipe()));
                                         return 0;
                                     }
-                                    var stack = PlayerKnowledge.create(player.getLevel(), entry, player.getRandom());
+                                    var stack = PlayerKnowledge.create(player.serverLevel(), entry, player.getRandom());
                                     if (!player.getInventory().add(stack)) {
                                         player.drop(stack, false);
                                     }

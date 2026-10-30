@@ -8,6 +8,7 @@ import lNalator.Cultivationcraft.Common.Capabilities.ChunkQiSources.ChunkQiSourc
 import lNalator.Cultivationcraft.Common.Qi.Elements.Elements;
 import lNalator.Cultivationcraft.Common.Qi.QiSource;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
@@ -66,7 +67,7 @@ public class FrozenBlockEntity extends BlockEntity implements TickableBlockEntit
             FREEZE_DURATION_TICKS = cultivationCraftData.getInt("freezeDuration");
         }
 
-        this.oldBlockState = NbtUtils.readBlockState(cultivationCraftData.getCompound("FrozenBlockState"));
+        this.oldBlockState = NbtUtils.readBlockState(BuiltInRegistries.BLOCK.asLookup(), cultivationCraftData.getCompound("FrozenBlockState"));
         this.blockPos = NbtUtils.readBlockPos(cultivationCraftData.getCompound("FrozenBlockPos"));
         this.itemStack = new ItemStack(this.oldBlockState.getBlock().asItem());
         this.isSecondBlock = cultivationCraftData.getBoolean("isSecondBlock");

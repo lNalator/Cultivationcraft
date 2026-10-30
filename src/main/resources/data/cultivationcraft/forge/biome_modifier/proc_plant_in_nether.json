@@ -1,0 +1,6 @@
+{
+  "type": "forge:add_features",
+  "biomes": "#minecraft:is_nether",
+  "features": "cultivationcraft:procedural_plant_patch",
+  "step": "vegetal_decoration"
+}

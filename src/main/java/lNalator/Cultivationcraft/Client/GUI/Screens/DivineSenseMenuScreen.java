@@ -4,13 +4,13 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
-import com.mojang.math.Matrix4f;
+import org.joml.Matrix4f;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.DivineSenseTechnique;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
@@ -134,7 +134,7 @@ public class DivineSenseMenuScreen extends Screen {
     }
 
     @Override
-    public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         DivineSenseTechnique sense = DivineSenseTechnique.find(minecraft.player);
 
         if (sense == null) {
@@ -144,7 +144,7 @@ public class DivineSenseMenuScreen extends Screen {
         float centerX = width / 2f, centerY = height / 2f;
         int hovered = hovered(mouseX, mouseY);
         double span = 360.0 / SECTORS.length;
-        Matrix4f matrix = poseStack.last().pose();
+        Matrix4f matrix = guiGraphics.pose().last().pose();
 
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
@@ -175,14 +175,14 @@ public class DivineSenseMenuScreen extends Screen {
             int y = Math.round(centerY - (float) Math.cos(angle) * labelRadius);
             boolean on = sense.senses(SECTORS[i].category());
 
-            drawCenteredString(poseStack, font, Component.translatable(SECTORS[i].name()), x, y - 9, on ? 0xFFFFFF : 0x9A9A9A);
-            drawCenteredString(poseStack, font, Component.translatable(on ? "cultivationcraft.divinesense.menu.on" : "cultivationcraft.divinesense.menu.off"),
+            guiGraphics.drawCenteredString(font, Component.translatable(SECTORS[i].name()), x, y - 9, on ? 0xFFFFFF : 0x9A9A9A);
+            guiGraphics.drawCenteredString(font, Component.translatable(on ? "cultivationcraft.divinesense.menu.on" : "cultivationcraft.divinesense.menu.off"),
                     x, y + 1, on ? 0x91DCCD : 0x9A9A9A);
         }
 
-        drawCenteredString(poseStack, font, Component.translatable("cultivationcraft.divinesense.menu.all"), Math.round(centerX), Math.round(centerY) - 4, 0xFFFFFF);
+        guiGraphics.drawCenteredString(font, Component.translatable("cultivationcraft.divinesense.menu.all"), Math.round(centerX), Math.round(centerY) - 4, 0xFFFFFF);
 
-        super.render(poseStack, mouseX, mouseY, partialTick);
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
     }
 
     // A ring section from start to end degrees, clockwise from the top

@@ -1,7 +1,7 @@
 plugins {
     id 'eclipse'
     id 'maven-publish'
-    id 'net.minecraftforge.gradle' version '5.1.+'
+    id 'net.minecraftforge.gradle' version '[6.0.16,6.2)'
     id 'org.spongepowered.mixin' version '0.7.+'
 }
 
@@ -27,7 +27,7 @@ minecraft {
     //
     // Use non-default mappings at your own risk. They may not always work.
     // Simply re-run your setup task after changing the mappings to update your workspace.
-    mappings channel: 'official', version: '1.19.2'
+    mappings channel: 'official', version: '1.20.1'
 
     // accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg') // Currently, this location cannot be changed from the default.
 
@@ -171,13 +171,14 @@ dependencies {
     // Specify the version of Minecraft to use. If this is any group other than 'net.minecraft', it is assumed
     // that the dep is a ForgeGradle 'patcher' dependency, and its patches will be applied.
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
-    minecraft 'net.minecraftforge:forge:1.19.2-43.1.52'
+    minecraft 'net.minecraftforge:forge:1.20.1-47.3.0'
     implementation 'lnalator.mlmanimator:mlmanimator:0.2.2'
     // The source dependency includes item scaling absent from the older CurseForge jar.
     // settings.gradle substitutes the MLM Animator checkout; CI pins its upstream commit.
-    implementation fg.deobf("curse.maven:ironchest-228756:3966365")
-    runtimeOnly fg.deobf("curse.maven:jade-324717:4800904")
-    implementation fg.deobf("curse.maven:distant-horizons-508933:9004749")
+    // 1.20.1 port: Iron Chests, Jade and Distant Horizons (dev-only, no code uses them) are left out until their 1.20.1 files are picked
+    // implementation fg.deobf("curse.maven:ironchest-228756:3966365")
+    // runtimeOnly fg.deobf("curse.maven:jade-324717:4800904")
+    // implementation fg.deobf("curse.maven:distant-horizons-508933:9004749")
 
     // Real mod deobf dependency examples - these get remapped to your current mappings
     // compileOnly fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}:api") // Adds JEI API as a compile dependency

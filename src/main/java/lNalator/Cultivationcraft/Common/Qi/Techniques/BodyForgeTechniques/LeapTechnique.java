@@ -66,7 +66,7 @@ public class LeapTechnique extends Technique {
     // keyDown = true when the key is pressed down, false when the key is released
     public void useKeyPressed(boolean keyDown, Player player) {
         // Do nothing if the technique is already active, the key has been released or the player is not on the ground
-        if (active || leaping || !keyDown || !player.isOnGround() || player.isInWater()) {
+        if (active || leaping || !keyDown || !player.onGround() || player.isInWater()) {
             return;
         }
 
@@ -114,7 +114,7 @@ public class LeapTechnique extends Technique {
     // Check if the leap has ended
     protected void continueLeap(Player player) {
         // If the player is no longer jumping turn the technique off
-        if (player.isOnGround() || player.isInWater()) {
+        if (player.onGround() || player.isInWater()) {
             active = false;
             leaping = false;
         }

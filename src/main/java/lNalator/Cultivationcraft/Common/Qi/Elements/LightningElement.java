@@ -34,7 +34,7 @@ public class LightningElement extends ElementVariant {
     public void applyStatusEffect(QiDamageSource source, Entity target, float damageAmount) {
         Entity attacker = source.getEntity();
 
-        if (!(target.level instanceof ServerLevel level) || attacker == null || damageAmount <= 0 || !(target instanceof LivingEntity living)) {
+        if (!(target.level() instanceof ServerLevel level) || attacker == null || damageAmount <= 0 || !(target instanceof LivingEntity living)) {
             super.applyStatusEffect(source, target, damageAmount);
             return;
         }
@@ -56,7 +56,7 @@ public class LightningElement extends ElementVariant {
 
         for (LivingEntity next : nearby.subList(0, Math.min(chains, nearby.size()))) {
             // No status on chained hits, so the chain cannot chain again
-            next.hurt(new QiDamageSource(msgId, attacker, name, false), damageAmount * 0.5f);
+            next.hurt(new QiDamageSource(level, msgId, attacker, name, false), damageAmount * 0.5f);
             next.addEffect(new MobEffectInstance(ElementalStates.ELECTRIFIED.get(), 60));
             visualBolt(level, next.position());
 

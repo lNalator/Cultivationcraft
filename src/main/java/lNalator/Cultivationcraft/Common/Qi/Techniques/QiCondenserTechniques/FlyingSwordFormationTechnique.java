@@ -80,7 +80,7 @@ public class FlyingSwordFormationTechnique extends AttackOverrideTechnique {
     public void attackEntity(Player player, Entity toAttack) {
         target = toAttack;
 
-        if (player.level.isClientSide) {
+        if (player.level().isClientSide) {
             PoseHandler.getPlayerPoseHandler(player.getUUID()).cancelNextAttackAnimation();
         }
     }
@@ -96,7 +96,7 @@ public class FlyingSwordFormationTechnique extends AttackOverrideTechnique {
     public void attackNothing(Player player) {
         target = null;
 
-        if (player.level.isClientSide) {
+        if (player.level().isClientSide) {
             PoseHandler.getPlayerPoseHandler(player.getUUID()).cancelNextAttackAnimation();
         }
     }

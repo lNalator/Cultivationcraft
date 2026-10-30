@@ -3,8 +3,8 @@ package lNalator.Cultivationcraft.Client.GUI;
 import lNalator.Cultivationcraft.Common.Config;
 import lNalator.Cultivationcraft.Common.CultivationNotifier;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.components.toasts.ToastComponent;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
@@ -44,7 +44,7 @@ public class CultivationToast implements Toast {
         return switch (type) {
             case SUCCESS -> SoundEvents.UI_TOAST_CHALLENGE_COMPLETE;
             case PROGRESS -> SoundEvents.PLAYER_LEVELUP;
-            case ALERT -> SoundEvents.NOTE_BLOCK_BASS;
+            case ALERT -> SoundEvents.NOTE_BLOCK_BASS.value();
         };
     }
 
@@ -65,21 +65,20 @@ public class CultivationToast implements Toast {
     }
 
     @Override
-    public Visibility render(PoseStack stack, ToastComponent toasts, long time) {
-        RenderSystem.setShaderTexture(0, TEXTURE);
+    public Visibility render(GuiGraphics guiGraphics, ToastComponent toasts, long time) {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        toasts.blit(stack, 0, 0, 0, 0, width(), height());
+        guiGraphics.blit(TEXTURE, 0, 0, 0, 0, width(), height());
 
         var font = toasts.getMinecraft().font;
-        font.draw(stack, title, 30, 7, titleColor());
+        guiGraphics.drawString(font, title, 30, 7, titleColor(), false);
 
         // ponytail: only the first line fits the vanilla 32px toast
         List<FormattedCharSequence> lines = font.split(text, 125);
         if (!lines.isEmpty()) {
-            font.draw(stack, lines.get(0), 30, 18, 0xFFFFFF);
+            guiGraphics.drawString(font, lines.get(0), 30, 18, 0xFFFFFF, false);
         }
 
-        toasts.getMinecraft().getItemRenderer().renderAndDecorateFakeItem(icon(), 8, 8);
+        guiGraphics.renderFakeItem(icon(), 8, 8);
 
         return time >= 5000L ? Visibility.HIDE : Visibility.SHOW;
     }

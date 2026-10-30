@@ -6,7 +6,7 @@ import lNalator.Cultivationcraft.Common.Qi.Damage.QiDamageSource;
 import lNalator.Cultivationcraft.Common.Qi.Quests.Quest;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.BlockHitResult;
@@ -56,7 +56,7 @@ public class BounceModifier extends TechniqueModifier {
             return;
         }
 
-        if (source.msgId.compareTo(DamageSource.FALL.getMsgId()) == 0) {
+        if (source.is(DamageTypes.FALL)) {
             Physics.Bounce(owner, 0.75f);
         }
     }

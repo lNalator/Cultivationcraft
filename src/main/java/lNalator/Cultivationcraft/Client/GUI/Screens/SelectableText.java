@@ -1,11 +1,9 @@
 package lNalator.Cultivationcraft.Client.GUI.Screens;
 
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.GuiGraphics;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.ResourceLocation;
@@ -127,21 +125,20 @@ public class SelectableText {
         return null;
     }
 
-    public void render(Screen screen, Font font, PoseStack poseStack, int color, int xPos, int yPos, int xEnd, int yStart, int yEnd) {
+    public void render(GuiGraphics guiGraphics, Font font, int color, int xPos, int yPos, int xEnd, int yStart, int yEnd) {
         lineHeight = font.lineHeight + yPadding;
 
         // Draw nothing if this line is off the screen
         if (yPos <= yEnd - lineHeight && yPos >= yStart) {
             // Highlight this line if it is selected
             if (selected) {
-                RenderSystem.setShaderTexture(0, texture);
                 RenderSystem.setShaderColor(highlightColor.getRed() / 255f, highlightColor.getGreen() / 255f, highlightColor.getBlue() / 255f, 1);
-                GuiComponent.blit(poseStack, xPos - 2, yPos - yPadding, screen.getBlitOffset(), 0, 0, xEnd - xPos + 4, lineHeight, xEnd - xPos + 4, lineHeight);
+                guiGraphics.blit(texture, xPos - 2, yPos - yPadding, 0, 0, xEnd - xPos + 4, lineHeight, xEnd - xPos + 4, lineHeight);
             }
 
             FormattedText formatedName = font.substrByWidth(FormattedText.of(getName()), xEnd - xPos);
 
-            font.draw(poseStack, formatedName.getString(), xPos, yPos, color);
+            guiGraphics.drawString(font, formatedName.getString(), xPos, yPos, color, false);
         }
 
         if (expanded) {
@@ -150,7 +147,7 @@ public class SelectableText {
             yPos += lineHeight;
 
             for (SelectableText select : selectables) {
-                select.render(screen, font, poseStack, color, xPos, yPos, xEnd, yStart, yEnd);
+                select.render(guiGraphics, font, color, xPos, yPos, xEnd, yStart, yEnd);
                 yPos += select.height();
             }
         }

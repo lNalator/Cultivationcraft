@@ -2,9 +2,8 @@ package lNalator.Cultivationcraft.Client.GUI;
 
 import lNalator.Cultivationcraft.Cultivationcraft;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 
 import java.awt.*;
@@ -106,8 +105,7 @@ public class GUIButton {
         return hover;
     }
 
-    public void render(PoseStack PoseStack, int mouseX, int mouseY, GuiComponent gui) {
-        RenderSystem.setShaderTexture(0, TEXTURE);
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
         int textColor = Color.BLACK.getRGB();
@@ -129,11 +127,11 @@ public class GUIButton {
         }
 
         // Draw the start, end and middle of the button.
-        GuiComponent.blit(PoseStack, xpos, ypos, gui.getBlitOffset(), offset, 0, baseWidth / 2, height, 255, 255);
-        GuiComponent.blit(PoseStack, xpos + baseWidth / 2, ypos, gui.getBlitOffset(), 0, 14 + offset * 2, width - baseWidth, height, 255, 255);
-        GuiComponent.blit(PoseStack, xpos + width - baseWidth / 2, ypos, gui.getBlitOffset(), offset + baseWidth / 2, 0, baseWidth / 2, height, 255, 255);
+        guiGraphics.blit(TEXTURE, xpos, ypos, offset, 0, baseWidth / 2, height, 255, 255);
+        guiGraphics.blit(TEXTURE, xpos + baseWidth / 2, ypos, 0, 14 + offset * 2, width - baseWidth, height, 255, 255);
+        guiGraphics.blit(TEXTURE, xpos + width - baseWidth / 2, ypos, offset + baseWidth / 2, 0, baseWidth / 2, height, 255, 255);
 
         // Draw the button text
-        Minecraft.getInstance().font.draw(PoseStack, name, xpos + baseWidth / 2, ypos + 2, textColor);
+        guiGraphics.drawString(Minecraft.getInstance().font, name, xpos + baseWidth / 2, ypos + 2, textColor, false);
     }
 }

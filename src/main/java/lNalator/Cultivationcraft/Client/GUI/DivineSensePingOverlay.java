@@ -3,11 +3,11 @@ package lNalator.Cultivationcraft.Client.GUI;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
-import com.mojang.math.Matrix4f;
+import org.joml.Matrix4f;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.util.Mth;
@@ -55,7 +55,7 @@ public final class DivineSensePingOverlay {
         pings.add(new Ping(observerId, position, level.getGameTime()));
     }
 
-    public static void render(PoseStack poseStack, float partialTick) {
+    public static void render(GuiGraphics guiGraphics, float partialTick) {
         Minecraft mc = Minecraft.getInstance();
 
         if (pings.isEmpty() || mc.player == null || mc.level == null) {
@@ -79,7 +79,7 @@ public final class DivineSensePingOverlay {
         float radius = Math.min(centerX, centerY) * 0.6f;
         Vec3 eye = mc.player.getEyePosition(partialTick);
         float yaw = mc.player.getViewYRot(partialTick);
-        Matrix4f matrix = poseStack.last().pose();
+        Matrix4f matrix = guiGraphics.pose().last().pose();
 
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();

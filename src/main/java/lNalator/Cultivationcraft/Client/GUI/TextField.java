@@ -1,11 +1,9 @@
 package lNalator.Cultivationcraft.Client.GUI;
 
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.GuiGraphics;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
 
 import java.awt.*;
@@ -81,18 +79,17 @@ public class TextField {
         return true;
     }
 
-    public void render(Screen screen, Font font, PoseStack poseStack, int mouseX, int mouseY) {
-        RenderSystem.setShaderTexture(0, texture);
+    public void render(GuiGraphics guiGraphics, Font font, int mouseX, int mouseY) {
         RenderSystem.setShaderColor(backgroundColor.getRed() / 255f, backgroundColor.getGreen() / 255f, backgroundColor.getBlue() / 255f, 1);
-        GuiComponent.blit(poseStack, x, y, screen.getBlitOffset(), 0, 0, width, height, width, height);
+        guiGraphics.blit(texture, x, y, 0, 0, width, height, width, height);
 
         RenderSystem.setShaderColor((backgroundColor.getRed() - 100) / 255f, (backgroundColor.getGreen() - 100) / 255f, (backgroundColor.getBlue() - 100) / 255f, 1);
-        GuiComponent.blit(poseStack, x, y, screen.getBlitOffset(), 0, 0, 1, height - 1, 1, height - 1);
-        GuiComponent.blit(poseStack, x, y, screen.getBlitOffset(), 0, 0, width - 1, 1, width - 1, 1);
+        guiGraphics.blit(texture, x, y, 0, 0, 1, height - 1, 1, height - 1);
+        guiGraphics.blit(texture, x, y, 0, 0, width - 1, 1, width - 1, 1);
 
         RenderSystem.setShaderColor(1, 1, 1, 1);
-        GuiComponent.blit(poseStack, x + width - 1, y + 1, screen.getBlitOffset(), 0, 0, 1, height - 1, 1, height - 1);
-        GuiComponent.blit(poseStack, x + 1, y + height - 1, screen.getBlitOffset(), 0, 0, width - 1, 1, width - 1, 1);
+        guiGraphics.blit(texture, x + width - 1, y + 1, 0, 0, 1, height - 1, 1, height - 1);
+        guiGraphics.blit(texture, x + 1, y + height - 1, 0, 0, width - 1, 1, width - 1, 1);
 
         int textWidth = width - xPadding * 2;
         int lines = BetterFontRenderer.countLines(font, text, textWidth) + yPadding * 2;
@@ -107,14 +104,14 @@ public class TextField {
             scroll.setScrollPosition(0);
         }
 
-        BetterFontRenderer.wordwrap(font, poseStack, text, x + xPadding, y + yPadding, textColor.getRGB(), textWidth, height - yPadding * 2, scroll.scrollPosition);
+        BetterFontRenderer.wordwrap(font, guiGraphics, text, x + xPadding, y + yPadding, textColor.getRGB(), textWidth, height - yPadding * 2, scroll.scrollPosition);
 
         int scrollSize = Math.max(BetterFontRenderer.countLines(font, text, width - xPadding * 2 - scroll.buttonSize) - (height - yPadding * 2), 0);
         scroll.scrollInterval = font.lineHeight + 1;
         scroll.setSize(scrollSize);
 
         if (lines > height) {
-            scroll.render(screen, poseStack, mouseX, mouseY);
+            scroll.render(guiGraphics, mouseX, mouseY);
         }
     }
 }

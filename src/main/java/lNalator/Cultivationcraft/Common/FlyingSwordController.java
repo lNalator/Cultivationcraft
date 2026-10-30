@@ -47,9 +47,9 @@ public class FlyingSwordController {
 
     // Deletes the specified ItemEntity and replaces it with a flying sword entity
     public static void spawnFlyingSword(ItemEntity item) {
-        FlyingSwordEntity test = new FlyingSwordEntity(item.level, item.getX(), item.getY(), item.getZ(), item.getItem());
+        FlyingSwordEntity test = new FlyingSwordEntity(item.level(), item.getX(), item.getY(), item.getZ(), item.getItem());
 
-        item.level.addFreshEntity(test);
+        item.level().addFreshEntity(test);
     }
 
     // Start binding to the specified flying sword

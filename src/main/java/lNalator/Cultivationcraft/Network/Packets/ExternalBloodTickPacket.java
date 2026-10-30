@@ -63,6 +63,6 @@ public class ExternalBloodTickPacket extends Packet {
     }
 
     protected void processPacket(Player player) {
-        PlayerHealthManager.getBlood(player).externalTick(player.level, x, y, z, onGround);
+        PlayerHealthManager.getBlood(player).externalTick(player.level(), x, y, z, onGround);
     }
 }

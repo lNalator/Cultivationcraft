@@ -104,7 +104,7 @@ public class QiEmission extends Technique {
     public void activate(Player player) {
         super.activate(player);
 
-        if (!player.level.isClientSide) {
+        if (!player.level().isClientSide) {
             int number = (int) getTechniqueStat(amount, player);
 
             if (number == 1) {
@@ -143,13 +143,13 @@ public class QiEmission extends Technique {
             tempo *= mod.getTempoMultiplier(player);
         }
 
-        Entity projectile = new QiProjectile(player.level, player, pos.x, pos.y, pos.z, getElement(), (int) (getTechniqueStat(DefaultTechniqueStatIDs.damage, player) * charge), (float) getTechniqueStat(DefaultTechniqueStatIDs.movementSpeed, player) * tempo, this, (float) getTechniqueStat(DefaultTechniqueStatIDs.lifetime, player));
+        Entity projectile = new QiProjectile(player.level(), player, pos.x, pos.y, pos.z, getElement(), (int) (getTechniqueStat(DefaultTechniqueStatIDs.damage, player) * charge), (float) getTechniqueStat(DefaultTechniqueStatIDs.movementSpeed, player) * tempo, this, (float) getTechniqueStat(DefaultTechniqueStatIDs.lifetime, player));
         ((QiProjectile) projectile).setDirection(player.getLookAngle());
 
         for (TechniqueModifier mod : CultivatorStats.getCultivatorStats(player).getCultivation().getModifiers()) {
             projectile = mod.QiProjectileSpawnOverride(player, projectile);
         }
 
-        player.level.addFreshEntity(projectile);
+        player.level().addFreshEntity(projectile);
     }
 }

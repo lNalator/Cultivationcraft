@@ -86,7 +86,7 @@ public class FlightTechnique extends Technique {
     public void tickClient(TickEvent.PlayerTickEvent event) {
         super.tickClient(event);
 
-        if (!event.player.isOnGround()) {
+        if (!event.player.onGround()) {
             // The server pays Qi and decides when flight ends. Client-only spending
             // drifts downward while meditation replenishes the server's reserve.
             event.player.getAbilities().setFlyingSpeed((float) getTechniqueStat(DefaultTechniqueStatIDs.movementSpeed, event.player));
@@ -109,7 +109,7 @@ public class FlightTechnique extends Technique {
 
     @Override
     public void tickServer(TickEvent.PlayerTickEvent event) {
-        if (!event.player.isOnGround()) {
+        if (!event.player.onGround()) {
             if (!spendExternalQi(event.player, 0.05)) {
                 deactivate(event.player);
                 lNalator.Cultivationcraft.Network.PacketHandler.sendCultivatorTechniquesToClient(event.player);
@@ -200,7 +200,7 @@ public class FlightTechnique extends Technique {
         for (double distance = Math.min(WARP_MAX_BLOCKS, getWarpBlocks(player)); distance >= 1; distance -= 1) {
             Vec3 offset = direction.scale(distance);
 
-            if (player.level.noCollision(player, player.getBoundingBox().move(offset))) {
+            if (player.level().noCollision(player, player.getBoundingBox().move(offset))) {
                 player.setPos(player.position().add(offset));
                 return;
             }
@@ -226,8 +226,8 @@ public class FlightTechnique extends Technique {
         }
 
         QuestHandler.progressQuest(player, Quest.ENDER_TELEPORT, 1);
-        ((ServerLevel) player.level).sendParticles(ParticleTypes.PORTAL, lastWarpPos.x, lastWarpPos.y + 1, lastWarpPos.z, 16, 0.3, 0.5, 0.3, 0.5);
-        player.level.playSound(null, player, SoundEvents.ENDERMAN_TELEPORT, player.getSoundSource(), 0.5f, 1.5f);
+        ((ServerLevel) player.level()).sendParticles(ParticleTypes.PORTAL, lastWarpPos.x, lastWarpPos.y + 1, lastWarpPos.z, 16, 0.3, 0.5, 0.3, 0.5);
+        player.level().playSound(null, player, SoundEvents.ENDERMAN_TELEPORT, player.getSoundSource(), 0.5f, 1.5f);
     }
 
     @Override

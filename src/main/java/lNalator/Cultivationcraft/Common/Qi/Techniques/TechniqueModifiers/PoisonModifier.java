@@ -43,7 +43,7 @@ public class PoisonModifier extends TechniqueModifier {
     public void onHitEntity(Player owner, Entity hit, float damage, ResourceLocation element, Vec3 pos) {
         super.onHitEntity(owner, hit, damage, element, pos);
 
-        if (owner.level.isClientSide || hit == owner || !(hit instanceof LivingEntity target)) {
+        if (owner.level().isClientSide || hit == owner || !(hit instanceof LivingEntity target)) {
             return;
         }
 

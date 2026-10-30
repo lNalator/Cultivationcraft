@@ -31,7 +31,7 @@ public class ExplosionModifier extends TechniqueModifier {
 
     @Override
     public void onHitAll(Player owner, Vec3 pos, float damage, ResourceLocation element) {
-        if (owner.level.isClientSide) {
+        if (owner.level().isClientSide) {
             return;
         }
 
@@ -42,7 +42,7 @@ public class ExplosionModifier extends TechniqueModifier {
     }
 
     public void onHitTaken(Player owner, float damage, ResourceLocation defensiveElement, QiDamageSource source) {
-        if (owner.level.isClientSide) {
+        if (owner.level().isClientSide) {
             return;
         }
 
@@ -53,12 +53,12 @@ public class ExplosionModifier extends TechniqueModifier {
     }
 
     public void explode(Player owner, Vec3 pos, ResourceLocation element, float radius) {
-        Explosion explosion = new Explosion(owner.level, owner, new QiDamageSource("explosion.player", owner, element, true), null, pos.x, pos.y, pos.z, radius, false, Explosion.BlockInteraction.BREAK);
+        Explosion explosion = new Explosion(owner.level(), owner, new QiDamageSource(owner.level(), "explosion.player", owner, element, true), null, pos.x, pos.y, pos.z, radius, false, Explosion.BlockInteraction.DESTROY);
 
         explosion.explode();
         explosion.finalizeExplosion(false);
 
-        for (ServerPlayer serverplayer : ((ServerLevel) owner.level).players()) {
+        for (ServerPlayer serverplayer : ((ServerLevel) owner.level()).players()) {
             if (serverplayer.distanceToSqr(pos) < 4096.0D) {
                 serverplayer.connection.send(new ClientboundExplodePacket(pos.x, pos.y, pos.z, radius, explosion.getToBlow(), explosion.getHitPlayers().get(serverplayer)));
             }

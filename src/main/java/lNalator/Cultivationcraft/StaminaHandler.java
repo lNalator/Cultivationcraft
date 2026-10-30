@@ -25,7 +25,7 @@ public class StaminaHandler
         if (((QiFoodStats)player.getFoodData()).getTrueFoodLevel() < stamina)
             return false;
 
-        if (!player.level.isClientSide)
+        if (!player.level().isClientSide)
             QuestHandler.progressQuest(player, Quest.DRAIN_STAMINA, stamina);
 
         // Update stamina on server here

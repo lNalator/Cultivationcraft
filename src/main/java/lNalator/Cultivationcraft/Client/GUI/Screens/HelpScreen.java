@@ -4,7 +4,7 @@ import lNalator.Cultivationcraft.Client.ClientKnowledge;
 import lNalator.Cultivationcraft.Client.GUI.SelectableTextField;
 import lNalator.Cultivationcraft.Client.GUI.TextField;
 import lNalator.Cultivationcraft.Cultivationcraft;
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -120,24 +120,24 @@ public class HelpScreen extends GenericTabScreen {
     }
 
     @Override
-    public void render(PoseStack PoseStack, int mouseX, int mouseY, float partialTicks) {
-        super.render(PoseStack, mouseX, mouseY, partialTicks);
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+        super.render(guiGraphics, mouseX, mouseY, partialTicks);
 
         int edgeSpacingX = (this.width - this.xSize) / 2;
         int edgeSpacingY = (this.height - this.ySize) / 2;
 
         if (selectText.getSelected() != null) {
             String title = selectText.getSelected().getName();
-            font.draw(PoseStack, title, edgeSpacingX + (this.xSize - font.width(title)) / 2,
-                    edgeSpacingY + nameTextY, Color.darkGray.getRGB());
+            guiGraphics.drawString(font, title, edgeSpacingX + (this.xSize - font.width(title)) / 2,
+                    edgeSpacingY + nameTextY, Color.darkGray.getRGB(), false);
         }
 
         helpText.setPos(edgeSpacingX + helpTextX, edgeSpacingY + helpTextY);
         helpText.setSize(helpTextWidth, helpTextHeight);
         helpText.setText(selectText.getText());
-        helpText.render(this, font, PoseStack, mouseX, mouseY);
+        helpText.render(guiGraphics, font, mouseX, mouseY);
 
         selectText.setPos(edgeSpacingX + selectTextX, edgeSpacingY + selectTextY);
-        selectText.render(this, font, PoseStack, mouseX, mouseY);
+        selectText.render(guiGraphics, font, mouseX, mouseY);
     }
 }

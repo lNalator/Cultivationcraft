@@ -85,7 +85,7 @@ public class QiTransferTechnique extends Technique {
         super.tickServer(event);
         Player player = event.player;
         if (!active || !player.isAlive() || player.isSpectator() || !isValid(player)
-                || !(player.level instanceof ServerLevel level)) {
+                || !(player.level() instanceof ServerLevel level)) {
             return;
         }
         Vec3 start = player.getEyePosition();
@@ -157,7 +157,7 @@ public class QiTransferTechnique extends Technique {
         PacketHandler.channel.send(
                 PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> server),
                 new QiStreamPacket(server.getUUID(),
-                        server.level.dimension().location(), target,
+                        server.level().dimension().location(), target,
                         RefinementVisualSync.elementColor(server), active));
     }
 

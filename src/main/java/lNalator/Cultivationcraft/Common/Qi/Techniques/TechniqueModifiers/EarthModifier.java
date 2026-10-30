@@ -26,7 +26,7 @@ public class EarthModifier extends TechniqueModifier {
     }
 
     public BlockState getMountSource(Player owner) {
-        if (owner.isOnGround()) {
+        if (owner.onGround()) {
             return owner.getFeetBlockState();
         }
 

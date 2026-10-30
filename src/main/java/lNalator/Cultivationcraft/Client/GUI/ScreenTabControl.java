@@ -8,10 +8,9 @@ import lNalator.Cultivationcraft.Common.Qi.Cultivation.CultivationType;
 import lNalator.Cultivationcraft.Common.Qi.CultivationTypes;
 import lNalator.Cultivationcraft.Common.Register;
 import lNalator.Cultivationcraft.Network.ClientPacketHandler;
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 
 import java.awt.*;
@@ -44,16 +43,16 @@ public class ScreenTabControl {
 
     protected static int selectedScreen = 0;
 
-    public static void drawTabs(PoseStack PoseStack, int screenX, int screenY, Screen drawTo) {
+    public static void drawTabs(GuiGraphics guiGraphics, int screenX, int screenY) {
         int type = CultivatorStats.getCultivatorStats(Minecraft.getInstance().player).getCultivationType();
 
         // Loop through each tab, checking if the mouse is over it and highlighting it if so
         for (int i = 0; i < TAB_BAR_NUMBER[type]; i++) {
-            drawTo.blit(PoseStack, screenX + (TAB_BAR_X_SIZE + TAB_BAR_PADDING) * i, screenY, TAB_BAR_U, TAB_BAR_V, TAB_BAR_X_SIZE, TAB_BAR_Y_SIZE);
+            guiGraphics.blit(GenericTabScreen.tabTexture, screenX + (TAB_BAR_X_SIZE + TAB_BAR_PADDING) * i, screenY, TAB_BAR_U, TAB_BAR_V, TAB_BAR_X_SIZE, TAB_BAR_Y_SIZE);
         }
     }
 
-    public static void highlightTabs(PoseStack PoseStack, int tabSelected, int mouseX, int mouseY, int screenX, int screenY, Screen drawTo) {
+    public static void highlightTabs(GuiGraphics guiGraphics, int tabSelected, int mouseX, int mouseY, int screenX, int screenY) {
         int type = CultivatorStats.getCultivatorStats(Minecraft.getInstance().player).getCultivationType();
 
         mouseX = mouseX - screenX;
@@ -63,22 +62,22 @@ public class ScreenTabControl {
         for (int i = 0; i < TAB_BAR_NUMBER[type]; i++) {
             if (tabSelected != i) {
                 if (mouseOver(mouseX, mouseY, i)) {
-                    drawTo.blit(PoseStack, screenX + (TAB_BAR_X_SIZE + TAB_BAR_PADDING) * i, screenY, HIGHLIGHTED_TAB_BAR_U, HIGHLIGHTED_TAB_BAR_V, HIGHLIGHTED_TAB_BAR_X_SIZE, HIGHLIGHTED_TAB_BAR_Y_SIZE);
+                    guiGraphics.blit(GenericTabScreen.tabTexture, screenX + (TAB_BAR_X_SIZE + TAB_BAR_PADDING) * i, screenY, HIGHLIGHTED_TAB_BAR_U, HIGHLIGHTED_TAB_BAR_V, HIGHLIGHTED_TAB_BAR_X_SIZE, HIGHLIGHTED_TAB_BAR_Y_SIZE);
                 }
             } else {
-                drawTo.blit(PoseStack, screenX + (TAB_BAR_X_SIZE + TAB_BAR_PADDING) * i, screenY, SELECTED_TAB_BAR_U, SELECTED_TAB_BAR_V, SELECTED_TAB_BAR_X_SIZE, SELECTED_TAB_BAR_Y_SIZE);
+                guiGraphics.blit(GenericTabScreen.tabTexture, screenX + (TAB_BAR_X_SIZE + TAB_BAR_PADDING) * i, screenY, SELECTED_TAB_BAR_U, SELECTED_TAB_BAR_V, SELECTED_TAB_BAR_X_SIZE, SELECTED_TAB_BAR_Y_SIZE);
             }
         }
     }
 
-    public static void tabText(PoseStack PoseStack, int screenX, int screenY, Font font) {
+    public static void tabText(GuiGraphics guiGraphics, int screenX, int screenY, Font font) {
         int type = CultivatorStats.getCultivatorStats(Minecraft.getInstance().player).getCultivationType();
 
         for (int i = 0; i < TAB_BAR_NUMBER[type]; i++) {
             String text = Component.translatable("cultivationcraft.gui.tab." + type + "." + i).getString();
 
             // Draw the text centered on each tab
-            font.draw(PoseStack, text, screenX + (TAB_BAR_X_SIZE + TAB_BAR_PADDING) * i + TAB_BAR_X_SIZE / 2 - font.width(text) / 2 + 1, screenY + font.lineHeight / 2, fontColor);
+            guiGraphics.drawString(font, text, screenX + (TAB_BAR_X_SIZE + TAB_BAR_PADDING) * i + TAB_BAR_X_SIZE / 2 - font.width(text) / 2 + 1, screenY + font.lineHeight / 2, fontColor, false);
         }
     }
 

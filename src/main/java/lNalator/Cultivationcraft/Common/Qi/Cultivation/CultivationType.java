@@ -282,7 +282,7 @@ public class CultivationType {
         boolean qiFull = food.getTrueFoodLevel() >= food.getMaxFood();
         food.setFoodLevel(food.getTrueFoodLevel() + (float) (getCultivationStat(player, DefaultCultivationStatIDs.qiPassiveSpeed) / 20.0));
 
-        if (player.level.isClientSide) {
+        if (player.level().isClientSide) {
             return;
         }
 
@@ -413,7 +413,7 @@ public class CultivationType {
     }
 
     public double absorbFromQiSource(double amount, Player player) {
-        List<QiSource> sources = ChunkQiSources.getQiSourcesInRange(player.level, player.position(), (int) getCultivationStat(player, DefaultCultivationStatIDs.qiAbsorbRange));
+        List<QiSource> sources = ChunkQiSources.getQiSourcesInRange(player.level(), player.position(), (int) getCultivationStat(player, DefaultCultivationStatIDs.qiAbsorbRange));
 
         double remaining = amount;
         float toAbsorb = 0;

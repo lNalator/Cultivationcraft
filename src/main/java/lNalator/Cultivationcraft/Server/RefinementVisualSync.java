@@ -62,7 +62,7 @@ public final class RefinementVisualSync {
             visual.getTag().remove(Cultivationcraft.MODID + "bindtime");
         }
         int color = RefinementHandlers.find(stack).flowsTowardPlayer() ? 0xFFFFFF : elementColor(player);
-        ResourceLocation dimension = player.level.dimension().location();
+        ResourceLocation dimension = player.level().dimension().location();
         if (previous == null || previous.color != color || !previous.dimension.equals(dimension)
                 || !ItemStack.matches(previous.item, visual) || player.tickCount % 20 == 0) {
             active.put(player, new State(visual, color, dimension));
@@ -104,7 +104,7 @@ public final class RefinementVisualSync {
 
     private static void send(ServerPlayer player, ItemStack item, int color) {
         PacketHandler.channel.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> player),
-                new RefinementVisualPacket(player.getUUID(), player.level.dimension().location(), item, color));
+                new RefinementVisualPacket(player.getUUID(), player.level().dimension().location(), item, color));
     }
 
     @SubscribeEvent

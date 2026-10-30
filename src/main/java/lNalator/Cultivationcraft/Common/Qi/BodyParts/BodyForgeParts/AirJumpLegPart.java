@@ -28,7 +28,7 @@ public class AirJumpLegPart extends MovementOverridePart {
         if (jump) {
             if (jumpWasDown) {
                 if (!player.isInWater()) {
-                    if (player.isOnGround()) {
+                    if (player.onGround()) {
                         Physics.applyJump(player);
                     } else if (PlayerHealthManager.getLungs(player).drainBreath(Breath.WIND, jumpBreathCost)) {
                         player.setDeltaMovement(player.getDeltaMovement().x, 0, player.getDeltaMovement().z);

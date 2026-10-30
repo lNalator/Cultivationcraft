@@ -28,7 +28,7 @@ public class PlantCatalogEvents {
         if (!(event.getEntity() instanceof ServerPlayer sp)) {
             return;
         }
-        ServerLevel level = sp.getLevel();
+        ServerLevel level = sp.serverLevel();
         PlantCatalogSavedData data = PlantCatalogSavedData.getOrCreate(level, lNalator.Cultivationcraft.Common.Config.Server.procPlantCatalogSize());
         PacketHandler.sendPlantCatalogToClient(sp, data.entries());
     }
@@ -38,7 +38,7 @@ public class PlantCatalogEvents {
         if (!(event.getEntity() instanceof ServerPlayer sp)) {
             return;
         }
-        ServerLevel level = sp.getLevel();
+        ServerLevel level = sp.serverLevel();
         PlantCatalogSavedData data = PlantCatalogSavedData.getOrCreate(level, lNalator.Cultivationcraft.Common.Config.Server.procPlantCatalogSize());
         PacketHandler.sendPlantCatalogToClient(sp, data.entries());
     }
@@ -48,7 +48,7 @@ public class PlantCatalogEvents {
         if (!(event.getEntity() instanceof ServerPlayer sp)) {
             return;
         }
-        ServerLevel level = sp.getLevel();
+        ServerLevel level = sp.serverLevel();
         PlantCatalogSavedData data = PlantCatalogSavedData.getOrCreate(level, lNalator.Cultivationcraft.Common.Config.Server.procPlantCatalogSize());
         PacketHandler.sendPlantCatalogToClient(sp, data.entries());
     }

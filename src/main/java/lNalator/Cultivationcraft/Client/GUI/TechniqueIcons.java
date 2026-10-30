@@ -4,9 +4,8 @@ import lNalator.Cultivationcraft.Client.genericClientFunctions;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorTechniques.CultivatorTechniques;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorTechniques.ICultivatorTechniques;
 import lNalator.Cultivationcraft.Cultivationcraft;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 
 public class TechniqueIcons {
@@ -16,7 +15,7 @@ public class TechniqueIcons {
 
     // Loop through all player icons and draw them from the supplied coordinates
     // Remember to rebind texture aftwards
-    public static void renderIcons(PoseStack stack, int xpos, int ypos, GuiComponent gui, int spacing) {
+    public static void renderIcons(GuiGraphics guiGraphics, int xpos, int ypos, int spacing) {
         if (genericClientFunctions.getPlayer() == null) {
             return;
         }
@@ -25,31 +24,29 @@ public class TechniqueIcons {
 
         for (int i = 0; i < CultivatorTechniques.numberOfTechniques; i++) {
             if (techs.getTechnique(i) != null) {
-                RenderSystem.setShaderTexture(0, techs.getTechnique(i).getIcon());
-
-                GuiComponent.blit(stack, xpos + i * spacing, ypos, gui.getBlitOffset(), 0, 0, 16, 16, 16, 16);
+                guiGraphics.blit(techs.getTechnique(i).getIcon(), xpos + i * spacing, ypos, 0, 0, 16, 16, 16, 16);
             }
         }
     }
 
     // Highlight all techniques that are currently active
-    public static void highlightActive(PoseStack stack, int xpos, int ypos, GuiComponent gui, int spacing) {
+    public static void highlightActive(GuiGraphics guiGraphics, int xpos, int ypos, int spacing) {
         ICultivatorTechniques techs = CultivatorTechniques.getCultivatorTechniques(genericClientFunctions.getPlayer());
 
         for (int i = 0; i < CultivatorTechniques.numberOfTechniques; i++) {
             if (techs.getTechnique(i) != null && techs.getTechnique(i).isActive()) {
-                highlightIcon(stack, xpos, ypos, gui, spacing, i);
+                highlightIcon(guiGraphics, xpos, ypos, spacing, i);
             }
         }
     }
 
     // Highlight all techniques that are currently active
-    public static void showCooldowns(PoseStack stack, int xpos, int ypos, GuiComponent gui, int spacing) {
+    public static void showCooldowns(GuiGraphics guiGraphics, int xpos, int ypos, int spacing) {
         ICultivatorTechniques techs = CultivatorTechniques.getCultivatorTechniques(genericClientFunctions.getPlayer());
 
         for (int i = 0; i < CultivatorTechniques.numberOfTechniques; i++) {
             if (techs.getTechnique(i) != null && techs.getTechnique(i).getCooldown() > 0) {
-                cooldownIcon(stack, xpos, ypos, gui, spacing, i);
+                cooldownIcon(guiGraphics, xpos, ypos, spacing, i);
             }
         }
     }
@@ -70,42 +67,38 @@ public class TechniqueIcons {
         return -1;
     }
 
-    public static void mouseOverHighlight(PoseStack stack, int xpos, int ypos, GuiComponent gui, int spacing, int mouseX, int mouseY) {
+    public static void mouseOverHighlight(GuiGraphics guiGraphics, int xpos, int ypos, int spacing, int mouseX, int mouseY) {
         int mouseOver = mouseOver(xpos, ypos, mouseX, mouseY, spacing);
 
         if (mouseOver == -1) {
             return;
         }
 
-        highlightIcon(stack, xpos, ypos, gui, spacing, mouseOver);
+        highlightIcon(guiGraphics, xpos, ypos, spacing, mouseOver);
     }
 
     // Highlight the selected icon
     // Remember to rebind texture afterwards
-    public static void highlightIcon(PoseStack stack, int xpos, int ypos, GuiComponent gui, int spacing, int icon) {
+    public static void highlightIcon(GuiGraphics guiGraphics, int xpos, int ypos, int spacing, int icon) {
         RenderSystem.enableBlend();
-
-        RenderSystem.setShaderTexture(0, HIGHLIGHT);
 
         // Set the texture to be semi-transparent
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 0.5F);
 
-        GuiComponent.blit(stack, xpos + icon * spacing, ypos, gui.getBlitOffset(), 0, 0, 16, 16, 16, 16);
+        guiGraphics.blit(HIGHLIGHT, xpos + icon * spacing, ypos, 0, 0, 16, 16, 16, 16);
 
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1F);
     }
 
     // Darken the selected icon
     // Remember to rebind texture afterwards
-    public static void cooldownIcon(PoseStack stack, int xpos, int ypos, GuiComponent gui, int spacing, int icon) {
+    public static void cooldownIcon(GuiGraphics guiGraphics, int xpos, int ypos, int spacing, int icon) {
         RenderSystem.enableBlend();
-
-        RenderSystem.setShaderTexture(0, COOLDOWN);
 
         // Set the texture to be semi-transparent
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 0.5F);
 
-        GuiComponent.blit(stack, xpos + icon * spacing, ypos, gui.getBlitOffset(), 0, 0, 16, 16, 16, 16);
+        guiGraphics.blit(COOLDOWN, xpos + icon * spacing, ypos, 0, 0, 16, 16, 16, 16);
 
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1F);
 

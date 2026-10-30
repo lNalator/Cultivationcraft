@@ -13,7 +13,6 @@ import net.minecraft.world.level.block.BaseFireBlock;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
-import net.minecraft.world.level.material.Material;
 
 import java.awt.*;
 
@@ -47,7 +46,7 @@ public class FireElement extends Element {
             return;
         }
 
-        if (!level.isClientSide && (state.getMaterial() == Material.TOP_SNOW || state.getMaterial() == Material.SNOW || state.is(Blocks.POWDER_SNOW))) {
+        if (!level.isClientSide && (state.is(Blocks.SNOW) || state.is(Blocks.SNOW_BLOCK) || state.is(Blocks.POWDER_SNOW))) {
             level.removeBlock(pos, false);
             return;
         }

@@ -198,7 +198,7 @@ public class JetLegTechnique extends MovementOverrideTechnique {
 
     @Override
     public void deactivate(Player player) {
-        if (player.level.isClientSide) {
+        if (player.level().isClientSide) {
             MultiLimbedModel model = PoseHandler.getPlayerPoseHandler(player.getUUID()).getPlayerModel();
 
             model.getLimb(BodyPartModelNames.jetLegLeftEmitter).getModelPart().visible = false;
@@ -217,7 +217,7 @@ public class JetLegTechnique extends MovementOverrideTechnique {
             on = true;
         }
 
-        if (!player.level.isClientSide()) {
+        if (!player.level().isClientSide()) {
             enabled = on;
         } else {
             enableJets(on, player);

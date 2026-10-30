@@ -44,7 +44,7 @@ public class RefinementContainer extends BasicContainer {
 
     @Override
     public void broadcastChanges() {
-        if (!owner.level.isClientSide) {
+        if (!owner.level().isClientSide) {
             ItemStack stack = itemStackHandler.getStackInSlot(0);
             var handler = RefinementHandlers.find(stack);
             refinementProgress.set(0, handler == null ? 0 : Math.round(handler.progress(owner, stack) * 1000));

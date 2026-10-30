@@ -22,6 +22,7 @@ import lNalator.Cultivationcraft.Common.Qi.Techniques.AttackTechnique;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.PassiveTechniques.PassiveTechnique;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.Technique;
 import lNalator.Cultivationcraft.Network.PacketHandler;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -117,7 +118,7 @@ public class ServerListeners {
 
     @SubscribeEvent
     public static void onFall(LivingFallEvent event) {
-        if (event.getEntity().level.isClientSide || !(event.getEntity() instanceof Player) || !event.getEntity().isAlive()) {
+        if (event.getEntity().level().isClientSide || !(event.getEntity() instanceof Player) || !event.getEntity().isAlive()) {
             return;
         }
 
@@ -135,7 +136,7 @@ public class ServerListeners {
 
     @SubscribeEvent
     public static void startTracking(PlayerEvent.StartTracking event) {
-        if (event.getEntity().level.isClientSide) {
+        if (event.getEntity().level().isClientSide) {
             return;
         }
 
@@ -251,13 +252,13 @@ public class ServerListeners {
             }
         }
 
-        if (event.getEntity().level.isClientSide) {
+        if (event.getEntity().level().isClientSide) {
             return;
         }
 
         if (event.getEntity() instanceof Player) {
             // Don't modify damage if it bypasses invulnerability
-            if (event.getSource().isBypassInvul()) {
+            if (event.getSource().is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
                 return;
             }
 
@@ -273,13 +274,13 @@ public class ServerListeners {
 
     @SubscribeEvent
     public static void onPlayerHurt(LivingHurtEvent event) {
-        if (event.getEntity().level.isClientSide) {
+        if (event.getEntity().level().isClientSide) {
             return;
         }
 
         if (event.getEntity() instanceof Player) {
             // Don't modify damage if it bypasses invulnerability
-            if (event.getSource().isBypassInvul()) {
+            if (event.getSource().is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
                 return;
             }
 

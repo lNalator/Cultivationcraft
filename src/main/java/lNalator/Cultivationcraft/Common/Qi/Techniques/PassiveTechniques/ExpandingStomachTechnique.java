@@ -83,7 +83,7 @@ public class ExpandingStomachTechnique extends PassiveTechnique {
             update = true;
 
             if (oldStamina != (int) currentStamina) {
-                if (player.level.isClientSide && Minecraft.getInstance().player == player) {
+                if (player.level().isClientSide && Minecraft.getInstance().player == player) {
                     sendInfo((int) currentStamina);
                 }
 

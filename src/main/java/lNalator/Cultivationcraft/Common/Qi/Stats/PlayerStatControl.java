@@ -82,7 +82,7 @@ public class PlayerStatControl {
 
         // Add all existing body part stats to the players stats
         for (BodyPart part : BodyModifications.getBodyModifications(player).getModifications().values()) {
-            if (player.level.isClientSide()) {
+            if (player.level().isClientSide()) {
                 part.onLoad(player.getUUID());
             }
 
@@ -92,7 +92,7 @@ public class PlayerStatControl {
         // Add all existing body part option stats to the players stats
         for (HashMap<String, BodyPartOption> options : BodyModifications.getBodyModifications(player).getModificationOptions().values()) {
             for (BodyPartOption part : options.values()) {
-                if (player.level.isClientSide()) {
+                if (player.level().isClientSide()) {
                     part.onLoad(player.getUUID());
                 }
 
@@ -124,7 +124,7 @@ public class PlayerStatControl {
         stats = newStats;
 
         // Only apply player attribute modifiers on the server
-        if (!player.level.isClientSide) {
+        if (!player.level().isClientSide) {
             applyStats(player);
         }
 
@@ -212,7 +212,7 @@ public class PlayerStatControl {
         player.getAttribute(Attributes.ARMOR).removeModifier(ARMOR_MODIFIER_UUID);
         player.getAttribute(Attributes.ARMOR_TOUGHNESS).removeModifier(ARMOR_TOUGHNESS_MODIFIER_UUID);
         player.getAttribute(ForgeMod.SWIM_SPEED.get()).removeModifier(SWIM_MODIFIER_UUID);
-        player.getAttribute(ForgeMod.REACH_DISTANCE.get()).removeModifier(RANGE_MODIFIER_UUID);
+        player.getAttribute(ForgeMod.BLOCK_REACH.get()).removeModifier(RANGE_MODIFIER_UUID);
         player.getAttribute(Attributes.ATTACK_DAMAGE).removeModifier(ATTACK_MODIFIER_UUID);
         player.getAttribute(ForgeMod.STEP_HEIGHT_ADDITION.get()).removeModifier(STEP_HEIGHT_MODIFIER_UUID);
 
@@ -222,7 +222,7 @@ public class PlayerStatControl {
         player.getAttribute(Attributes.ARMOR).addTransientModifier(new AttributeModifier(ARMOR_MODIFIER_UUID, "BodyForgeArmor", stats.getStat(StatIDs.armor), AttributeModifier.Operation.ADDITION));
         player.getAttribute(Attributes.ARMOR_TOUGHNESS).addTransientModifier(new AttributeModifier(ARMOR_TOUGHNESS_MODIFIER_UUID, "BodyForgeArmorToughness", stats.getStat(StatIDs.armorToughness), AttributeModifier.Operation.ADDITION));
         player.getAttribute(ForgeMod.SWIM_SPEED.get()).addTransientModifier(new AttributeModifier(SWIM_MODIFIER_UUID, "BodyForgeSwimSpeed", stats.getStat(StatIDs.swimSpeed) - StatIDs.defaultSwimSpeed, AttributeModifier.Operation.ADDITION));
-        player.getAttribute(ForgeMod.REACH_DISTANCE.get()).addTransientModifier(new AttributeModifier(RANGE_MODIFIER_UUID, "BodyForgeReach", stats.getStat(StatIDs.attackRange) - StatIDs.defaultAttackRange, AttributeModifier.Operation.ADDITION));
+        player.getAttribute(ForgeMod.BLOCK_REACH.get()).addTransientModifier(new AttributeModifier(RANGE_MODIFIER_UUID, "BodyForgeReach", stats.getStat(StatIDs.attackRange) - StatIDs.defaultAttackRange, AttributeModifier.Operation.ADDITION));
         player.getAttribute(Attributes.ATTACK_DAMAGE).addTransientModifier(new AttributeModifier(ATTACK_MODIFIER_UUID, "BodyForgeAttack", stats.getStat(StatIDs.armAttackModifier) - StatIDs.defaultAttackModifier, AttributeModifier.Operation.MULTIPLY_TOTAL));
         player.getAttribute(ForgeMod.STEP_HEIGHT_ADDITION.get()).addTransientModifier(new AttributeModifier(STEP_HEIGHT_MODIFIER_UUID, "BodyForgeStepHeight", stats.getStat(StatIDs.stepHeight), AttributeModifier.Operation.ADDITION));
 

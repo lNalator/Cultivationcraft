@@ -5,6 +5,7 @@ import lNalator.Cultivationcraft.Client.Animations.GenericQiPoses;
 import lNalator.Cultivationcraft.Common.Capabilities.BodyModifications.BodyModifications;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.CultivatorStats;
 import lNalator.Cultivationcraft.Common.Qi.BodyParts.BodyPartNames;
+import lNalator.Cultivationcraft.Common.Qi.BodyParts.FoodStats.HerbivoreFoodStats;
 import lNalator.Cultivationcraft.Common.Qi.BodyParts.FoodStats.QiFoodStats;
 import lNalator.Cultivationcraft.Common.Qi.CultivationTypes;
 import lNalator.Cultivationcraft.Common.Qi.Stats.BodyPartStatControl;
@@ -24,7 +25,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.TickEvent;
 
@@ -104,15 +104,15 @@ public class BiteTechnique extends AttackOverrideTechnique {
         int nutrition = ((QiFoodStats) player.getFoodData()).getNutrition(block);
 
         if (nutrition > 0 && BodyModifications.getBodyModifications(player).hasOption(BodyPartNames.headPosition, BodyPartNames.mouthSubPosition, BodyPartNames.flatTeethPart)) {
-            player.level.playSound((Player) null, player.getX(), player.getY(), player.getZ(), SoundEvents.GENERIC_EAT, player.getSoundSource(), 1.0F, 1.0F);
+            player.level().playSound((Player) null, player.getX(), player.getY(), player.getZ(), SoundEvents.GENERIC_EAT, player.getSoundSource(), 1.0F, 1.0F);
 
             // If the block is grass, destroy the grass but leave the dirt
-            if (block.getMaterial() == Material.GRASS) {
-                player.level.levelEvent(2001, pos, Block.getId(block));
-                player.level.setBlock(pos, Blocks.DIRT.defaultBlockState(), 2);
+            if (block.is(HerbivoreFoodStats.GRASS_LIKE)) {
+                player.level().levelEvent(2001, pos, Block.getId(block));
+                player.level().setBlock(pos, Blocks.DIRT.defaultBlockState(), 2);
             } // Otherwise destroy the block
             else {
-                player.level.destroyBlock(pos, false);
+                player.level().destroyBlock(pos, false);
             }
 
             player.getFoodData().eat(nutrition, 0.8f);
@@ -135,8 +135,8 @@ public class BiteTechnique extends AttackOverrideTechnique {
             // Make entity disappear once eaten, so it leaves no corpse
             entity.setInvisible(true);
 
-            ((ServerLevel) player.level).sendParticles(ParticleTypes.SMOKE, entity.getX(), entity.getY(), entity.getZ(), 20, 1D, 1D, 1D, 1D);
-            player.level.playSound((Player) null, player.getX(), player.getY(), player.getZ(), SoundEvents.GENERIC_EAT, player.getSoundSource(), 1.0F, 1.0F);
+            ((ServerLevel) player.level()).sendParticles(ParticleTypes.SMOKE, entity.getX(), entity.getY(), entity.getZ(), 20, 1D, 1D, 1D, 1D);
+            player.level().playSound((Player) null, player.getX(), player.getY(), player.getZ(), SoundEvents.GENERIC_EAT, player.getSoundSource(), 1.0F, 1.0F);
         }
     }
 }

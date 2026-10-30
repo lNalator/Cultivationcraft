@@ -67,7 +67,7 @@ public class InfusionModifier extends TechniqueModifier {
     @Override
     public void tick(Player owner, Vec3 position, ResourceLocation element) {
         // Flight and Qi Barrier tick at the player's own position: only projectiles and swords leave a trail
-        if (owner.level.isClientSide || owner.tickCount % 5 != 0 || position.distanceToSqr(owner.position()) < 1) {
+        if (owner.level().isClientSide || owner.tickCount % 5 != 0 || position.distanceToSqr(owner.position()) < 1) {
             return;
         }
 
@@ -76,7 +76,7 @@ public class InfusionModifier extends TechniqueModifier {
 
     @Override
     public void onHitAll(Player owner, Vec3 pos, float damage, ResourceLocation element) {
-        if (owner.level.isClientSide) {
+        if (owner.level().isClientSide) {
             return;
         }
 
@@ -88,9 +88,9 @@ public class InfusionModifier extends TechniqueModifier {
             return;
         }
 
-        QiDamageSource source = new QiDamageSource("infusion", owner, element, true);
+        QiDamageSource source = new QiDamageSource(owner.level(), "infusion", owner, element, true);
 
-        for (Entity target : owner.level.getEntities(owner, new AABB(pos, pos).inflate(radius), entity -> entity instanceof LivingEntity && entity.isAlive())) {
+        for (Entity target : owner.level().getEntities(owner, new AABB(pos, pos).inflate(radius), entity -> entity instanceof LivingEntity && entity.isAlive())) {
             Elements.getElement(element).applyStatusEffect(source, target, strength * INFUSED_STRENGTH);
         }
     }

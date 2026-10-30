@@ -128,7 +128,7 @@ public class QiSource {
             randomPos = new Vec3((Math.random() * getSize() * 2) - getSize(), Math.random() * getSize() * 2 - getSize(), Math.random() * getSize() * 2 - getSize());
         } while (randomPos.length() > getSize());
 
-        return new BlockPos(pos.getX() + randomPos.x, pos.getY() + randomPos.y, pos.getZ() + randomPos.z);
+        return BlockPos.containing(pos.getX() + randomPos.x, pos.getY() + randomPos.y, pos.getZ() + randomPos.z);
     }
 
     // Apply elemental effects to all blocks in range

@@ -48,7 +48,7 @@ public class ChanneledAttackTechnique extends AttackTechnique {
     public void deactivate(Player player) {
         super.deactivate(player);
 
-        if (player.level.isClientSide) {
+        if (player.level().isClientSide) {
             unmine(player);
         }
 
@@ -84,7 +84,7 @@ public class ChanneledAttackTechnique extends AttackTechnique {
     }
 
     public void attackBlock(Player player, BlockState block, BlockPos pos) {
-        player.level.destroyBlock(pos, true);
+        player.level().destroyBlock(pos, true);
     }
 
     protected void mine(Player player, BlockPos pos, Direction direction) {
@@ -100,26 +100,26 @@ public class ChanneledAttackTechnique extends AttackTechnique {
             return;
         }
 
-        float destroySpeed = player.level.getBlockState(pos).getDestroySpeed(player.level, pos);
+        float destroySpeed = player.level().getBlockState(pos).getDestroySpeed(player.level(), pos);
 
         if (destroySpeed == -1) {
             progress = 0;
             return;
         }
 
-        progress += getMinePower(player.level, target) / destroySpeed / 3.0f;
+        progress += getMinePower(player.level(), target) / destroySpeed / 3.0f;
 
         if (progress < 10) {
-            player.level.destroyBlockProgress(player.getId(), pos, (int) progress); 
+            player.level().destroyBlockProgress(player.getId(), pos, (int) progress); 
         }else if (destroyed) {
-            player.level.destroyBlockProgress(player.getId(), pos, 9);
-        } else if (player.level.isClientSide) {
+            player.level().destroyBlockProgress(player.getId(), pos, 9);
+        } else if (player.level().isClientSide) {
             ClientPacketHandler.sendAttackToServer(player.getUUID(), HitResult.Type.BLOCK, new Vec3(pos.getX(), pos.getY(), pos.getZ()), player.getUUID(), direction, CultivatorControl.getTechnique(player, this));
         }
     }
 
     protected void unmine(Player player) {
-        player.level.destroyBlockProgress(player.getId(), null, -1);
+        player.level().destroyBlockProgress(player.getId(), null, -1);
 
         target = null;
     }

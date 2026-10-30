@@ -74,7 +74,7 @@ public class BeamTechnique extends ChanneledAttackTechnique {
 
         // This was doing nothing
         //if (ClientListeners.tick % 10 == 0)
-        //    event.player.level.playSound((Player) null, event.player.getX(), event.player.getY(), event.player.getZ(), SoundEvents.BUBBLE_COLUMN_BUBBLE_POP, event.player.getSoundSource(), 1.0F, 1.0F);
+        //    event.player.level().playSound((Player) null, event.player.getX(), event.player.getY(), event.player.getZ(), SoundEvents.BUBBLE_COLUMN_BUBBLE_POP, event.player.getSoundSource(), 1.0F, 1.0F);
         super.tickClient(event);
 
         spawnParticles(event.player);
@@ -136,8 +136,8 @@ public class BeamTechnique extends ChanneledAttackTechnique {
     @Override
     public void attackBlock(Player player, BlockState block, BlockPos pos, Direction direction) {
         if (breath.doBlockAttack(player, pos, direction)) {
-            player.level.destroyBlock(pos, true);
-            breath.onBlockDestroy(player.level, pos);
+            player.level().destroyBlock(pos, true);
+            breath.onBlockDestroy(player.level(), pos);
         }
     }
 

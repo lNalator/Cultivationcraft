@@ -88,7 +88,7 @@ public class KeybindingControl {
     }
 
     public static boolean chatOpen() {
-        if (Minecraft.getInstance().gui.getChat().getFocusedChat() != null) {
+        if (Minecraft.getInstance().screen instanceof net.minecraft.client.gui.screens.ChatScreen) {
             return true;
         }
 
@@ -388,7 +388,12 @@ public class KeybindingControl {
         }
 
         if (Minecraft.getInstance().options.keyAttack.isActiveAndMatches(InputConstants.Type.MOUSE.getOrCreate(event.getButton()))) {
-            event.setCanceled(handleAttackOverrides());
+            boolean cancel = handleAttackOverrides();
+
+            // The handler receives both MouseButton.Pre and Post, and only Pre can be cancelled since 1.20
+            if (event.isCancelable()) {
+                event.setCanceled(cancel);
+            }
         }
     }
 

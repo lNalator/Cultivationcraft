@@ -86,11 +86,11 @@ public class AttackTechnique extends Technique {
     }
 
     public void attackNothing(Player player) {
-        player.level.playSound((Player) null, player.getX(), player.getY(), player.getZ(), missSound, player.getSoundSource(), 1.0F, 1.0F);
+        player.level().playSound((Player) null, player.getX(), player.getY(), player.getZ(), missSound, player.getSoundSource(), 1.0F, 1.0F);
     }
 
     public void attackBlock(Player player, BlockState block, BlockPos pos, Direction direction) {
-        player.level.playSound((Player) null, player.getX(), player.getY(), player.getZ(), attackSound, player.getSoundSource(), 1.0F, 1.0F);
+        player.level().playSound((Player) null, player.getX(), player.getY(), player.getZ(), attackSound, player.getSoundSource(), 1.0F, 1.0F);
     }
 
     // Attack specified entity with specified player, server only

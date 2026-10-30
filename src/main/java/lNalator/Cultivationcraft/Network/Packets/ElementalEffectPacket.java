@@ -3,7 +3,7 @@ package lNalator.Cultivationcraft.Network.Packets;
 import lNalator.Cultivationcraft.Common.Qi.Elements.Elements;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -39,7 +39,7 @@ public class ElementalEffectPacket extends Packet {
         try {
             // Read in the send values
             ResourceLocation element = buffer.readResourceLocation();
-            ResourceKey<Level> level = buffer.readResourceKey(Registry.DIMENSION_REGISTRY);
+            ResourceKey<Level> level = buffer.readResourceKey(Registries.DIMENSION);
             BlockPos pos = buffer.readBlockPos();
 
             return new ElementalEffectPacket(element, level, pos);

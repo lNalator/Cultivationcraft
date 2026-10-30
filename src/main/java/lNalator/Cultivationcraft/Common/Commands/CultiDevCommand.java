@@ -78,14 +78,14 @@ public class CultiDevCommand {
         double[] start = rates.remove(player.getUUID());
 
         if (start == null) {
-            rates.put(player.getUUID(), new double[]{player.level.getGameTime(), cultivation.getQuestProgress()});
-            ctx.getSource().sendSuccess(Component.literal("Measuring \"" + cultivation.getQuest().getDescription() + "\"; run the command again to stop"), false);
+            rates.put(player.getUUID(), new double[]{player.level().getGameTime(), cultivation.getQuestProgress()});
+            ctx.getSource().sendSuccess(() -> Component.literal("Measuring \"" + cultivation.getQuest().getDescription() + "\"; run the command again to stop"), false);
             return 1;
         }
 
-        double minutes = (player.level.getGameTime() - start[0]) / 1200.0;
+        double minutes = (player.level().getGameTime() - start[0]) / 1200.0;
         double perMinute = minutes > 0 ? (cultivation.getQuestProgress() - start[1]) / minutes : 0;
-        ctx.getSource().sendSuccess(Component.literal(String.format("%.1f per minute over %.1f min (quest needs %.0f)", perMinute, minutes, cultivation.getQuest().complete)), false);
+        ctx.getSource().sendSuccess(() -> Component.literal(String.format("%.1f per minute over %.1f min (quest needs %.0f)", perMinute, minutes, cultivation.getQuest().complete)), false);
         return 1;
     }
 
@@ -148,7 +148,7 @@ public class CultiDevCommand {
         // Qi cultivators use Qi instead of food: without this a player with no cultivation crashes on tick
         PlayerHealthManager.updateFoodStats(player);
         PacketHandler.sendCultivatorStatsToClient(player);
-        ctx.getSource().sendSuccess(Component.literal("Realm set to " + (coreForming ? "Core Forming " : "Qi Condensation ") + stage), true);
+        ctx.getSource().sendSuccess(() -> Component.literal("Realm set to " + (coreForming ? "Core Forming " : "Qi Condensation ") + stage), true);
         return 1;
     }
 
@@ -168,7 +168,8 @@ public class CultiDevCommand {
             }
         }
 
-        ctx.getSource().sendSuccess(Component.literal("Learnt " + learnt + " concept(s)"), true);
+        int learntCount = learnt;
+        ctx.getSource().sendSuccess(() -> Component.literal("Learnt " + learntCount + " concept(s)"), true);
         return learnt;
     }
 
@@ -190,7 +191,7 @@ public class CultiDevCommand {
         // No category or duplicate checks: this is for testing
         cultivation.setCore(mod);
         PacketHandler.sendCultivatorStatsToClient(player);
-        ctx.getSource().sendSuccess(Component.literal("Added core " + mod.getID()), true);
+        ctx.getSource().sendSuccess(() -> Component.literal("Added core " + mod.getID()), true);
         return 1;
     }
 }

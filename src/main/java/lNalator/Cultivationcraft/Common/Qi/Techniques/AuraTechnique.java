@@ -11,7 +11,7 @@ import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers.Techniq
 import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueStats.DefaultTechniqueStatIDs;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueStats.TechniqueStatModification;
 import lNalator.Cultivationcraft.Cultivationcraft;
-import com.mojang.math.Vector3f;
+import org.joml.Vector3f;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.network.chat.Component;
@@ -86,7 +86,7 @@ public class AuraTechnique extends Technique {
     public void activate(Player player) {
         super.activate(player);
 
-        if (!player.level.isClientSide) {
+        if (!player.level().isClientSide) {
             released = player.isShiftKeyDown();
             pulseTimer = 0;
             player.displayClientMessage(Component.translatable(langLocation + (released ? ".released" : ".contained")), true);
@@ -131,12 +131,12 @@ public class AuraTechnique extends Technique {
         double chance = getTechniqueStat(intensity, player);
         int hits = 0;
 
-        for (LivingEntity target : player.level.getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(range),
+        for (LivingEntity target : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(range),
                 e -> e != player && e.isAlive() && e.distanceTo(player) <= range && !e.isSpectator()
                         && !(e instanceof TamableAnimal pet && pet.isOwnedBy(player)))) {
             // Status at reduced intensity: applied on a fraction of the pulses
             boolean status = Math.random() < chance;
-            target.hurt(new QiDamageSource("player", player, element, status), (float) damage);
+            target.hurt(new QiDamageSource(player.level(), "player", player, element, status), (float) damage);
 
             // Pure aura: Qi pressure slows
             if (status && Elements.noElement.equals(element)) {
@@ -156,7 +156,7 @@ public class AuraTechnique extends Technique {
         if (released) {
             for (int i = 0; i < BLOCKS_PER_PULSE; i++) {
                 Vec3 offset = new Vec3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1).scale(range);
-                el.effectBlock(player.level, new BlockPos(player.position().add(offset)));
+                el.effectBlock(player.level(), BlockPos.containing(player.position().add(offset)));
             }
         }
 
@@ -165,7 +165,7 @@ public class AuraTechnique extends Technique {
 
     // Wind aura pushes enemy projectiles away
     protected void deflectProjectiles(Player player, double range) {
-        for (Projectile projectile : player.level.getEntitiesOfClass(Projectile.class, player.getBoundingBox().inflate(range),
+        for (Projectile projectile : player.level().getEntitiesOfClass(Projectile.class, player.getBoundingBox().inflate(range),
                 p -> p.getOwner() != player)) {
             Vec3 away = projectile.position().subtract(player.position()).normalize().scale(0.3);
             projectile.setDeltaMovement(projectile.getDeltaMovement().add(away));
@@ -174,7 +174,7 @@ public class AuraTechnique extends Technique {
     }
 
     protected void ring(Player player, Element el, double range) {
-        if (!(player.level instanceof ServerLevel level)) {
+        if (!(player.level() instanceof ServerLevel level)) {
             return;
         }
 

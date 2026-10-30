@@ -17,7 +17,7 @@ public class TechUseTrigger extends SimpleCriterionTrigger<TechUseTrigger.Instan
     }
 
     @Override
-    public TechUseTrigger.Instance createInstance(JsonObject json, EntityPredicate.Composite composite, DeserializationContext context) {
+    public TechUseTrigger.Instance createInstance(JsonObject json, ContextAwarePredicate composite, DeserializationContext context) {
         String techID = GsonHelper.getAsString(json, "techid");
         int conditional = GsonHelper.getAsInt(json, "conditional");
         return new TechUseTrigger.Instance(composite, techID, conditional);
@@ -34,7 +34,7 @@ public class TechUseTrigger extends SimpleCriterionTrigger<TechUseTrigger.Instan
         private final String techID;
         private final int conditional;
 
-        public Instance(EntityPredicate.Composite composite, String tech, int conditional) {
+        public Instance(ContextAwarePredicate composite, String tech, int conditional) {
             super(ID, composite);
             this.techID = tech;
             this.conditional = conditional;

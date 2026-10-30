@@ -5,7 +5,6 @@ import lNalator.Cultivationcraft.Common.Qi.Quests.Quest;
 import lNalator.Cultivationcraft.Common.Qi.Quests.QuestHandler;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -25,7 +24,7 @@ public class GravityModifier extends TechniqueModifier {
         ID = new ResourceLocation(Cultivationcraft.MODID, "concept.gravity");
         CATEGORY = FIELD_CATEGORY;
 
-        unlockQuest = new Quest(Quest.DAMAGE_TAKEN, 50, DamageSource.FALL.msgId);
+        unlockQuest = new Quest(Quest.DAMAGE_TAKEN, 50, "fall");
         stabiliseQuest = new Quest(Quest.FIELD_MOVED, 1000);
     }
 
@@ -36,7 +35,7 @@ public class GravityModifier extends TechniqueModifier {
 
     @Override
     public void onHitAll(Player owner, Vec3 pos, float damage, ResourceLocation element) {
-        if (owner.level.isClientSide) {
+        if (owner.level().isClientSide) {
             return;
         }
 
@@ -44,7 +43,7 @@ public class GravityModifier extends TechniqueModifier {
         double radius = BASE_RADIUS + (rank - 1);
         double force = BASE_FORCE * (1 + 0.25 * (rank - 1));
 
-        for (Entity target : owner.level.getEntities(owner, new AABB(pos, pos).inflate(radius))) {
+        for (Entity target : owner.level().getEntities(owner, new AABB(pos, pos).inflate(radius))) {
             double distance = target.position().distanceTo(pos);
 
             if (distance > radius) {

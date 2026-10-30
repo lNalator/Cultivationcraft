@@ -4,7 +4,10 @@ import lNalator.Cultivationcraft.Cultivationcraft;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.material.Material;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -105,44 +108,20 @@ public class Elements {
         addVariant(windElement, new LightningElement(lightningElement, new Color(1f, 1f, 0), 0, 0.02));
     }
 
+    // Replaces the 1.19 Material -> element map, see data/cultivationcraft/tags/blocks/elements/
     protected static void createMaterialElements() {
-        BlockElements.addMaterial(Material.AIR, windElement);
+        BlockElements.addBlockElement(BlockBehaviour.BlockStateBase::isAir, windElement);
 
-        BlockElements.addMaterial(Material.BUBBLE_COLUMN, waterElement);
-        BlockElements.addMaterial(Material.WATER_PLANT, waterElement);
-        BlockElements.addMaterial(Material.REPLACEABLE_WATER_PLANT, waterElement);
-        BlockElements.addMaterial(Material.WATER, waterElement);
-        BlockElements.addMaterial(Material.SPONGE, waterElement);
+        addElementTag("water", waterElement);
+        addElementTag("ice", iceElement);
+        addElementTag("fire", fireElement);
+        addElementTag("wood", woodElement);
+        addElementTag("earth", earthElement);
+    }
 
-        BlockElements.addMaterial(Material.ICE, iceElement);
-        BlockElements.addMaterial(Material.ICE_SOLID, iceElement);
-        BlockElements.addMaterial(Material.TOP_SNOW, iceElement);
-        BlockElements.addMaterial(Material.POWDER_SNOW, iceElement);
-        BlockElements.addMaterial(Material.SNOW, iceElement);
-
-        BlockElements.addMaterial(Material.BAMBOO, woodElement);
-        BlockElements.addMaterial(Material.BAMBOO_SAPLING, woodElement);
-        BlockElements.addMaterial(Material.PLANT, woodElement);
-        BlockElements.addMaterial(Material.REPLACEABLE_PLANT, woodElement);
-        BlockElements.addMaterial(Material.REPLACEABLE_FIREPROOF_PLANT, woodElement);
-        BlockElements.addMaterial(Material.CACTUS, woodElement);
-        BlockElements.addMaterial(Material.WOOD, woodElement);
-        BlockElements.addMaterial(Material.NETHER_WOOD, woodElement);
-        BlockElements.addMaterial(Material.LEAVES, woodElement);
-        BlockElements.addMaterial(Material.MOSS, woodElement);
-        BlockElements.addMaterial(Material.VEGETABLE, woodElement);
-
-        BlockElements.addMaterial(Material.CLAY, earthElement);
-        BlockElements.addMaterial(Material.DIRT, earthElement);
-        BlockElements.addMaterial(Material.GRASS, earthElement);
-        BlockElements.addMaterial(Material.SAND, earthElement);
-        BlockElements.addMaterial(Material.STONE, earthElement);
-        BlockElements.addMaterial(Material.METAL, earthElement);
-        BlockElements.addMaterial(Material.HEAVY_METAL, earthElement);
-
-        BlockElements.addMaterial(Material.EXPLOSIVE, fireElement);
-        BlockElements.addMaterial(Material.FIRE, fireElement);
-        BlockElements.addMaterial(Material.LAVA, fireElement);
+    protected static void addElementTag(String name, ResourceLocation element) {
+        TagKey<Block> tag = TagKey.create(Registries.BLOCK, new ResourceLocation(Cultivationcraft.MODID, "elements/" + name));
+        BlockElements.addBlockElement(state -> state.is(tag), element);
     }
 
     // Adds a new element of the specified resourceLocation to the Elements list

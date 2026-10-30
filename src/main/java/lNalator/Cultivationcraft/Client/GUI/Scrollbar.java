@@ -1,10 +1,8 @@
 package lNalator.Cultivationcraft.Client.GUI;
 
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.GuiGraphics;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
 
 public class Scrollbar {
@@ -80,20 +78,19 @@ public class Scrollbar {
         }
     }
 
-    public void render(Screen screen, PoseStack poseStack, int mouseX, int mouseY) {
-        RenderSystem.setShaderTexture(0, texture);
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
-        GuiComponent.blit(poseStack, x, y, screen.getBlitOffset(), 0, 0, buttonSize, buttonSize, 255, 255);
-        GuiComponent.blit(poseStack, x, y + buttonSize, screen.getBlitOffset(), 0, buttonSize, buttonSize, yHeight - buttonSize * 2, 255, 255);
-        GuiComponent.blit(poseStack, x, y + yHeight - buttonSize, screen.getBlitOffset(), 0, 244, buttonSize, buttonSize, 255, 255);
+        guiGraphics.blit(texture, x, y, 0, 0, buttonSize, buttonSize, 255, 255);
+        guiGraphics.blit(texture, x, y + buttonSize, 0, buttonSize, buttonSize, yHeight - buttonSize * 2, 255, 255);
+        guiGraphics.blit(texture, x, y + yHeight - buttonSize, 0, 244, buttonSize, buttonSize, 255, 255);
 
         // Highlight the scroll buttons if mouse is over them
         if (mouseX - x >= 0 && mouseX - x < buttonSize) {
             if (mouseY - y >= 0 && mouseY - y < buttonSize) {
-                GuiComponent.blit(poseStack, x, y, screen.getBlitOffset(), buttonSize, 0, buttonSize, buttonSize, 255, 255); 
+                guiGraphics.blit(texture, x, y, buttonSize, 0, buttonSize, buttonSize, 255, 255); 
             }else if (mouseY - y >= yHeight - buttonSize && mouseY - y < yHeight) {
-                GuiComponent.blit(poseStack, x, y + yHeight - buttonSize, screen.getBlitOffset(), buttonSize, 244, buttonSize, buttonSize, 255, 255);
+                guiGraphics.blit(texture, x, y + yHeight - buttonSize, buttonSize, 244, buttonSize, buttonSize, 255, 255);
             }
         }
 
@@ -103,6 +100,6 @@ public class Scrollbar {
         float percent = (float) scrollPosition / (float) scrollSize;
         int yPos = (int) ((yHeight - buttonSize * 2 - 9) * percent);
 
-        GuiComponent.blit(poseStack, x, y + buttonSize + yPos, screen.getBlitOffset(), buttonSize, buttonSize, buttonSize, buttonSize + 9, 255, 255);
+        guiGraphics.blit(texture, x, y + buttonSize + yPos, buttonSize, buttonSize, buttonSize, buttonSize + 9, 255, 255);
     }
 }

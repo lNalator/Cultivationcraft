@@ -20,7 +20,7 @@ import java.util.Locale;
 @Mod.EventBusSubscriber(modid = Cultivationcraft.MODID, value = Dist.CLIENT)
 public final class AlchemyPillPresentation {
 
-    public static boolean renderCooldown(net.minecraft.client.gui.Font font, ItemStack stack, int x, int y, float blitOffset) {
+    public static boolean renderCooldown(net.minecraft.client.gui.GuiGraphics guiGraphics, net.minecraft.client.gui.Font font, ItemStack stack, int x, int y) {
         Minecraft mc = Minecraft.getInstance();
         float fraction = PillEffects.cooldownFraction(mc.player, stack, mc.getFrameTime());
         if (fraction <= 0) {
@@ -28,8 +28,7 @@ public final class AlchemyPillPresentation {
         }
         // Vanilla's white cooldown sweep, evaluated per stack's effect family.
         // ItemCooldowns is keyed by Item and would incorrectly lock every pill family.
-        com.mojang.blaze3d.systems.RenderSystem.disableDepthTest();
-        net.minecraft.client.gui.GuiComponent.fill(new com.mojang.blaze3d.vertex.PoseStack(), x,
+        guiGraphics.fill(net.minecraft.client.renderer.RenderType.guiOverlay(), x,
                 y + net.minecraft.util.Mth.floor(16 * (1 - fraction)), x + 16, y + 16, 0x7FFFFFFF);
         return true;
     }

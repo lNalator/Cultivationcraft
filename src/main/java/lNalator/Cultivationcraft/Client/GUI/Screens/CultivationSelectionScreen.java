@@ -6,7 +6,7 @@ import lNalator.Cultivationcraft.Common.Qi.CultivationTypes;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import lNalator.Cultivationcraft.Network.ClientPacketHandler;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -86,38 +86,37 @@ public class CultivationSelectionScreen extends Screen {
     }
 
     @Override
-    public void render(PoseStack PoseStack, int mouseX, int mouseY, float partialTicks) {
-        this.renderBackground(PoseStack);
-        drawGuiBackgroundLayer(PoseStack, partialTicks, mouseX, mouseY);
-        super.render(PoseStack, mouseX, mouseY, partialTicks);
-        drawGuiForgroundLayer(PoseStack, partialTicks, mouseX, mouseY);
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+        this.renderBackground(guiGraphics);
+        drawGuiBackgroundLayer(guiGraphics, partialTicks, mouseX, mouseY);
+        super.render(guiGraphics, mouseX, mouseY, partialTicks);
+        drawGuiForgroundLayer(guiGraphics, partialTicks, mouseX, mouseY);
     }
 
-    protected void drawGuiBackgroundLayer(PoseStack PoseStack, float partialTicks, int mouseX, int mouseY) {
+    protected void drawGuiBackgroundLayer(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
         int edgeSpacingX = (this.width - this.xSize) / 2;
         int edgeSpacingY = (this.height - this.ySize) / 2;
 
-        RenderSystem.setShaderTexture(0, TEXTURE);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
-        this.blit(PoseStack, edgeSpacingX, edgeSpacingY, 0, 0, this.xSize, this.ySize);
+        guiGraphics.blit(TEXTURE, edgeSpacingX, edgeSpacingY, 0, 0, this.xSize, this.ySize);
     }
 
-    protected void drawGuiForgroundLayer(PoseStack PoseStack, float partialTicks, int mouseX, int mouseY) {
+    protected void drawGuiForgroundLayer(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
         int edgeSpacingX = (this.width - this.xSize) / 2;
         int edgeSpacingY = (this.height - this.ySize) / 2;
 
         internal.setPos(edgeSpacingX + selectionXPos - internal.width - selectionSpacing / 2, edgeSpacingY + selectionYPos);
-        internal.render(PoseStack, mouseX, mouseY, this);
+        internal.render(guiGraphics, mouseX, mouseY);
         external.setPos(edgeSpacingX + selectionXPos + selectionSpacing / 2, edgeSpacingY + selectionYPos);
-        external.render(PoseStack, mouseX, mouseY, this);
+        external.render(guiGraphics, mouseX, mouseY);
 
         cultivationText.setPos(edgeSpacingX + cultivationTextX, edgeSpacingY + cultivationTextY);
         cultivationText.setSize(cultivationTextWidth, cultivationTextHeight);
         cultivationText.setText(Component.translatable("cultivationcraft.gui.cultivationtype." + type).getString());
-        cultivationText.render(this, font, PoseStack, mouseX, mouseY);
+        cultivationText.render(guiGraphics, font, mouseX, mouseY);
 
         cultivate.setPos(edgeSpacingX + cultivateXPos - cultivate.width / 2, edgeSpacingY + cultivateYPos);
-        cultivate.render(PoseStack, mouseX, mouseY, this);
+        cultivate.render(guiGraphics, mouseX, mouseY);
     }
 }

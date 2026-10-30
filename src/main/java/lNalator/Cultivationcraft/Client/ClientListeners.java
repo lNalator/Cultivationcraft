@@ -32,11 +32,9 @@ import lNalator.Cultivationcraft.Client.GUI.DivineSensePingOverlay;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.PassiveTechniques.PassiveTechnique;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.BlockHitResult;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.material.FogType;
@@ -185,7 +183,7 @@ public class ClientListeners {
         if (event.getOverlay().id() == VanillaGuiOverlay.HOTBAR.id()) {
             // Do not render the skill hotbar if the player has no cultivation
             if (CultivatorStats.getCultivatorStats(genericClientFunctions.getPlayer()).getCultivationType() != CultivationTypes.NO_CULTIVATION) {
-                SkillHotbarOverlay.PreRenderSkillHotbar(event.getPoseStack());
+                SkillHotbarOverlay.PreRenderSkillHotbar(event.getGuiGraphics());
                 Renderer.renderTechniqueOverlays();
             }
         } else if (event.getOverlay().id() == VanillaGuiOverlay.FOOD_LEVEL.id()) {
@@ -200,8 +198,8 @@ public class ClientListeners {
             event.setCanceled(true);
         } else if (event.getOverlay().id() == VanillaGuiOverlay.ARMOR_LEVEL.id()) {
             // Move the armor/XP/air bar up slightly
-            event.getPoseStack().pushPose();
-            event.getPoseStack().translate(0, -10, 0);
+            event.getGuiGraphics().pose().pushPose();
+            event.getGuiGraphics().pose().translate(0, -10, 0);
         } else if (event.getOverlay().id() == VanillaGuiOverlay.AIR_LEVEL.id()) {
             // Cancel the vanilla air level rendering
             event.setCanceled(true);
@@ -217,14 +215,14 @@ public class ClientListeners {
 
         if (event.getOverlay().id() == VanillaGuiOverlay.EXPERIENCE_BAR.id()) {
             // Remove the upward translation
-            event.getPoseStack().popPose();
+            event.getGuiGraphics().pose().popPose();
         }
 
         if (event.getOverlay().id() == VanillaGuiOverlay.HOTBAR.id()) {
-            SkillHotbarOverlay.PostRenderSkillHotbar(event.getPoseStack());
+            SkillHotbarOverlay.PostRenderSkillHotbar(event.getGuiGraphics());
 
             // Vigilance: where someone senses this player from
-            DivineSensePingOverlay.render(event.getPoseStack(), event.getPartialTick());
+            DivineSensePingOverlay.render(event.getGuiGraphics(), event.getPartialTick());
 
             // Draw dynamic Tier/Age HUD when looking at a Procedural Plant (visible only during Divine Sense)
             if (Renderer.QiSourcesVisible) {
@@ -250,15 +248,14 @@ public class ClientListeners {
                                 if (entry != null && entry.element != null) {
                                     ResourceLocation el = new ResourceLocation(entry.element);
                                     ResourceLocation icon = new ResourceLocation("cultivationcraft", "textures/gui/plants/element_icons/" + el.getPath() + ".png");
-                                    RenderSystem.setShaderTexture(0, icon);
                                     int iw = 12, ih = 12;
                                     int ix = x - iw - 4;
                                     int iy = y - 2;
-                                    GuiComponent.blit(event.getPoseStack(), ix, iy, 0, 0, iw, ih, iw, ih);
+                                    event.getGuiGraphics().blit(icon, ix, iy, 0, 0, iw, ih, iw, ih);
                                 }
                             } catch (Exception ignored) {
                             }
-                            font.draw(event.getPoseStack(), text, x, y, 0xFFFFFF);
+                            event.getGuiGraphics().drawString(font, text, x, y, 0xFFFFFF, false);
                         }
                     }
                 }
@@ -272,7 +269,7 @@ public class ClientListeners {
                             element.getName(), Component.translatable("cultivationcraft.qisource.tier." + source.getDensityTier())).getString();
                     int x = (mc.getWindow().getGuiScaledWidth() - font.width(text)) / 2;
                     int y = mc.getWindow().getGuiScaledHeight() / 2 + 24;
-                    font.draw(event.getPoseStack(), text, x, y, element.color.getRGB() & 0xFFFFFF);
+                    event.getGuiGraphics().drawString(font, text, x, y, element.color.getRGB() & 0xFFFFFF, false);
                 }
             }
         }

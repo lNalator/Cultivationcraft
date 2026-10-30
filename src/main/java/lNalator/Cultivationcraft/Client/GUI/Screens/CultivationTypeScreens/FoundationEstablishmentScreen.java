@@ -1,12 +1,10 @@
 package lNalator.Cultivationcraft.Client.GUI.Screens.CultivationTypeScreens;
 
-import net.minecraft.client.gui.GuiComponent;
 import lNalator.Cultivationcraft.Common.Qi.Cultivation.CultivationType;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
 
 public class FoundationEstablishmentScreen extends CultivationTypeScreen {
@@ -18,14 +16,13 @@ public class FoundationEstablishmentScreen extends CultivationTypeScreen {
         ySize = 115;
     }
 
-    public void render(PoseStack PoseStack, float partialTicks, int xPos, int yPos, Screen screen, CultivationType cultivation, Font font) {
-        RenderSystem.setShaderTexture(0, TEXTURE);
+    public void render(GuiGraphics guiGraphics, float partialTicks, int xPos, int yPos, CultivationType cultivation, Font font) {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
         float maxProgress = cultivation.getMaxStage() * cultivation.getMaxTechLevelWithoutPrevious();
         float currentProgress = cultivation.getTechLevelProgress(cultivation.getPassive());
         float height = currentProgress / maxProgress;
 
-        GuiComponent.blit(PoseStack, xPos, yPos + (int) (ySize * (1 - height)), screen.getBlitOffset(), 0, (int) (ySize * (1 - height)), xSize, (int) (ySize * height), xSize, ySize);
+        guiGraphics.blit(TEXTURE, xPos, yPos + (int) (ySize * (1 - height)), 0, (int) (ySize * (1 - height)), xSize, (int) (ySize * height), xSize, ySize);
     }
 }

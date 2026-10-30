@@ -1,5 +1,7 @@
 package lNalator.Cultivationcraft;
 
+import net.minecraft.world.item.CreativeModeTabs;
+import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import lNalator.Cultivationcraft.Client.ClientItemControl;
 import lNalator.Cultivationcraft.Client.Animations.GenericQiPoses;
 import lNalator.Cultivationcraft.Client.Textures.initTextures;
@@ -19,8 +21,6 @@ import lNalator.Cultivationcraft.Common.Qi.BodyParts.Lungs.BreathingHandler;
 import lNalator.Cultivationcraft.Common.Qi.Elements.Elements;
 import lNalator.Cultivationcraft.Common.Qi.Quests.DefaultQuests;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueStats.DefaultTechniqueStatIDs;
-import lNalator.Cultivationcraft.Common.Worldgen.ModBiomeModifiers;
-import lNalator.Cultivationcraft.Common.Worldgen.ModWorldgen;
 import lNalator.Cultivationcraft.Network.PacketHandler;
 import net.minecraftforge.client.event.RegisterClientTooltipComponentFactoriesEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -51,6 +51,7 @@ public class Cultivationcraft {
         modEventBus.addListener(this::commonInit);
         modEventBus.addListener(this::clientInit);
         modEventBus.addListener(this::registerTooltipFactories);
+        modEventBus.addListener(this::buildCreativeTabs);
 
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, Config.Server.spec, "cultivationcraft.toml");
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, Config.Client.spec, "cultivationcraft-client.toml");
@@ -61,8 +62,6 @@ public class Cultivationcraft {
         lNalator.Cultivationcraft.Common.Knowledge.JadeSlipLootModifier.init(modEventBus);
         lNalator.Cultivationcraft.Common.Alchemy.AlchemyEffects.init(modEventBus);
         lNalator.Cultivationcraft.Common.Qi.Elements.ElementalStates.init(modEventBus);
-        ModWorldgen.init();
-        ModBiomeModifiers.init();
         BodyPartNames.registerLungLocations();
         CultivationAdvancements.init(modEventBus);
     }
@@ -90,5 +89,19 @@ public class Cultivationcraft {
     protected void registerTooltipFactories(final RegisterClientTooltipComponentFactoriesEvent event) {
         event.register(PlantBadgeTooltipData.class, PlantBadgeTooltip::new);
     }
-}
 
+    // Item.Properties.tab() was removed in 1.19.3: items join the vanilla tabs here
+    private void buildCreativeTabs(BuildCreativeModeTabContentsEvent event) {
+        if (event.getTabKey() == CreativeModeTabs.INGREDIENTS) {
+            event.accept(ItemRegister.JADE_CHUNK);
+            event.accept(ItemRegister.SPIRIT_STONE);
+        } else if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
+            event.accept(ItemRegister.ELEMENT_WAND);
+        } else if (event.getTabKey() == CreativeModeTabs.FUNCTIONAL_BLOCKS) {
+            event.accept(BlockRegister.ALCHEMY_CAULDRON_ITEM);
+        } else if (event.getTabKey() == CreativeModeTabs.NATURAL_BLOCKS) {
+            event.accept(BlockRegister.JADE_ORE_ITEM);
+            event.accept(BlockRegister.SPIRIT_STONE_ORE_ITEM);
+        }
+    }
+}

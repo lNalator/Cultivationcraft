@@ -1,14 +1,12 @@
 package lNalator.Cultivationcraft.Client;
 
 import lNalator.Cultivationcraft.Client.Renderers.BakedModels.ProceduralPlantBakedModel;
-import lNalator.Cultivationcraft.Client.Renderers.BakedModels.ProceduralPlantTextures;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ModelEvent;
-import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -24,13 +22,9 @@ public final class ProceduralPlantRenderSetup {
     private ProceduralPlantRenderSetup() {
     }
 
+    // The procplant textures are stitched by the vanilla blocks atlas "block/" directory source
     @SubscribeEvent
-    public static void onTextureStitch(TextureStitchEvent.Pre event) {
-        ProceduralPlantTextures.register(event);
-    }
-
-    @SubscribeEvent
-    public static void onModelsReady(ModelEvent.BakingCompleted event) {
+    public static void onModelsReady(ModelEvent.ModifyBakingResult event) {
         Map<ResourceLocation, BakedModel> models = event.getModels();
         List<ModelResourceLocation> targets = new ArrayList<>();
         for (ResourceLocation key : models.keySet()) {

@@ -145,7 +145,7 @@ public class Technique {
     }
 
     public void levelUp(Player player, double amount) {
-        if (!canLevel || player.level.isClientSide) {
+        if (!canLevel || player.level().isClientSide) {
             return;
         }
 
@@ -393,7 +393,7 @@ public class Technique {
         cooldownCount = cooldown;
         currentChannel = 0;
 
-        if (player.level.isClientSide) {
+        if (player.level().isClientSide) {
             toDeactivate = false;
         } else {
             toDeactivate = true;

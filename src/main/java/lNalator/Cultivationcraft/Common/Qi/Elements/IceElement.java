@@ -11,7 +11,7 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.tags.TagKey;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import lNalator.Cultivationcraft.Common.Qi.Damage.QiDamageSource;
 import net.minecraft.world.entity.Entity;
@@ -42,7 +42,7 @@ public class IceElement extends ElementVariant {
 
     public static final int BASE_FREEZE_TICKS = 100;
     public static final int MAX_FREEZE_TICKS = 600;
-    public static final TagKey<Block> FREEZE_IMMUNE = TagKey.create(Registry.BLOCK_REGISTRY, new ResourceLocation(Cultivationcraft.MODID, "freeze_immune"));
+    public static final TagKey<Block> FREEZE_IMMUNE = TagKey.create(Registries.BLOCK, new ResourceLocation(Cultivationcraft.MODID, "freeze_immune"));
 
     @Override
     public void effectBlock(Level level, BlockPos pos) {

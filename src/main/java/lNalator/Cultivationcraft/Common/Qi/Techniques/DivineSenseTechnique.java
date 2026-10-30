@@ -186,7 +186,7 @@ public class DivineSenseTechnique extends Technique {
             Renderer.QiSourcesVisible = true;
             Renderer.DivineSenseMask = senseMask;
             Renderer.QiSenseRadius = getTechniqueStat(DETECTION_RADIUS, event.player);
-            Renderer.QiSenseTick = event.player.level.getGameTime();
+            Renderer.QiSenseTick = event.player.level().getGameTime();
         }
 
         // Resource depletion is decided on the server, not from a stale client reserve.
@@ -218,9 +218,9 @@ public class DivineSenseTechnique extends Technique {
 
         int radius = getSenseProfile(observer).radius();
         int realm = getRealm(observer);
-        long now = observer.level.getGameTime();
+        long now = observer.level().getGameTime();
 
-        for (Player target : observer.level.players()) {
+        for (Player target : observer.level().players()) {
             if (target == observer || !(target instanceof ServerPlayer serverTarget) || target.isSpectator() || !target.isAlive()) {
                 continue;
             }

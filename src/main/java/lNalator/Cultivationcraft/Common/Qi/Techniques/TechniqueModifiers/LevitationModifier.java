@@ -34,8 +34,8 @@ public class LevitationModifier extends TechniqueModifier {
     // The player still accumulates fall distance; the landing damage is reduced in CommonListeners
     @Override
     public void playerTick(Player player) {
-        if (!player.level.isClientSide) {
-            if (!player.isShiftKeyDown() || player.isOnGround()) {
+        if (!player.level().isClientSide) {
+            if (!player.isShiftKeyDown() || player.onGround()) {
                 sneakStart.remove(player.getUUID());
             } else if (player.fallDistance > 0) {
                 sneakStart.putIfAbsent(player.getUUID(), player.fallDistance);

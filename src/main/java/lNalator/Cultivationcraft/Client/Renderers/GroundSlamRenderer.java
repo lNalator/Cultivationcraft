@@ -1,9 +1,10 @@
 package lNalator.Cultivationcraft.Client.Renderers;
 
+import com.mojang.math.Axis;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Vector3f;
+import org.joml.Vector3f;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -58,7 +59,7 @@ public final class GroundSlamRenderer {
 
         List<Piece> pieces = new ArrayList<>();
         int r = (int) Math.ceil(radius);
-        BlockPos ground = new BlockPos(center).below();
+        BlockPos ground = BlockPos.containing(center).below();
 
         for (int dx = -r; dx <= r; dx++) {
             for (int dz = -r; dz <= r; dz++) {
@@ -150,7 +151,7 @@ public final class GroundSlamRenderer {
                 pose.pushPose();
                 pose.translate(piece.pos.getX() + 0.5 - camera.x, piece.pos.getY() + lift - camera.y, piece.pos.getZ() + 0.5 - camera.z);
                 // Tilt the outer edge up, away from the impact
-                pose.mulPose(new Vector3f((float) axis.x, 0, (float) axis.z).rotationDegrees((float) (MAX_TILT * rise * falloff)));
+                pose.mulPose(Axis.of(new Vector3f((float) axis.x, 0, (float) axis.z)).rotationDegrees((float) (MAX_TILT * rise * falloff)));
                 pose.translate(-0.5, 0, -0.5);
                 mc.getBlockRenderer().renderSingleBlock(piece.state, pose, BLOCKS, LevelRenderer.getLightColor(mc.level, piece.pos.above()), OverlayTexture.NO_OVERLAY);
                 pose.popPose();

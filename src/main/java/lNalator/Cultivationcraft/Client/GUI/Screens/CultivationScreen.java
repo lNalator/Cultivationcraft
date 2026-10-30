@@ -6,7 +6,7 @@ import lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.CultivatorS
 import lNalator.Cultivationcraft.Common.Qi.Cultivation.CultivationType;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import lNalator.Cultivationcraft.Network.ClientPacketHandler;
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -74,13 +74,13 @@ public class CultivationScreen extends GenericTabScreen {
     }
 
     @Override
-    public void render(PoseStack PoseStack, int mouseX, int mouseY, float partialTicks) {
-        super.render(PoseStack, mouseX, mouseY, partialTicks);
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+        super.render(guiGraphics, mouseX, mouseY, partialTicks);
 
-        drawGuiForgroundLayer(PoseStack, partialTicks, mouseX, mouseY);
+        drawGuiForgroundLayer(guiGraphics, partialTicks, mouseX, mouseY);
     }
 
-    protected void drawGuiForgroundLayer(PoseStack PoseStack, float partialTicks, int mouseX, int mouseY) {
+    protected void drawGuiForgroundLayer(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
         CultivationType cultivation = CultivatorStats.getCultivatorStats(minecraft.player).getCultivation();
 
         int edgeSpacingX = (this.width - this.xSize) / 2;
@@ -88,9 +88,9 @@ public class CultivationScreen extends GenericTabScreen {
 
         String name = cultivation.getName() + ": " + Component.translatable("cultivationcraft.gui.stage").getString() + " " + cultivation.getStage() + "/" + cultivation.getMaxStage();
 
-        font.draw(PoseStack, name, edgeSpacingX + this.xSize / 2 - font.width(name) / 2, edgeSpacingY + nameYPos, 0);
+        guiGraphics.drawString(font, name, edgeSpacingX + this.xSize / 2 - font.width(name) / 2, edgeSpacingY + nameYPos, 0, false);
 
-        font.draw(PoseStack, Component.translatable("cultivationcraft.gui.breakthroughrequirements").getString(), edgeSpacingX + breakthroughXPos, edgeSpacingY + breakthroughYPos - 10, 0);
+        guiGraphics.drawString(font, Component.translatable("cultivationcraft.gui.breakthroughrequirements").getString(), edgeSpacingX + breakthroughXPos, edgeSpacingY + breakthroughYPos - 10, 0, false);
         breakthrough.setPos(edgeSpacingX + breakthroughXPos, edgeSpacingY + breakthroughYPos);
 
         breakthrough.setText(cultivation.breakthroughProgress(Minecraft.getInstance().player));
@@ -113,18 +113,18 @@ public class CultivationScreen extends GenericTabScreen {
             }
 
             breakthroughButton.setPos(edgeSpacingX + breakXPos, edgeSpacingY + breakYPos);
-            breakthroughButton.render(PoseStack, mouseX, mouseY, this);
+            breakthroughButton.render(guiGraphics, mouseX, mouseY);
         }
 
-        breakthrough.render(this, font, PoseStack, mouseX, mouseY);
+        breakthrough.render(guiGraphics, font, mouseX, mouseY);
 
-        cultivation.getScreen().renderButtons(PoseStack, edgeSpacingX, edgeSpacingY, mouseX, mouseY, this);
-        cultivation.getScreen().render(PoseStack, partialTicks, edgeSpacingX + 159, edgeSpacingY + 32, this, cultivation, font);
+        cultivation.getScreen().renderButtons(guiGraphics, edgeSpacingX, edgeSpacingY, mouseX, mouseY);
+        cultivation.getScreen().render(guiGraphics, partialTicks, edgeSpacingX + 159, edgeSpacingY + 32, cultivation, font);
 
         stats.setPos(edgeSpacingX + statsXPos, edgeSpacingY + statsYPos);
-        stats.render(PoseStack, mouseX, mouseY, this);
+        stats.render(guiGraphics, mouseX, mouseY);
 
         reset.setPos(edgeSpacingX + statsXPos, edgeSpacingY + statsYPos + 20);
-        reset.render(PoseStack, mouseX, mouseY, this);
+        reset.render(guiGraphics, mouseX, mouseY);
     }
 }

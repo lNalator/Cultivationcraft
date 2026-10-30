@@ -83,7 +83,7 @@ public class IceWalkTechnique extends Technique {
             int frozen = 0;
 
             for (BlockPos pos : BlockPos.betweenClosed(below.offset(-range, 0, -range), below.offset(range, 0, range))) {
-                if (pos.distSqr(below) <= range * range && freezeLiquid(player.level, pos.immutable())) {
+                if (pos.distSqr(below) <= range * range && freezeLiquid(player.level(), pos.immutable())) {
                     frozen++;
                 }
             }

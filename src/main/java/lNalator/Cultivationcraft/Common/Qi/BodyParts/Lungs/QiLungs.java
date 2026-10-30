@@ -3,7 +3,6 @@ package lNalator.Cultivationcraft.Common.Qi.BodyParts.Lungs;
 import lNalator.Cultivationcraft.Common.Qi.BodyParts.Lungs.Breath.Breath;
 import lNalator.Cultivationcraft.Common.Qi.BodyParts.Lungs.Lung.QiLung;
 import lNalator.Cultivationcraft.Common.Qi.BodyParts.PlayerHealthManager;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 
@@ -76,7 +75,7 @@ public class QiLungs extends Lungs {
         }
 
         if (getSuffocating() < 0) {
-            player.hurt(DamageSource.DROWN, getSuffocating() / -20F);
+            player.hurt(player.damageSources().drown(), getSuffocating() / -20F);
         }
     }
 

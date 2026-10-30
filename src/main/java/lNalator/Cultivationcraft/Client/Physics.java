@@ -22,7 +22,7 @@ public class Physics {
     public static Vec3 getDelta(Player player) {
         Vec3 currentMotion = player.getDeltaMovement();
 
-        if (player.level.isClientSide) {
+        if (player.level().isClientSide) {
             currentMotion = PoseHandler.getPlayerPoseHandler(player.getUUID()).getDeltaMovement();
         }
 
@@ -52,8 +52,8 @@ public class Physics {
 
     // Copied from LivingEntity, cuz it's protected for no reason
     public static float getBlockJumpFactor(Player player) {
-        float f = player.level.getBlockState(player.blockPosition()).getBlock().getJumpFactor();
-        float f1 = player.level.getBlockState(new BlockPos(player.getX(), player.getBoundingBox().minY - 0.5000001D, player.getZ())).getBlock().getJumpFactor();
+        float f = player.level().getBlockState(player.blockPosition()).getBlock().getJumpFactor();
+        float f1 = player.level().getBlockState(BlockPos.containing(player.getX(), player.getBoundingBox().minY - 0.5000001D, player.getZ())).getBlock().getJumpFactor();
         return (double) f == 1.0D ? f1 : f;
     }
 
@@ -67,7 +67,7 @@ public class Physics {
             return;
         }
 
-        if (bounceHeight > 0 && player.isOnGround()) {
+        if (bounceHeight > 0 && player.onGround()) {
             Bounce(player, bounceHeight);
         }
 
@@ -121,7 +121,7 @@ public class Physics {
 
             double d3 = player.getLookAngle().y;
             double d4 = d3 < -0.2D ? 0.085D : 0.06D;
-            if (d3 <= 0.0D ||  !player.level.getBlockState(new BlockPos(player.getX(), player.getY() + 1.0D - 0.1D, player.getZ())).getFluidState().isEmpty())
+            if (d3 <= 0.0D ||  !player.level().getBlockState(new BlockPos(player.getX(), player.getY() + 1.0D - 0.1D, player.getZ())).getFluidState().isEmpty())
             {
                 Vec3 vec31 = player.getDeltaMovement();
                 player.setDeltaMovement(vec31.add(0.0D, (d3 - vec31.y) * d4, 0.0D));

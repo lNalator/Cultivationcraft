@@ -12,7 +12,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
@@ -38,7 +38,7 @@ public class WarpModifier extends TechniqueModifier {
     @Override
     public boolean flyingSwordMovementOverride(FlyingSwordEntity sword, Vec3 targetPos) {
         // Do nothing if the sword is already in range of the targetPos
-        if (sword.level.isClientSide() || sword.position().subtract(targetPos).length() < range || sword.getOwningPlayer() == null) {
+        if (sword.level().isClientSide() || sword.position().subtract(targetPos).length() < range || sword.getOwningPlayer() == null) {
             return false;
         }
 
@@ -46,7 +46,7 @@ public class WarpModifier extends TechniqueModifier {
     }
 
     public void onHitTaken(Player owner, float damage, ResourceLocation defensiveElement, QiDamageSource source) {
-        if (damage <= 0 || source.isInternal() || source.msgId.compareTo(DamageSource.FALL.getMsgId()) == 0) {
+        if (damage <= 0 || source.isInternal() || source.is(DamageTypes.FALL)) {
             return;
         }
 
@@ -58,7 +58,7 @@ public class WarpModifier extends TechniqueModifier {
         Vec3 originalDestination = destination;
 
         // Change the Y position until there is an air block on and above the position, but not below
-        while (!owner.level.getBlockState(new BlockPos(destination)).isAir() || !owner.level.getBlockState(new BlockPos(destination.x, destination.y + 1, destination.z)).isAir() || owner.level.getBlockState(new BlockPos(destination.x, destination.y - 1, destination.z)).isAir()) {
+        while (!owner.level().getBlockState(BlockPos.containing(destination)).isAir() || !owner.level().getBlockState(BlockPos.containing(destination.x, destination.y + 1, destination.z)).isAir() || owner.level().getBlockState(BlockPos.containing(destination.x, destination.y - 1, destination.z)).isAir()) {
             destination = originalDestination.add(0, (int) modifier * negmodifier, 0);
 
             negmodifier *= -1;
@@ -101,10 +101,10 @@ public class WarpModifier extends TechniqueModifier {
         QuestHandler.progressQuest(owner, Quest.ENDER_TELEPORT, 1);
 
         for (int i = 0; i < 32; ++i) {
-            ((ServerLevel) entity.level).sendParticles(ParticleTypes.PORTAL, entity.position().x, entity.position().y + owner.getRandom().nextDouble() * 2.0D, entity.position().z, 1, owner.getRandom().nextGaussian(), 0.0D, owner.getRandom().nextGaussian(), 0);
+            ((ServerLevel) entity.level()).sendParticles(ParticleTypes.PORTAL, entity.position().x, entity.position().y + owner.getRandom().nextDouble() * 2.0D, entity.position().z, 1, owner.getRandom().nextGaussian(), 0.0D, owner.getRandom().nextGaussian(), 0);
         }
 
-        entity.level.playSound(null, entity, SoundEvents.ENDERMAN_TELEPORT, entity.getSoundSource(), 1, 1);
+        entity.level().playSound(null, entity, SoundEvents.ENDERMAN_TELEPORT, entity.getSoundSource(), 1, 1);
 
         entity.teleportTo(pos.x, pos.y, pos.z);
         entity.resetFallDistance();

@@ -5,11 +5,9 @@ import lNalator.Cultivationcraft.Client.GUI.Screens.ConceptScreen;
 import lNalator.Cultivationcraft.Common.Qi.Cultivation.CultivationType;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiComponent;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
@@ -30,10 +28,10 @@ public class CultivationTypeScreen {
         conceptButton = new GUIButton("CONCEPT", Component.translatable("cultivationcraft.gui.concept").getString());
     }
 
-    public void renderButtons(PoseStack poseStack, int xPos, int yPos, int mouseX, int mouseY, GuiComponent gui) {
+    public void renderButtons(GuiGraphics guiGraphics, int xPos, int yPos, int mouseX, int mouseY) {
         if (conceptButton != null) {
             conceptButton.setPos(xPos + conceptButtonX, yPos + conceptButtonY);
-            conceptButton.render(poseStack, mouseX, mouseY, gui);
+            conceptButton.render(guiGraphics, mouseX, mouseY);
         }
     }
 
@@ -47,10 +45,9 @@ public class CultivationTypeScreen {
         return false;
     }
 
-    public void render(PoseStack PoseStack, float partialTicks, int xPos, int yPos, Screen screen, CultivationType cultivation, Font font) {
-        RenderSystem.setShaderTexture(0, TEXTURE);
+    public void render(GuiGraphics guiGraphics, float partialTicks, int xPos, int yPos, CultivationType cultivation, Font font) {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
-        GuiComponent.blit(PoseStack, xPos, yPos, screen.getBlitOffset(), 0, 0, xSize, ySize, xSize, ySize);
+        guiGraphics.blit(TEXTURE, xPos, yPos, 0, 0, xSize, ySize, xSize, ySize);
     }
 }

@@ -9,7 +9,7 @@ import lNalator.Cultivationcraft.Common.Qi.Cultivation.CultivationType;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import lNalator.Cultivationcraft.Network.ClientPacketHandler;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -116,26 +116,25 @@ public class SelectNewCultivationScreen extends Screen {
     }
 
     @Override
-    public void render(PoseStack PoseStack, int mouseX, int mouseY, float partialTicks) {
-        super.render(PoseStack, mouseX, mouseY, partialTicks);
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+        super.render(guiGraphics, mouseX, mouseY, partialTicks);
 
         int edgeSpacingX = (this.width - this.xSize) / 2;
         int edgeSpacingY = (this.height - this.ySize) / 2;
 
-        RenderSystem.setShaderTexture(0, TEXTURE);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
-        this.blit(PoseStack, edgeSpacingX, edgeSpacingY, 0, 0, this.xSize, this.ySize);
+        guiGraphics.blit(TEXTURE, edgeSpacingX, edgeSpacingY, 0, 0, this.xSize, this.ySize);
 
-        font.draw(PoseStack, name, edgeSpacingX + this.xSize / 2 - font.width(name) / 2, edgeSpacingY + nameTextY, Color.darkGray.getRGB());
+        guiGraphics.drawString(font, name, edgeSpacingX + this.xSize / 2 - font.width(name) / 2, edgeSpacingY + nameTextY, Color.darkGray.getRGB(), false);
 
         description.setPos(edgeSpacingX + descTextX, edgeSpacingY + descTextY);
         description.setSize(descTextWidth, descTextHeight);
         description.setText(selection.getText());
-        description.render(this, font, PoseStack, mouseX, mouseY);
+        description.render(guiGraphics, font, mouseX, mouseY);
 
         selection.setPos(edgeSpacingX + selectTextX, edgeSpacingY + selectTextY);
-        selection.render(this, font, PoseStack, mouseX, mouseY);
+        selection.render(guiGraphics, font, mouseX, mouseY);
 
         if (selection.getSelected() != null) {
             select.enable(); 
@@ -144,6 +143,6 @@ public class SelectNewCultivationScreen extends Screen {
         }
 
         select.setPos(edgeSpacingX + selectButtonX - select.width / 2, selectButtonY + edgeSpacingY);
-        select.render(PoseStack, mouseX, mouseY, this);
+        select.render(guiGraphics, mouseX, mouseY);
     }
 }

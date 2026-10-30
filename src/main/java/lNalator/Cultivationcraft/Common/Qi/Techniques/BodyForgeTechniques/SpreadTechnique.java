@@ -113,7 +113,7 @@ public class SpreadTechnique extends Technique {
         tickInactiveClient(event);
 
         // Reset flapping if player is on the ground
-        if (event.player.isOnGround() || event.player.isInWater()) {
+        if (event.player.onGround() || event.player.isInWater()) {
             cooldownCount = 0;
             jumpPressed = false;
             groundCheck = false;
@@ -161,7 +161,7 @@ public class SpreadTechnique extends Technique {
     }
 
     protected void flapUp(Player player) {
-        if (player.isOnGround() || player.isInWater()) {
+        if (player.onGround() || player.isInWater()) {
             groundCheck = true;
         }
 
@@ -172,7 +172,7 @@ public class SpreadTechnique extends Technique {
         // Don't flap if jumping off the ground
         if (groundCheck == true) {
             groundCheck = false;
-        } else if (!player.isOnGround() && cooldownCount == 0) {
+        } else if (!player.onGround() && cooldownCount == 0) {
             if (StaminaHandler.consumeStamina(player, (float) getTechniqueStat(DefaultTechniqueStatIDs.staminaCost, player))) {
                 cooldownCount = cooldown;
             }

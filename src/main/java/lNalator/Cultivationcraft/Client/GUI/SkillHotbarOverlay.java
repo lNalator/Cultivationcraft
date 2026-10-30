@@ -4,11 +4,10 @@ import lNalator.Cultivationcraft.Client.KeybindingControl;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorTechniques.CultivatorTechniques;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.Technique;
 import lNalator.Cultivationcraft.Network.ClientPacketHandler;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 
 public class SkillHotbarOverlay {
@@ -24,53 +23,49 @@ public class SkillHotbarOverlay {
     // Render in the post-render phase if the hotbar is active
     // In the pre-render phase if it isn't
     // This is necessary so that it renders in the right order for transparency to work properly
-    public static void PreRenderSkillHotbar(PoseStack stack) {
+    public static void PreRenderSkillHotbar(GuiGraphics guiGraphics) {
         if (!isActive) {
-            RenderSkillHotbar(stack);
+            RenderSkillHotbar(guiGraphics);
         }
     }
 
-    public static void PostRenderSkillHotbar(PoseStack stack) {
+    public static void PostRenderSkillHotbar(GuiGraphics guiGraphics) {
         if (isActive) {
-            RenderSkillHotbar(stack);
+            RenderSkillHotbar(guiGraphics);
         }
     }
 
-    protected static void RenderSkillHotbar(PoseStack stack) {
+    protected static void RenderSkillHotbar(GuiGraphics guiGraphics) {
         // Enable transparency
         RenderSystem.enableBlend();
-
-        GuiComponent gui = Minecraft.getInstance().gui;
-
-        RenderSystem.setShaderTexture(0, WIDGETS_TEX_PATH);
 
         int scaledWidth = Minecraft.getInstance().getWindow().getGuiScaledWidth() / 2;
         int scaledHeight = Minecraft.getInstance().getWindow().getGuiScaledHeight();
 
         // Store the current Z layer to reset back to later
-        int blitOffset = gui.getBlitOffset();
+        guiGraphics.pose().pushPose();
 
         // Set the Z-layer to either in front of or behind the item hotbar based on whether this hotbar is active or not
         if (isActive) {
-            gui.setBlitOffset(200); 
+            guiGraphics.pose().translate(0, 0, 200); 
         }else {
-            gui.setBlitOffset(-91);
+            guiGraphics.pose().translate(0, 0, -91);
         }
 
         // Draw the hotbar
-        gui.blit(stack, scaledWidth - 83, scaledHeight - 30, 0, 0, 182, 22);
+        guiGraphics.blit(WIDGETS_TEX_PATH, scaledWidth - 83, scaledHeight - 30, 0, 0, 182, 22);
 
         // Draw the selection box
-        gui.blit(stack, scaledWidth - 83 - 1 + skillSelected * 20, scaledHeight - 30 - 1, 0, 22, 24, 22);
+        guiGraphics.blit(WIDGETS_TEX_PATH, scaledWidth - 83 - 1 + skillSelected * 20, scaledHeight - 30 - 1, 0, 22, 24, 22);
 
         // Draw icons in the selection box
-        TechniqueIcons.renderIcons(stack, scaledWidth + 3 - 83, scaledHeight + 3 - 30, gui, 20);
-        TechniqueIcons.highlightActive(stack, scaledWidth + 3 - 83, scaledHeight + 3 - 30, gui, 20);
-        TechniqueIcons.showCooldowns(stack, scaledWidth + 3 - 83, scaledHeight + 3 - 30, gui, 20);
-        renderKeyLabels(stack, scaledWidth + 3 - 83, scaledHeight + 3 - 30, gui.getBlitOffset());
+        TechniqueIcons.renderIcons(guiGraphics, scaledWidth + 3 - 83, scaledHeight + 3 - 30, 20);
+        TechniqueIcons.highlightActive(guiGraphics, scaledWidth + 3 - 83, scaledHeight + 3 - 30, 20);
+        TechniqueIcons.showCooldowns(guiGraphics, scaledWidth + 3 - 83, scaledHeight + 3 - 30, 20);
+        renderKeyLabels(guiGraphics, scaledWidth + 3 - 83, scaledHeight + 3 - 30);
 
         // Reset the Z layer to its original value
-        gui.setBlitOffset(blitOffset);
+        guiGraphics.pose().popPose();
     }
 
     // Called when the use item button is pressed and the hotbar is active
@@ -97,7 +92,7 @@ public class SkillHotbarOverlay {
     }
 
     // Draw the bound key of each slot in the top-left corner of its icon (visible even behind the item hotbar)
-    protected static void renderKeyLabels(PoseStack stack, int xpos, int ypos, int z) {
+    protected static void renderKeyLabels(GuiGraphics guiGraphics, int xpos, int ypos) {
         if (KeybindingControl.techniqueKeys == null) {
             return;
         }
@@ -113,11 +108,12 @@ public class SkillHotbarOverlay {
             String label = key.getTranslatedKeyMessage().getString();
             label = label.substring(0, Math.min(3, label.length()));
 
-            stack.pushPose();
-            stack.translate(xpos + i * 20 - 2, ypos - 2, z + 1);
-            stack.scale(0.5F, 0.5F, 1F);
-            Minecraft.getInstance().font.drawShadow(stack, label, 0, 0, 0xFFFFFF);
-            stack.popPose();
+            // The pose is already translated to the hotbar's Z layer
+            guiGraphics.pose().pushPose();
+            guiGraphics.pose().translate(xpos + i * 20 - 2, ypos - 2, 1);
+            guiGraphics.pose().scale(0.5F, 0.5F, 1F);
+            guiGraphics.drawString(Minecraft.getInstance().font, label, 0, 0, 0xFFFFFF, true);
+            guiGraphics.pose().popPose();
         }
     }
 

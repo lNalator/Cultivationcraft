@@ -5,8 +5,8 @@ import lNalator.Cultivationcraft.Common.Containers.AlchemyQi;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -80,9 +80,9 @@ public class AlchemyCauldronScreen extends AbstractContainerScreen<AlchemyCauldr
     }
 
     @Override
-    public void render(PoseStack pose, int mouseX, int mouseY, float partialTick) {
-        renderBackground(pose);
-        fill(pose, stationLeft + PANEL_X, stationTop + PANEL_Y,
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        renderBackground(guiGraphics);
+        guiGraphics.fill(stationLeft + PANEL_X, stationTop + PANEL_Y,
                 stationLeft + PANEL_X + panelWidth(), stationTop + PANEL_Y + panelHeight(), 0xFF000000);
         double guiScale = minecraft.getWindow().getGuiScale();
         RenderSystem.enableScissor((int) ((stationLeft + PANEL_X) * guiScale),
@@ -99,27 +99,29 @@ public class AlchemyCauldronScreen extends AbstractContainerScreen<AlchemyCauldr
             menu.setVisibleSection(1);
             // Vanilla draws the station slots and drag previews. Draw the carried stack only
             // in the normal-scale inventory pass, so it can cross between both sections.
-            super.render(pose, -10000, -10000, partialTick);
+            super.render(guiGraphics, -10000, -10000, partialTick);
             for (int i = 0; i < AlchemyCauldronMenu.STATION_SLOTS; i++) {
                 Slot slot = menu.slots.get(i);
                 if (isHovering(slot.x, slot.y, 16, 16, mouseX, mouseY)) {
-                    renderSlotHighlight(pose, leftPos + slot.x, topPos + slot.y, getBlitOffset());
+                    renderSlotHighlight(guiGraphics, leftPos + slot.x, topPos + slot.y, 0);
                 }
             }
         } finally {
             menu.setVisibleSection(0);
             renderingPanel = false;
+            // Draw anything still batched with the panel transform before restoring it
+            guiGraphics.flush();
             modelView.popPose();
             RenderSystem.applyModelViewMatrix();
             RenderSystem.disableScissor();
         }
         RenderSystem.disableDepthTest();
-        drawFrame(pose);
-        font.draw(pose, title, stationLeft + 8, stationTop + 6, 0x404040);
+        drawFrame(guiGraphics);
+        guiGraphics.drawString(font, title, stationLeft + 8, stationTop + 6, 0x404040, false);
         RenderSystem.enableDepthTest();
         try {
             menu.setVisibleSection(2);
-            super.render(pose, mouseX, mouseY, partialTick);
+            super.render(guiGraphics, mouseX, mouseY, partialTick);
         } finally {
             menu.setVisibleSection(0);
         }
@@ -130,50 +132,48 @@ public class AlchemyCauldronScreen extends AbstractContainerScreen<AlchemyCauldr
                 break;
             }
         }
-        renderTooltip(pose, mouseX, mouseY);
+        renderTooltip(guiGraphics, mouseX, mouseY);
         if (hoveredSlot != null && hoveredSlot.index == menu.getPreviewSlot() && menu.getCarried().isEmpty()) {
-            renderComponentTooltip(pose, menu.previewTooltip(), mouseX, mouseY);
+            guiGraphics.renderComponentTooltip(font, menu.previewTooltip(), mouseX, mouseY);
         }
         if (hoveredSlot == null && menu.getCarried().isEmpty()) {
             if (inPanel(mouseX, mouseY)) {
-                drawPanelTooltip(pose, mouseX, mouseY); 
+                drawPanelTooltip(guiGraphics, mouseX, mouseY); 
             }else if (inStation(mouseX, mouseY)) {
-                renderTooltip(pose, Component.translatable("cultivationcraft.gui.alchemy.controls"), mouseX, mouseY);
+                guiGraphics.renderTooltip(font, Component.translatable("cultivationcraft.gui.alchemy.controls"), mouseX, mouseY);
             }
         }
     }
 
-    private void drawFrame(PoseStack pose) {
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+    private void drawFrame(GuiGraphics guiGraphics) {
         RenderSystem.setShaderColor(1, 1, 1, 1);
-        RenderSystem.setShaderTexture(0, FRAME);
         // Nine-slice the original 252x140 advancement frame, keeping its borders pixel-sized.
-        frameSlice(pose, 0, 0, 9, 18, 0, 0, 9, 18);
-        frameSlice(pose, 9, 0, stationWidth - 18, 18, 9, 0, 234, 18);
-        frameSlice(pose, stationWidth - 9, 0, 9, 18, 243, 0, 9, 18);
-        frameSlice(pose, 0, 18, 9, panelHeight(), 0, 18, 9, 113);
-        frameSlice(pose, stationWidth - 9, 18, 9, panelHeight(), 243, 18, 9, 113);
-        frameSlice(pose, 0, stationHeight - 9, 9, 9, 0, 131, 9, 9);
-        frameSlice(pose, 9, stationHeight - 9, stationWidth - 18, 9, 9, 131, 234, 9);
-        frameSlice(pose, stationWidth - 9, stationHeight - 9, 9, 9, 243, 131, 9, 9);
+        frameSlice(guiGraphics, 0, 0, 9, 18, 0, 0, 9, 18);
+        frameSlice(guiGraphics, 9, 0, stationWidth - 18, 18, 9, 0, 234, 18);
+        frameSlice(guiGraphics, stationWidth - 9, 0, 9, 18, 243, 0, 9, 18);
+        frameSlice(guiGraphics, 0, 18, 9, panelHeight(), 0, 18, 9, 113);
+        frameSlice(guiGraphics, stationWidth - 9, 18, 9, panelHeight(), 243, 18, 9, 113);
+        frameSlice(guiGraphics, 0, stationHeight - 9, 9, 9, 0, 131, 9, 9);
+        frameSlice(guiGraphics, 9, stationHeight - 9, stationWidth - 18, 9, 9, 131, 234, 9);
+        frameSlice(guiGraphics, stationWidth - 9, stationHeight - 9, 9, 9, 243, 131, 9, 9);
     }
 
-    private void frameSlice(PoseStack pose, int x, int y, int w, int h, int u, int v, int sw, int sh) {
-        blit(pose, stationLeft + x, stationTop + y, w, h, u, v, sw, sh, 256, 256);
+    private void frameSlice(GuiGraphics guiGraphics, int x, int y, int w, int h, int u, int v, int sw, int sh) {
+        guiGraphics.blit(FRAME, stationLeft + x, stationTop + y, w, h, (float) u, (float) v, sw, sh, 256, 256);
     }
 
     @Override
-    protected void renderBg(PoseStack pose, float partialTick, int mouseX, int mouseY) {
+    protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         if (!renderingPanel) {
             // A separate, fixed vanilla-style inventory below the advancement frame.
-            fill(pose, leftPos, topPos, leftPos + imageWidth, topPos + imageHeight, 0xFF373737);
-            fill(pose, leftPos + 1, topPos + 1, leftPos + imageWidth - 1, topPos + imageHeight - 1, 0xFFFFFFFF);
-            fill(pose, leftPos + 3, topPos + 3, leftPos + imageWidth - 1, topPos + imageHeight - 1, 0xFF555555);
-            fill(pose, leftPos + 3, topPos + 3, leftPos + imageWidth - 3, topPos + imageHeight - 3, 0xFFC6C6C6);
+            guiGraphics.fill(leftPos, topPos, leftPos + imageWidth, topPos + imageHeight, 0xFF373737);
+            guiGraphics.fill(leftPos + 1, topPos + 1, leftPos + imageWidth - 1, topPos + imageHeight - 1, 0xFFFFFFFF);
+            guiGraphics.fill(leftPos + 3, topPos + 3, leftPos + imageWidth - 1, topPos + imageHeight - 1, 0xFF555555);
+            guiGraphics.fill(leftPos + 3, topPos + 3, leftPos + imageWidth - 3, topPos + imageHeight - 3, 0xFFC6C6C6);
         }
         for (Slot slot : menu.slots) {
             if (slot.isActive()) {
-                drawSlot(pose, leftPos + slot.x, topPos + slot.y);
+                drawSlot(guiGraphics, leftPos + slot.x, topPos + slot.y);
             }
         }
         if (!renderingPanel) {
@@ -182,40 +182,38 @@ public class AlchemyCauldronScreen extends AbstractContainerScreen<AlchemyCauldr
         int preview = menu.getPreviewSlot();
         if (preview >= 0) {
             Slot slot = menu.slots.get(preview);
-            itemRenderer.renderAndDecorateItem(menu.getPreviewItem(), leftPos + slot.x, topPos + slot.y);
+            guiGraphics.renderItem(menu.getPreviewItem(), leftPos + slot.x, topPos + slot.y);
         }
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1, 1, 1, 1);
-        RenderSystem.setShaderTexture(0, FURNACE);
         // Charge is separate from the plants' elemental ingredient totals.
-        blit(pose, leftPos + 51, topPos + 94, menu.isReceivingQi() ? 176 : 56,
+        guiGraphics.blit(FURNACE, leftPos + 51, topPos + 94, menu.isReceivingQi() ? 176 : 56,
                 menu.isReceivingQi() ? 0 : 36, 14, 14);
         for (int i = 0; i < AlchemyQi.ELEMENTS.size(); i++) {
             ResourceLocation element = AlchemyQi.ELEMENTS.get(i);
-            RenderSystem.setShaderTexture(0, new ResourceLocation(Cultivationcraft.MODID,
-                    "textures/gui/plants/element_icons/" + element.getPath() + ".png"));
-            blit(pose, leftPos + ELEMENT_X + (i % 4) * ELEMENT_SPACING,
+            guiGraphics.blit(new ResourceLocation(Cultivationcraft.MODID,
+                    "textures/gui/plants/element_icons/" + element.getPath() + ".png"), leftPos + ELEMENT_X + (i % 4) * ELEMENT_SPACING,
                     topPos + ELEMENT_Y + (i / 4) * 38, 0, 0, 16, 16, 16, 16);
         }
     }
 
-    private void drawSlot(PoseStack pose, int x, int y) {
-        fill(pose, x - 1, y - 1, x + 17, y + 17, 0xFFDDDDDD);
-        fill(pose, x - 1, y - 1, x + 16, y + 16, 0xFF373737);
-        fill(pose, x, y, x + 16, y + 16, 0xFF737373);
+    private void drawSlot(GuiGraphics guiGraphics, int x, int y) {
+        guiGraphics.fill(x - 1, y - 1, x + 17, y + 17, 0xFFDDDDDD);
+        guiGraphics.fill(x - 1, y - 1, x + 16, y + 16, 0xFF373737);
+        guiGraphics.fill(x, y, x + 16, y + 16, 0xFF737373);
     }
 
     @Override
-    protected void renderLabels(PoseStack pose, int mouseX, int mouseY) {
+    protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        PoseStack pose = guiGraphics.pose();
         if (!renderingPanel) {
-            font.draw(pose, playerInventoryTitle, AlchemyCauldronMenu.INVENTORY_X, 6, 0x404040);
+            guiGraphics.drawString(font, playerInventoryTitle, AlchemyCauldronMenu.INVENTORY_X, 6, 0x404040, false);
             return;
         }
-        font.draw(pose, Component.translatable("cultivationcraft.gui.alchemy.charge"), 30, 116, 0xAAAAAA);
-        font.draw(pose, Integer.toString(menu.getStoredQi()), 30, 128, 0xFFFFFF);
-        font.draw(pose, Component.translatable("cultivationcraft.gui.alchemy.ingredients"), 30, 14, 0xDDDDDD);
-        font.draw(pose, Component.translatable("cultivationcraft.gui.alchemy.results"), 164, 14, 0xDDDDDD);
-        font.draw(pose, Component.translatable("cultivationcraft.gui.alchemy.elemental_qi"), 150, 70, 0xDDDDDD);
+        guiGraphics.drawString(font, Component.translatable("cultivationcraft.gui.alchemy.charge"), 30, 116, 0xAAAAAA, false);
+        guiGraphics.drawString(font, Integer.toString(menu.getStoredQi()), 30, 128, 0xFFFFFF, false);
+        guiGraphics.drawString(font, Component.translatable("cultivationcraft.gui.alchemy.ingredients"), 30, 14, 0xDDDDDD, false);
+        guiGraphics.drawString(font, Component.translatable("cultivationcraft.gui.alchemy.results"), 164, 14, 0xDDDDDD, false);
+        guiGraphics.drawString(font, Component.translatable("cultivationcraft.gui.alchemy.elemental_qi"), 150, 70, 0xDDDDDD, false);
         for (int i = 0; i < AlchemyQi.ELEMENTS.size(); i++) {
             String value = Integer.toString(menu.getElementalQi(i));
             int color = menu.getElementalQi(i) == 0 ? 0x777777 : 0xFFFFFF;
@@ -223,17 +221,17 @@ public class AlchemyCauldronScreen extends AbstractContainerScreen<AlchemyCauldr
             pose.pushPose();
             pose.translate(ELEMENT_X + (i % 4) * ELEMENT_SPACING + 8, ELEMENT_Y + (i / 4) * 38 + 19, 0);
             pose.scale(scale, scale, 1);
-            font.draw(pose, value, -font.width(value) / 2f, 0, color);
+            guiGraphics.drawString(font, value, -font.width(value) / 2f, 0, color, false);
             pose.popPose();
         }
     }
 
-    private void drawPanelTooltip(PoseStack pose, int mouseX, int mouseY) {
+    private void drawPanelTooltip(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         double x = virtualX(mouseX) - leftPos, y = virtualY(mouseY) - topPos;
         for (int i = 0; i < AlchemyQi.ELEMENTS.size(); i++) {
             int ex = ELEMENT_X + (i % 4) * ELEMENT_SPACING, ey = ELEMENT_Y + (i / 4) * 38;
             if (x >= ex - 8 && x < ex + 24 && y >= ey && y < ey + 30) {
-                renderTooltip(pose, Component.translatable("cultivationcraft.gui.alchemy.qi_total",
+                guiGraphics.renderTooltip(font, Component.translatable("cultivationcraft.gui.alchemy.qi_total",
                         Component.translatable(AlchemyQi.ELEMENTS.get(i).getPath()), menu.getElementalQi(i)), mouseX, mouseY);
                 return;
             }

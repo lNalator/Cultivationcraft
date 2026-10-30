@@ -50,7 +50,7 @@ public class QuestHandler {
 
     public static void resetQuest(Player player, ResourceLocation mode) {
         // Don't do anything if this is client side and the player is not the player character
-        if (player.level.isClientSide && !PlayerUtils.isClientPlayerCharacter(player)) {
+        if (player.level().isClientSide && !PlayerUtils.isClientPlayerCharacter(player)) {
             return;
         }
 
@@ -81,7 +81,7 @@ public class QuestHandler {
 
     public static void progressQuest(Player player, ResourceLocation mode, double amount, String extra) {
         // Don't do anything if this is client side
-        if (player.level.isClientSide) {
+        if (player.level().isClientSide) {
             return;
         }
 
@@ -168,7 +168,7 @@ public class QuestHandler {
 
         if (PlayerUtils.isClientPlayerCharacter(player)) {
             ClientPacketHandler.sendQuestProgressToServer(player.getUUID(), progress); 
-        }else if (!player.level.isClientSide) {
+        }else if (!player.level().isClientSide) {
             PacketHandler.sendQuestProgressToClient(player.getUUID(), progress);
         }
 

@@ -15,7 +15,7 @@ import lNalator.Cultivationcraft.Common.Qi.Stats.StatIDs;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import lNalator.Cultivationcraft.Network.ClientPacketHandler;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -274,13 +274,13 @@ public class BodyforgeScreen extends GenericTabScreen {
     }
 
     @Override
-    public void render(PoseStack PoseStack, int mouseX, int mouseY, float partialTicks) {
-        super.render(PoseStack, mouseX, mouseY, partialTicks);
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+        super.render(guiGraphics, mouseX, mouseY, partialTicks);
 
-        drawGuiForgroundLayer(PoseStack, partialTicks, mouseX, mouseY);
+        drawGuiForgroundLayer(guiGraphics, partialTicks, mouseX, mouseY);
     }
 
-    protected void drawGuiDetailsForgroundLayer(PoseStack PoseStack, int mouseX, int mouseY) {
+    protected void drawGuiDetailsForgroundLayer(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         if (forgePart.getSelected() == null) {
             return;
         }
@@ -302,17 +302,17 @@ public class BodyforgeScreen extends GenericTabScreen {
             partDescription.setText(part.getStatChanges().toString());
         }
 
-        partDescription.render(this, font, PoseStack, mouseX, mouseY);
+        partDescription.render(guiGraphics, font, mouseX, mouseY);
 
         description.setPos(edgeSpacingX + detailsMinXPos, edgeSpacingY + detailsYPos - 20);
-        description.render(PoseStack, mouseX, mouseY, this);
+        description.render(guiGraphics, mouseX, mouseY);
 
         stats.setPos(edgeSpacingX + detailsMaxXPos - stats.width, edgeSpacingY + detailsYPos - 20);
-        stats.render(PoseStack, mouseX, mouseY, this);
+        stats.render(guiGraphics, mouseX, mouseY);
     }
 
-    protected void drawGuiForgroundLayer(PoseStack PoseStack, float partialTicks, int mouseX, int mouseY) {
-        drawBody(PoseStack);
+    protected void drawGuiForgroundLayer(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
+        drawBody(guiGraphics);
 
         // If a part has already been selected then draw information on that selection
         // Otherwise draw the part selection menu
@@ -329,7 +329,7 @@ public class BodyforgeScreen extends GenericTabScreen {
                 part = BodyPartNames.getOption(questPart);
             }
 
-            drawQuest(PoseStack, part, mouseX, mouseY);
+            drawQuest(guiGraphics, part, mouseX, mouseY);
         } else {
             String Selection = modifications.getSelection();
             BodyPart part = BodyPartNames.getPart(Selection);
@@ -338,14 +338,14 @@ public class BodyforgeScreen extends GenericTabScreen {
             }
 
             if (part == null) {
-                drawSelection(PoseStack, mouseX, mouseY); 
+                drawSelection(guiGraphics, mouseX, mouseY); 
             }else {
-                drawSelected(PoseStack, part, mouseX, mouseY);
+                drawSelected(guiGraphics, part, mouseX, mouseY);
             }
         }
     }
 
-    protected void drawSelection(PoseStack PoseStack, int mouseX, int mouseY) {
+    protected void drawSelection(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         mode = 0;
 
         if (oldMode != mode) {
@@ -356,17 +356,17 @@ public class BodyforgeScreen extends GenericTabScreen {
         int edgeSpacingY = (this.height - this.ySize) / 2;
 
         forge.setPos(edgeSpacingX + forgeXPos, edgeSpacingY + forgeYPos);
-        forge.render(PoseStack, mouseX, mouseY, this);
+        forge.render(guiGraphics, mouseX, mouseY);
 
         // Render the BodyPart dropdown lists
-        forgePart.render(PoseStack, edgeSpacingX + bodyPartListXPos, edgeSpacingY + forgeListYPos, mouseX, mouseY, this);
-        bodySubParts.render(PoseStack, edgeSpacingX + bodySubPartListXPos, edgeSpacingY + bodySubPartListYPos, mouseX, mouseY, this);
-        bodyParts.render(PoseStack, edgeSpacingX + bodyPartListXPos, edgeSpacingY + bodyPartListYPos, mouseX, mouseY, this);
+        forgePart.render(guiGraphics, edgeSpacingX + bodyPartListXPos, edgeSpacingY + forgeListYPos, mouseX, mouseY);
+        bodySubParts.render(guiGraphics, edgeSpacingX + bodySubPartListXPos, edgeSpacingY + bodySubPartListYPos, mouseX, mouseY);
+        bodyParts.render(guiGraphics, edgeSpacingX + bodyPartListXPos, edgeSpacingY + bodyPartListYPos, mouseX, mouseY);
 
-        drawGuiDetailsForgroundLayer(PoseStack, mouseX, mouseY);
+        drawGuiDetailsForgroundLayer(guiGraphics, mouseX, mouseY);
     }
 
-    protected void drawSelected(PoseStack PoseStack, BodyPart part, int mouseX, int mouseY) {
+    protected void drawSelected(GuiGraphics guiGraphics, BodyPart part, int mouseX, int mouseY) {
         mode = 1;
 
         int edgeSpacingX = (this.width - this.xSize) / 2;
@@ -379,26 +379,25 @@ public class BodyforgeScreen extends GenericTabScreen {
             subPosition = BodyPartNames.getDisplayName(part.getPosition(), ((BodyPartOption) part).getSubPosition());
         }
 
-        font.draw(PoseStack, position, edgeSpacingX + selectedTextXPos - font.width(position) / 2, edgeSpacingY + selectedTextYPos, Color.GRAY.getRGB());
-        font.draw(PoseStack, subPosition, edgeSpacingX + selectedTextXPos - font.width(subPosition) / 2, edgeSpacingY + selectedTextYPos + font.lineHeight, Color.GRAY.getRGB());
-        font.draw(PoseStack, part.getDisplayName(), edgeSpacingX + selectedTextXPos - font.width(part.getDisplayName()) / 2, edgeSpacingY + selectedTextYPos + font.lineHeight * 2, Color.BLACK.getRGB());
+        guiGraphics.drawString(font, position, edgeSpacingX + selectedTextXPos - font.width(position) / 2, edgeSpacingY + selectedTextYPos, Color.GRAY.getRGB(), false);
+        guiGraphics.drawString(font, subPosition, edgeSpacingX + selectedTextXPos - font.width(subPosition) / 2, edgeSpacingY + selectedTextYPos + font.lineHeight, Color.GRAY.getRGB(), false);
+        guiGraphics.drawString(font, part.getDisplayName(), edgeSpacingX + selectedTextXPos - font.width(part.getDisplayName()) / 2, edgeSpacingY + selectedTextYPos + font.lineHeight * 2, Color.BLACK.getRGB(), false);
 
         // Render the progress bar
         IBodyModifications modifications = BodyModifications.getBodyModifications(genericClientFunctions.getPlayer());
         float progress = (float) modifications.getProgress() / BodyPartStatControl.getStats(genericClientFunctions.getPlayer()).getStat(StatIDs.qiCost);
 
-        RenderSystem.setShaderTexture(0, TEXTURE);
 
         int length = xSize - (9 * 2);
 
-        this.blit(PoseStack, edgeSpacingX + 9, edgeSpacingY + 160, 0, 233, length, 6);
-        this.blit(PoseStack, edgeSpacingX + 10, edgeSpacingY + 161, 1, 239, (int) ((length - 2) * progress), 4);
+        guiGraphics.blit(TEXTURE, edgeSpacingX + 9, edgeSpacingY + 160, 0, 233, length, 6);
+        guiGraphics.blit(TEXTURE, edgeSpacingX + 10, edgeSpacingY + 161, 1, 239, (int) ((length - 2) * progress), 4);
 
         cancel.setPos(edgeSpacingX + cancelXPos, edgeSpacingY + cancelYPos);
-        cancel.render(PoseStack, mouseX, mouseY, this);
+        cancel.render(guiGraphics, mouseX, mouseY);
     }
 
-    protected void drawQuest(PoseStack PoseStack, BodyPart part, int mouseX, int mouseY) {
+    protected void drawQuest(GuiGraphics guiGraphics, BodyPart part, int mouseX, int mouseY) {
         mode = 2;
 
         Quest quest = part.getQuest();
@@ -418,24 +417,23 @@ public class BodyforgeScreen extends GenericTabScreen {
 
         String stabilizing = Component.translatable("cultivationcraft.gui.generic.stabilizing").getString();
 
-        font.draw(PoseStack, stabilizing, edgeSpacingX + bodyPartListXPos, edgeSpacingY + 30, Color.BLACK.getRGB());
-        font.draw(PoseStack, position + "->" + subPosition + "->" + partName, edgeSpacingX + bodyPartListXPos, edgeSpacingY + 45, Color.GRAY.getRGB());
+        guiGraphics.drawString(font, stabilizing, edgeSpacingX + bodyPartListXPos, edgeSpacingY + 30, Color.BLACK.getRGB(), false);
+        guiGraphics.drawString(font, position + "->" + subPosition + "->" + partName, edgeSpacingX + bodyPartListXPos, edgeSpacingY + 45, Color.GRAY.getRGB(), false);
 
-        font.draw(PoseStack, quest.getDescription(), edgeSpacingX + 10, edgeSpacingY + 130, Color.GRAY.getRGB());
-        font.draw(PoseStack, (int) progress + "/" + (int) quest.complete, edgeSpacingX + bodyPartListXPos, edgeSpacingY + 145, Color.GRAY.getRGB());
+        guiGraphics.drawString(font, quest.getDescription(), edgeSpacingX + 10, edgeSpacingY + 130, Color.GRAY.getRGB(), false);
+        guiGraphics.drawString(font, (int) progress + "/" + (int) quest.complete, edgeSpacingX + bodyPartListXPos, edgeSpacingY + 145, Color.GRAY.getRGB(), false);
 
-        RenderSystem.setShaderTexture(0, TEXTURE);
 
         int length = xSize - (9 * 2);
 
-        this.blit(PoseStack, edgeSpacingX + 9, edgeSpacingY + 160, 0, 233, length, 6);
-        this.blit(PoseStack, edgeSpacingX + 10, edgeSpacingY + 161, 1, 239, (int) ((length - 2) * (progress / quest.complete)), 4);
+        guiGraphics.blit(TEXTURE, edgeSpacingX + 9, edgeSpacingY + 160, 0, 233, length, 6);
+        guiGraphics.blit(TEXTURE, edgeSpacingX + 10, edgeSpacingY + 161, 1, 239, (int) ((length - 2) * (progress / quest.complete)), 4);
 
         cancel.setPos(edgeSpacingX + cancelXPos, edgeSpacingY + cancelYPos);
-        cancel.render(PoseStack, mouseX, mouseY, this);
+        cancel.render(guiGraphics, mouseX, mouseY);
     }
 
-    protected void drawBody(PoseStack PoseStack) {
+    protected void drawBody(GuiGraphics guiGraphics) {
         // TODO: Lock and unlock the body whilst drawing to prevent crashes from changing body parts
 
         int edgeSpacingX = (this.width - this.xSize) / 2;
@@ -461,7 +459,7 @@ public class BodyforgeScreen extends GenericTabScreen {
             highlight = true;
         }
 
-        base.render(PoseStack, bodyPosX, bodyPosY, highlight, this);
+        base.render(guiGraphics, bodyPosX, bodyPosY, highlight);
 
         // Draw generic body parts if alterations don't exist
         highlight = false;
@@ -470,7 +468,7 @@ public class BodyforgeScreen extends GenericTabScreen {
                 highlight = true;
             }
 
-            BodyPartGUIs.getGUI(BodyPartNames.DefaultHead).get(0).render(PoseStack, bodyPosX, bodyPosY, highlight, this, base);
+            BodyPartGUIs.getGUI(BodyPartNames.DefaultHead).get(0).render(guiGraphics, bodyPosX, bodyPosY, highlight, base);
         }
 
         highlight = false;
@@ -479,8 +477,8 @@ public class BodyforgeScreen extends GenericTabScreen {
                 highlight = true;
             }
 
-            BodyPartGUIs.getGUI(BodyPartNames.DefaultRightArm).get(0).render(PoseStack, bodyPosX, bodyPosY, highlight, this, base);
-            BodyPartGUIs.getGUI(BodyPartNames.DefaultLeftArm).get(0).render(PoseStack, bodyPosX, bodyPosY, highlight, this, base);
+            BodyPartGUIs.getGUI(BodyPartNames.DefaultRightArm).get(0).render(guiGraphics, bodyPosX, bodyPosY, highlight, base);
+            BodyPartGUIs.getGUI(BodyPartNames.DefaultLeftArm).get(0).render(guiGraphics, bodyPosX, bodyPosY, highlight, base);
         }
 
         highlight = false;
@@ -489,8 +487,8 @@ public class BodyforgeScreen extends GenericTabScreen {
                 highlight = true;
             }
 
-            BodyPartGUIs.getGUI(BodyPartNames.DefaultRightLeg).get(0).render(PoseStack, bodyPosX, bodyPosY, highlight, this, base);
-            BodyPartGUIs.getGUI(BodyPartNames.DefaultLeftLeg).get(0).render(PoseStack, bodyPosX, bodyPosY, highlight, this, base);
+            BodyPartGUIs.getGUI(BodyPartNames.DefaultRightLeg).get(0).render(guiGraphics, bodyPosX, bodyPosY, highlight, base);
+            BodyPartGUIs.getGUI(BodyPartNames.DefaultLeftLeg).get(0).render(guiGraphics, bodyPosX, bodyPosY, highlight, base);
         }
 
         // Loop through and draw all other body part GUIs if they exist
@@ -507,7 +505,7 @@ public class BodyforgeScreen extends GenericTabScreen {
 
                 for (BodyPartGUI gui : guis) {
                     if (gui != null) {
-                        gui.render(PoseStack, bodyPosX, bodyPosY, highlight, this, base);
+                        gui.render(guiGraphics, bodyPosX, bodyPosY, highlight, base);
                     }
                 }
             }

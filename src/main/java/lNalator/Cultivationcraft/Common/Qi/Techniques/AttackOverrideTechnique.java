@@ -29,7 +29,7 @@ public class AttackOverrideTechnique extends AttackTechnique {
             return;
         }
 
-        if (player.level.isClientSide) {
+        if (player.level().isClientSide) {
             PoseHandler.getPlayerPoseHandler(player.getUUID()).cancelNextAttackAnimation();
         }
 
@@ -51,7 +51,7 @@ public class AttackOverrideTechnique extends AttackTechnique {
             return;
         }
 
-        if (player.level.isClientSide) {
+        if (player.level().isClientSide) {
             PoseHandler.getPlayerPoseHandler(player.getUUID()).cancelNextAttackAnimation();
         }
 

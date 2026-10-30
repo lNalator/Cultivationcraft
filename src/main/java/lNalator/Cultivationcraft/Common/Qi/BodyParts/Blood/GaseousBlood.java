@@ -7,7 +7,7 @@ import lNalator.Cultivationcraft.Common.Qi.Effects.WindInstance;
 import lNalator.Cultivationcraft.Common.Qi.Elements.Elements;
 import lNalator.Cultivationcraft.Network.PacketHandler;
 import lNalator.mlmanimator.Client.Poses.PoseHandler;
-import com.mojang.math.Vector3f;
+import org.joml.Vector3f;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
@@ -29,7 +29,7 @@ public class GaseousBlood extends CultivatorBlood {
     @Override
     public void regen(Player player) {
         // Only heal if player is in the air
-        if (!player.isInWater() && !player.isOnGround()) {
+        if (!player.isInWater() && !player.onGround()) {
             if (!staminaHealing(player)) {
                 naturalHealing(player);
             }
@@ -39,7 +39,7 @@ public class GaseousBlood extends CultivatorBlood {
     // Called when player takes damage
     public void onHit(Player player, Vec3 source, double amount) {
         // Send a block spawn packet to all clients if called on server
-        if (!player.level.isClientSide) {
+        if (!player.level().isClientSide) {
             PacketHandler.sendBloodSpawnToClient(player.getUUID(), source, amount);
 
             if (source != null) {
@@ -66,7 +66,7 @@ public class GaseousBlood extends CultivatorBlood {
 
             float height = PoseHandler.getHeightAdjustment(player.getUUID());
 
-            player.level.addParticle(particle, player.getX(), player.getY() + height, player.getZ(), direction.x, direction.y, direction.z);
+            player.level().addParticle(particle, player.getX(), player.getY() + height, player.getZ(), direction.x, direction.y, direction.z);
         }
     }
 

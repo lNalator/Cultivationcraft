@@ -23,7 +23,7 @@ public class FlyingSwordAttackTrigger extends SimpleCriterionTrigger<FlyingSword
     }
 
     @Override
-    public FlyingSwordAttackTrigger.Instance createInstance(JsonObject json, EntityPredicate.Composite composite, DeserializationContext context) {
+    public FlyingSwordAttackTrigger.Instance createInstance(JsonObject json, ContextAwarePredicate composite, DeserializationContext context) {
         boolean dead = GsonHelper.getAsBoolean(json, "killed");
         return new FlyingSwordAttackTrigger.Instance(composite, dead);
     }
@@ -32,7 +32,7 @@ public class FlyingSwordAttackTrigger extends SimpleCriterionTrigger<FlyingSword
 
         private final Boolean killed;
 
-        public Instance(EntityPredicate.Composite composite, boolean dead) {
+        public Instance(ContextAwarePredicate composite, boolean dead) {
             super(ID, composite);
 
             killed = dead;

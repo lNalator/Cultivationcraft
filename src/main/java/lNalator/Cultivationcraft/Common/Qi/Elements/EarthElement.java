@@ -16,7 +16,7 @@ public class EarthElement extends Element {
 
     public void applyStatusEffect(QiDamageSource source, Entity target, float damageAmount) {
         // Only cultivator attacks stun, not stalactites
-        if (damageAmount > 0 && source.getEntity() != null && target instanceof LivingEntity living && !target.level.isClientSide) {
+        if (damageAmount > 0 && source.getEntity() != null && target instanceof LivingEntity living && !target.level().isClientSide) {
             living.addEffect(new MobEffectInstance(ElementalStates.STUNNED.get(), 20));
         }
 

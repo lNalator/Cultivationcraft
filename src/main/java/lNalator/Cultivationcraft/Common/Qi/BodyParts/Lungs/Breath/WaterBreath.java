@@ -39,7 +39,7 @@ public class WaterBreath extends Breath {
 
     // Returns whether the specified block is mineable
     public boolean canBeMined(Player player, BlockPos pos, Direction direction, Technique source) {
-        BlockState state = player.level.getBlockState(pos);
+        BlockState state = player.level().getBlockState(pos);
 
         if (state.hasProperty(BlockStateProperties.WATERLOGGED) && !state.getValue(BlockStateProperties.WATERLOGGED)) {
             ClientPacketHandler.sendAttackToServer(player.getUUID(), HitResult.Type.BLOCK, new Vec3(pos.getX(), pos.getY(), pos.getZ()), player.getUUID(), direction, CultivatorControl.getTechnique(player, source));
@@ -51,10 +51,10 @@ public class WaterBreath extends Breath {
 
     // Returns whether this block should be destroyed on hit or not
     public boolean doBlockAttack(Player player, BlockPos pos) {
-        BlockState state = player.level.getBlockState(pos);
+        BlockState state = player.level().getBlockState(pos);
 
         if (state.hasProperty(BlockStateProperties.WATERLOGGED) && !state.getValue(BlockStateProperties.WATERLOGGED)) {
-            player.level.setBlock(pos, state.setValue(BlockStateProperties.WATERLOGGED, Boolean.valueOf(true)), 2);
+            player.level().setBlock(pos, state.setValue(BlockStateProperties.WATERLOGGED, Boolean.valueOf(true)), 2);
             return false;
         }
 

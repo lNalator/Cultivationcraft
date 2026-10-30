@@ -12,7 +12,7 @@ import lNalator.Cultivationcraft.Common.Qi.TechniqueControl;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.Technique;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import lNalator.Cultivationcraft.Network.ClientPacketHandler;
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.network.chat.Component;
@@ -80,10 +80,10 @@ public class TechniqueScreen extends GenericTabScreen {
     }
 
     @Override
-    public void render(PoseStack PoseStack, int mouseX, int mouseY, float partialTicks) {
-        super.render(PoseStack, mouseX, mouseY, partialTicks);
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+        super.render(guiGraphics, mouseX, mouseY, partialTicks);
 
-        drawGuiForgroundLayer(PoseStack, partialTicks, mouseX, mouseY);
+        drawGuiForgroundLayer(guiGraphics, partialTicks, mouseX, mouseY);
     }
 
     @Override
@@ -178,16 +178,16 @@ public class TechniqueScreen extends GenericTabScreen {
         updateSelection();
     }
 
-    protected void drawGuiForgroundLayer(PoseStack PoseStack, float partialTicks, int mouseX, int mouseY) {
+    protected void drawGuiForgroundLayer(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
         int edgeSpacingX = (this.width - this.xSize) / 2;
         int edgeSpacingY = (this.height - this.ySize) / 2;
 
         // Draw icons in the selection box
-        TechniqueIcons.renderIcons(PoseStack, edgeSpacingX + 48, edgeSpacingY + 155, this, 18);
+        TechniqueIcons.renderIcons(guiGraphics, edgeSpacingX + 48, edgeSpacingY + 155, 18);
 
         // Highlight the selected technique and the technique the mouse is hovering over
-        TechniqueIcons.mouseOverHighlight(PoseStack, edgeSpacingX + 48, edgeSpacingY + 155, this, 18, mouseX, mouseY);
-        TechniqueIcons.highlightIcon(PoseStack, edgeSpacingX + 48, edgeSpacingY + 155, this, 18, selected);
+        TechniqueIcons.mouseOverHighlight(guiGraphics, edgeSpacingX + 48, edgeSpacingY + 155, 18, mouseX, mouseY);
+        TechniqueIcons.highlightIcon(guiGraphics, edgeSpacingX + 48, edgeSpacingY + 155, 18, selected);
 
         Technique selectedTech = CultivatorTechniques.getCultivatorTechniques(genericClientFunctions.getPlayer()).getTechnique(selected);
 
@@ -200,19 +200,19 @@ public class TechniqueScreen extends GenericTabScreen {
         }
 
         description.setPos(edgeSpacingX + 127 - description.width - 10, edgeSpacingY + techniqueYPos + 15);
-        description.render(PoseStack, mouseX, mouseY, this);
+        description.render(guiGraphics, mouseX, mouseY);
         stats.setPos(edgeSpacingX + 127 + 10, edgeSpacingY + techniqueYPos + 15);
-        stats.render(PoseStack, mouseX, mouseY, this);
+        stats.render(guiGraphics, mouseX, mouseY);
 
         if (selectedTech != null && selectedTech.canLevel()) {
             modify.setPos(edgeSpacingX + 127 + 20 + modify.width, edgeSpacingY + techniqueYPos + 15);
-            modify.render(PoseStack, mouseX, mouseY, this);
+            modify.render(guiGraphics, mouseX, mouseY);
         }
 
         partDescription.setPos(edgeSpacingX + 30, edgeSpacingY + techniqueYPos + 30);
-        partDescription.render(this, font, PoseStack, mouseX, mouseY);
+        partDescription.render(guiGraphics, font, mouseX, mouseY);
 
         // Render the techniques dropdown list
-        techniques.render(PoseStack, edgeSpacingX + techniqueXPos, edgeSpacingY + techniqueYPos, mouseX, mouseY, this);
+        techniques.render(guiGraphics, edgeSpacingX + techniqueXPos, edgeSpacingY + techniqueYPos, mouseX, mouseY);
     }
 }

@@ -7,13 +7,12 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.CombatRules;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.level.Explosion;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.registries.RegistryObject;
 
@@ -25,7 +24,7 @@ public final class ElementInteractions {
     }
 
     public static Result apply(ResourceLocation element, QiDamageSource source, LivingEntity t, float amount) {
-        if (t.level.isClientSide || amount <= 0) {
+        if (t.level().isClientSide || amount <= 0) {
             return new Result(amount, false);
         }
 
@@ -45,7 +44,7 @@ public final class ElementInteractions {
             if (offBalance) { spreadFire(t, 3); }
             if (electrified) {
                 remove(t, ElementalStates.ELECTRIFIED);
-                t.level.explode(null, t.getX(), t.getY() + 0.5, t.getZ(), 0.5f, Explosion.BlockInteraction.NONE);
+                t.level().explode(null, t.getX(), t.getY() + 0.5, t.getZ(), 0.5f, Level.ExplosionInteraction.NONE);
             }
             if (stunned) { t.setRemainingFireTicks(t.getRemainingFireTicks() + 40); }
             if (rooted) { remove(t, ElementalStates.ROOTED); amount *= 1.5f; }
@@ -60,7 +59,7 @@ public final class ElementInteractions {
             if (onFire) { t.clearFire(); steam(t); skip = true; }
             else if (wet && !has(t, ElementalStates.FREEZE_IMMUNE)) { remove(t, ElementalStates.WET); ElementalStates.freeze(t, source.getEntity()); skip = true; }
             if (frozen) { extend(t, ElementalStates.FROZEN, 10); }
-            if (offBalance && t.isOnGround()) { push(t, source, 0.3f); }
+            if (offBalance && t.onGround()) { push(t, source, 0.3f); }
             if (electrified) { extend(t, ElementalStates.ELECTRIFIED, 20); }
             if (stunned) { ElementalStates.addChill(t, source.getEntity()); }
             if (rooted && !has(t, ElementalStates.FREEZE_IMMUNE)) {
@@ -136,21 +135,21 @@ public final class ElementInteractions {
     }
 
     static void steam(LivingEntity t) {
-        if (t.level instanceof ServerLevel level) {
+        if (t.level() instanceof ServerLevel level) {
             level.sendParticles(ParticleTypes.CLOUD, t.getX(), t.getY() + t.getBbHeight() / 2, t.getZ(), 12, 0.3, 0.4, 0.3, 0.02);
         }
     }
 
     static void spreadFire(LivingEntity t, int seconds) {
-        for (LivingEntity near : t.level.getEntitiesOfClass(LivingEntity.class, t.getBoundingBox().inflate(1.5), e -> e != t)) {
+        for (LivingEntity near : t.level().getEntitiesOfClass(LivingEntity.class, t.getBoundingBox().inflate(1.5), e -> e != t)) {
             near.setSecondsOnFire(seconds);
         }
     }
 
     // Water conducts lightning: small damage to wet entities nearby
     static void conduct(LivingEntity t, QiDamageSource source) {
-        for (LivingEntity near : t.level.getEntitiesOfClass(LivingEntity.class, t.getBoundingBox().inflate(4), e -> e != t && e != source.getEntity() && e.hasEffect(ElementalStates.WET.get()))) {
-            near.hurt(DamageSource.MAGIC, 2);
+        for (LivingEntity near : t.level().getEntitiesOfClass(LivingEntity.class, t.getBoundingBox().inflate(4), e -> e != t && e != source.getEntity() && e.hasEffect(ElementalStates.WET.get()))) {
+            near.hurt(near.damageSources().magic(), 2);
         }
     }
 

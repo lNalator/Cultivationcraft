@@ -51,9 +51,9 @@ public class BodyforgeCommand {
         }
 
         if (players.size() == 1) {
-            commandSourceStack.sendSuccess(Component.translatable("cultivationcraft.commands.completeprogress.single", players.iterator().next().getDisplayName()), true); 
+            commandSourceStack.sendSuccess(() -> Component.translatable("cultivationcraft.commands.completeprogress.single", players.iterator().next().getDisplayName()), true); 
         }else {
-            commandSourceStack.sendSuccess(Component.translatable("cultivationcraft.commands.completeprogress.multiple", players.size()), true);
+            commandSourceStack.sendSuccess(() -> Component.translatable("cultivationcraft.commands.completeprogress.multiple", players.size()), true);
         }
 
         return players.size();
@@ -73,9 +73,9 @@ public class BodyforgeCommand {
         }
 
         if (players.size() == 1) {
-            commandSourceStack.sendSuccess(Component.translatable("cultivationcraft.commands.completequest.single", players.iterator().next().getDisplayName()), true); 
+            commandSourceStack.sendSuccess(() -> Component.translatable("cultivationcraft.commands.completequest.single", players.iterator().next().getDisplayName()), true); 
         }else {
-            commandSourceStack.sendSuccess(Component.translatable("cultivationcraft.commands.completequest.multiple", players.size()), true);
+            commandSourceStack.sendSuccess(() -> Component.translatable("cultivationcraft.commands.completequest.multiple", players.size()), true);
         }
 
         return players.size();
@@ -95,9 +95,9 @@ public class BodyforgeCommand {
         }
 
         if (players.size() == 1) {
-            commandSourceStack.sendSuccess(Component.translatable("cultivationcraft.commands.levelskills.single", players.iterator().next().getDisplayName()), true); 
+            commandSourceStack.sendSuccess(() -> Component.translatable("cultivationcraft.commands.levelskills.single", players.iterator().next().getDisplayName()), true); 
         }else {
-            commandSourceStack.sendSuccess(Component.translatable("cultivationcraft.commands.levelskills.multiple", players.size()), true);
+            commandSourceStack.sendSuccess(() -> Component.translatable("cultivationcraft.commands.levelskills.multiple", players.size()), true);
         }
 
         return players.size();
@@ -111,9 +111,9 @@ public class BodyforgeCommand {
         }
 
         if (players.size() == 1) {
-            commandSourceStack.sendSuccess(Component.translatable("cultivationcraft.commands.fillqi.single", players.iterator().next().getDisplayName()), true); 
+            commandSourceStack.sendSuccess(() -> Component.translatable("cultivationcraft.commands.fillqi.single", players.iterator().next().getDisplayName()), true); 
         }else {
-            commandSourceStack.sendSuccess(Component.translatable("cultivationcraft.commands.fillqi.multiple", players.size()), true);
+            commandSourceStack.sendSuccess(() -> Component.translatable("cultivationcraft.commands.fillqi.multiple", players.size()), true);
         }
 
         return players.size();
@@ -133,9 +133,9 @@ public class BodyforgeCommand {
         }
 
         if (players.size() == 1) {
-            commandSourceStack.sendSuccess(Component.translatable("cultivationcraft.commands.revertcultivation.single", players.iterator().next().getDisplayName()), true); 
+            commandSourceStack.sendSuccess(() -> Component.translatable("cultivationcraft.commands.revertcultivation.single", players.iterator().next().getDisplayName()), true); 
         }else {
-            commandSourceStack.sendSuccess(Component.translatable("cultivationcraft.commands.revertcultivation.multiple", players.size()), true);
+            commandSourceStack.sendSuccess(() -> Component.translatable("cultivationcraft.commands.revertcultivation.multiple", players.size()), true);
         }
 
         return players.size();
@@ -151,9 +151,9 @@ public class BodyforgeCommand {
         }
 
         if (players.size() == 1) {
-            commandSourceStack.sendSuccess(Component.translatable("cultivationcraft.commands.reset.single", players.iterator().next().getDisplayName()), true); 
+            commandSourceStack.sendSuccess(() -> Component.translatable("cultivationcraft.commands.reset.single", players.iterator().next().getDisplayName()), true); 
         }else {
-            commandSourceStack.sendSuccess(Component.translatable("cultivationcraft.commands.reset.multiple", players.size()), true);
+            commandSourceStack.sendSuccess(() -> Component.translatable("cultivationcraft.commands.reset.multiple", players.size()), true);
         }
 
         return players.size();

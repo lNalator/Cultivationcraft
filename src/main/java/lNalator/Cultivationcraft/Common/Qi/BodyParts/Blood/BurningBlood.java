@@ -5,7 +5,7 @@ import lNalator.Cultivationcraft.Common.Qi.Damage.QiDamageSource;
 import lNalator.Cultivationcraft.Common.Qi.Elements.Elements;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import lNalator.Cultivationcraft.Server.ServerListeners;
-import com.mojang.math.Vector3f;
+import org.joml.Vector3f;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -31,7 +31,7 @@ public class BurningBlood extends CultivatorBlood {
             return;
         }
 
-        QiDamageSource damage = new QiDamageSource("burningBlood", Elements.fireElement, false);
+        QiDamageSource damage = new QiDamageSource(player.level(), "burningBlood", Elements.fireElement, false);
         damage.setInternal();
         player.hurt(damage, 1f);
     }

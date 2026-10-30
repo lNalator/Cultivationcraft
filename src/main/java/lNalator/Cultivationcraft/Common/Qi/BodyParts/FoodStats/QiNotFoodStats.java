@@ -7,7 +7,7 @@ import lNalator.Cultivationcraft.Common.Qi.Cultivation.CultivationType;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueStats.DefaultCultivationStatIDs;
 import lNalator.Cultivationcraft.Common.Qi.BodyParts.PlayerHealthManager;
 import net.minecraft.world.item.ItemStack;
-import com.mojang.math.Vector3f;
+import org.joml.Vector3f;
 import net.minecraft.world.entity.player.Player;
 
 

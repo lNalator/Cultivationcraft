@@ -92,7 +92,7 @@ public class QiProjectile extends AbstractHurtingProjectile {
 
         super.tick();
 
-        if (!level.isClientSide) {
+        if (!level().isClientSide) {
             entityData.set(ID_LIFE, entityData.get(ID_LIFE) - 1);
             Technique.tickTechniqueModifiers((Player) getOwner(), position(), getElement());
         }
@@ -166,10 +166,10 @@ public class QiProjectile extends AbstractHurtingProjectile {
             }
         }
 
-        BlockState blockstate = this.level.getBlockState(hit.getBlockPos());
-        blockstate.onProjectileHit(this.level, blockstate, hit, this);
+        BlockState blockstate = this.level().getBlockState(hit.getBlockPos());
+        blockstate.onProjectileHit(this.level(), blockstate, hit, this);
 
-        Elements.getElement(getElement()).effectBlock(this.level, hit.getBlockPos(), damage);
+        Elements.getElement(getElement()).effectBlock(this.level(), hit.getBlockPos(), damage);
 
         // Destroy this projectile if it hits a block
         if (!survive) {

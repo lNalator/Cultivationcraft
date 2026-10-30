@@ -66,7 +66,7 @@ public final class AlchemyFailureExplosion {
         level.playSound(null, center.x, center.y, center.z, SoundEvents.GENERIC_EXPLODE, SoundSource.BLOCKS,
                 (float) Math.min(1.5, .55 + profile.radius * .1), .95f + level.random.nextFloat() * .15f);
 
-        DamageSource source = DamageSource.explosion((LivingEntity) null);
+        DamageSource source = level.damageSources().explosion(null, null);
         AABB area = new AABB(center, center).inflate(profile.radius);
         for (LivingEntity entity : level.getEntitiesOfClass(LivingEntity.class, area,
                 target -> target.isAlive() && !target.isSpectator())) {
@@ -84,7 +84,7 @@ public final class AlchemyFailureExplosion {
         }
         // The most recent Qi supplier receives channel backlash, even outside splash range.
         // Batch completion requires recent Qi input, and the refiner must still be in this level.
-        if (refiner != null && refiner.level == level && refiner.isAlive() && !refiner.isSpectator()) {
+        if (refiner != null && refiner.level() == level && refiner.isAlive() && !refiner.isSpectator()) {
             double push = refiner.distanceToSqr(center) < profile.radius * profile.radius ? profile.knockback : 0;
             hurt(refiner, source, profile.refinerDamage, push, center);
         }

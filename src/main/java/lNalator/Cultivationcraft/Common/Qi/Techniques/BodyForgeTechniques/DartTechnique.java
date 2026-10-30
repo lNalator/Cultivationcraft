@@ -84,7 +84,7 @@ public class DartTechnique extends Technique {
         }
 
         // Don't play animation or slow movement if on ground
-        if (event.player.isOnGround() || event.player.isInWater()) {
+        if (event.player.onGround() || event.player.isInWater()) {
             return;
         }
 

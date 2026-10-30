@@ -13,7 +13,7 @@ import lNalator.Cultivationcraft.Common.Qi.Techniques.QiCondenserTechniques.QiEm
 import lNalator.Cultivationcraft.Common.Qi.Techniques.Technique;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
@@ -26,7 +26,7 @@ public class FallModifier extends TechniqueModifier {
         ID = new ResourceLocation(Cultivationcraft.MODID, "concept.fall");
         CATEGORY = MASS_CATEGORY;
 
-        unlockQuest = new Quest(Quest.DAMAGE_TAKEN, 1, DamageSource.FALL.msgId);
+        unlockQuest = new Quest(Quest.DAMAGE_TAKEN, 1, "fall");
         stabiliseQuest = new Quest(Quest.DAMAGE_DEALT, 10000);
 
         damageMult = 2;
@@ -59,7 +59,7 @@ public class FallModifier extends TechniqueModifier {
     }
 
     public void onHitTaken(Player owner, float damage, ResourceLocation defensiveElement, QiDamageSource source) {
-        if (owner.level.isClientSide || source.msgId.compareTo(DamageSource.FALL.getMsgId()) != 0 || damage <= 0) {
+        if (owner.level().isClientSide || !source.is(DamageTypes.FALL) || damage <= 0) {
             return;
         }
 
@@ -73,18 +73,18 @@ public class FallModifier extends TechniqueModifier {
         Vec3 center = owner.position();
         AABB area = new AABB(center.x - range, center.y - 1, center.z - range, center.x + range, center.y + 1, center.z + range);
 
-        for (Entity hit : owner.level.getEntities(owner, area)) {
+        for (Entity hit : owner.level().getEntities(owner, area)) {
             double dx = hit.getX() - center.x;
             double dz = hit.getZ() - center.z;
 
-            if (hit.isOnGround() && dx * dx + dz * dz <= range * range) {
-                hit.hurt(new QiDamageSource(ID.toString(), owner, defensiveElement, false), damage);
+            if (hit.onGround() && dx * dx + dz * dz <= range * range) {
+                hit.hurt(new QiDamageSource(owner.level(), ID.toString(), owner, defensiveElement, false), damage);
             }
         }
 
         // Ground slam visual for everyone around, and a heavy impact sound
         PacketHandler.channel.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> owner), new GroundSlamPacket(owner.position(), range));
-        owner.level.playSound(null, owner.blockPosition(), SoundEvents.ANVIL_LAND, SoundSource.PLAYERS, 0.6f, 0.5f);
+        owner.level().playSound(null, owner.blockPosition(), SoundEvents.ANVIL_LAND, SoundSource.PLAYERS, 0.6f, 0.5f);
     }
 
     public Vec3 flyingSwordTargetOverride(FlyingSwordEntity sword, Entity target, Vec3 targetPos) {

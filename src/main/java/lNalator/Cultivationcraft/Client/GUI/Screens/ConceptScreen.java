@@ -7,7 +7,7 @@ import lNalator.Cultivationcraft.Common.Qi.ExternalCultivationHandler;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers.TechniqueModifier;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import lNalator.Cultivationcraft.Network.ClientPacketHandler;
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.Minecraft;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.CultivatorStats;
 import net.minecraft.network.chat.Component;
@@ -183,8 +183,8 @@ public class ConceptScreen extends GenericTabScreen {
     }
 
     @Override
-    public void render(PoseStack PoseStack, int mouseX, int mouseY, float partialTicks) {
-        super.render(PoseStack, mouseX, mouseY, partialTicks);
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+        super.render(guiGraphics, mouseX, mouseY, partialTicks);
 
         int edgeSpacingX = (this.width - this.xSize) / 2;
         int edgeSpacingY = (this.height - this.ySize) / 2;
@@ -201,7 +201,7 @@ public class ConceptScreen extends GenericTabScreen {
 
         if (selectText.getSelected() != null) {
             String name = Component.translatable(selectText.getSelected().getName()).getString();
-            font.draw(PoseStack, name, edgeSpacingX + this.xSize / 2 - font.width(name) / 2, edgeSpacingY + nameTextY, Color.darkGray.getRGB());
+            guiGraphics.drawString(font, name, edgeSpacingX + this.xSize / 2 - font.width(name) / 2, edgeSpacingY + nameTextY, Color.darkGray.getRGB(), false);
 
             // Only allow the select button to be pressed if a concept is selected and not a category
             if (selectable) {
@@ -218,19 +218,19 @@ public class ConceptScreen extends GenericTabScreen {
         conceptText.setPos(edgeSpacingX + conceptTextX, edgeSpacingY + conceptTextY);
         conceptText.setSize(conceptTextWidth, conceptTextHeight);
         conceptText.setText(text);
-        conceptText.render(this, font, PoseStack, mouseX, mouseY);
+        conceptText.render(guiGraphics, font, mouseX, mouseY);
 
         selectText.setPos(edgeSpacingX + selectTextX, edgeSpacingY + selectTextY);
-        selectText.render(this, font, PoseStack, mouseX, mouseY);
+        selectText.render(guiGraphics, font, mouseX, mouseY);
 
         if (selectable) {
             select.setPos(edgeSpacingX + selectButtonX - select.width / 2, selectButtonY + edgeSpacingY);
-            select.render(PoseStack, mouseX, mouseY, this);
+            select.render(guiGraphics, mouseX, mouseY);
         } else {
             unlockedButton.setPos(edgeSpacingX + selectButtonX - unlockedButton.width - 2, selectButtonY + edgeSpacingY);
-            unlockedButton.render(PoseStack, mouseX, mouseY, this);
+            unlockedButton.render(guiGraphics, mouseX, mouseY);
             coresButton.setPos(edgeSpacingX + selectButtonX + 2, selectButtonY + edgeSpacingY);
-            coresButton.render(PoseStack, mouseX, mouseY, this);
+            coresButton.render(guiGraphics, mouseX, mouseY);
         }
     }
 }

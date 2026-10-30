@@ -7,14 +7,13 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.InventoryMenu;
-import net.minecraftforge.client.event.TextureStitchEvent;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 /**
- * Handles registration and lookup of the procedural plant texture parts.
+ * Handles lookup of the procedural plant texture parts.
  */
 public final class ProceduralPlantTextures {
 
@@ -31,15 +30,6 @@ public final class ProceduralPlantTextures {
             result.add(new Material(InventoryMenu.BLOCK_ATLAS, supplier.apply(i)));
         }
         return Collections.unmodifiableList(result);
-    }
-
-    public static void register(TextureStitchEvent.Pre event) {
-        if (!event.getAtlas().location().equals(InventoryMenu.BLOCK_ATLAS)) {
-            return;
-        }
-        STEMS.forEach(material -> event.addSprite(material.texture()));
-        FOLIAGE.forEach(material -> event.addSprite(material.texture()));
-        FRUITS.forEach(material -> event.addSprite(material.texture()));
     }
 
     public static int stemCount() {

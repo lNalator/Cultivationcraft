@@ -28,11 +28,11 @@ public class WoodElement extends Element {
 
     public void applyStatusEffect(QiDamageSource source, Entity target, float damageAmount) {
         // Only cultivator attacks drain and root, not cactus or berry bushes
-        if (damageAmount > 0 && source.getEntity() instanceof LivingEntity attacker && target instanceof LivingEntity living && !target.level.isClientSide) {
+        if (damageAmount > 0 && source.getEntity() instanceof LivingEntity attacker && target instanceof LivingEntity living && !target.level().isClientSide) {
             // Life steal, x1.5 on a stunned target (design D3)
             attacker.heal(damageAmount * (living.hasEffect(ElementalStates.STUNNED.get()) ? 0.3f : 0.2f));
 
-            long now = target.level.getGameTime();
+            long now = target.level().getGameTime();
             boolean offBalance = living.hasEffect(ElementalStates.OFF_BALANCE.get());
 
             if (offBalance || now - lastRooted.getOrDefault(target, -ROOT_COOLDOWN - 1L) > ROOT_COOLDOWN) {

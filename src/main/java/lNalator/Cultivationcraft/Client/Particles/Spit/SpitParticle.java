@@ -49,7 +49,7 @@ public class SpitParticle extends TextureSheetParticle {
             this.setBoundingBox(this.getBoundingBox().move(this.xd, this.yd, this.zd));
             this.setLocationFromBoundingbox();
 
-            BlockPos pos = new BlockPos(this.x, this.y, this.z);
+            BlockPos pos = BlockPos.containing(this.x, this.y, this.z);
 
             BlockState state = this.level.getBlockState(pos);
 
@@ -58,7 +58,7 @@ public class SpitParticle extends TextureSheetParticle {
                 this.remove();
             }*/
             if (state.getBlock() != Blocks.AIR) {
-                pos = new BlockPos(this.x - this.xd, this.y - this.yd, this.z - this.xd);
+                pos = BlockPos.containing(this.x - this.xd, this.y - this.yd, this.z - this.xd);
 
                 this.level.setBlockAndUpdate(pos, type.getFluid().getSource().defaultFluidState().createLegacyBlock());
 

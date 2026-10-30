@@ -122,7 +122,7 @@ public class AlchemyCauldronMenu extends AbstractContainerMenu {
 
     public static AlchemyCauldronMenu createClient(int id, Inventory inventory, FriendlyByteBuf data) {
         return new AlchemyCauldronMenu(id, inventory, new SimpleContainer(STATION_SLOTS),
-                ContainerLevelAccess.create(inventory.player.level, data.readBlockPos()));
+                ContainerLevelAccess.create(inventory.player.level(), data.readBlockPos()));
     }
 
     public AlchemyCauldronMenu(int id, Inventory inventory, Container container, ContainerLevelAccess access) {
@@ -131,7 +131,7 @@ public class AlchemyCauldronMenu extends AbstractContainerMenu {
         this.container = container;
         this.viewer = inventory.player;
         this.access = access;
-        this.serverLevel = inventory.player.level instanceof ServerLevel server ? server : null;
+        this.serverLevel = inventory.player.level() instanceof ServerLevel server ? server : null;
         addDataSlots(qiData);
         addDataSlots(chargeData);
         updateQi();

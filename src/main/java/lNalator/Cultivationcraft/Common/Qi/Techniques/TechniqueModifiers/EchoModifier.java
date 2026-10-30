@@ -55,7 +55,7 @@ public class EchoModifier extends TechniqueModifier {
     public void onHitEntity(Player owner, Entity hit, float damage, ResourceLocation element, Vec3 pos) {
         super.onHitEntity(owner, hit, damage, element, pos);
 
-        if (owner.level.isClientSide || hit == owner) {
+        if (owner.level().isClientSide || hit == owner) {
             return;
         }
 
@@ -81,9 +81,9 @@ public class EchoModifier extends TechniqueModifier {
                 return false;
             }
 
-            if (echo.target.isAlive() && echo.owner.isAlive() && echo.target.level == echo.owner.level) {
+            if (echo.target.isAlive() && echo.owner.isAlive() && echo.target.level() == echo.owner.level()) {
                 // Echo damage does not go through the modifiers again, so echoes never echo
-                echo.target.hurt(new QiDamageSource(ECHO_SOURCE, echo.owner, echo.element, true), echo.damage);
+                echo.target.hurt(new QiDamageSource(echo.owner.level(), ECHO_SOURCE, echo.owner, echo.element, true), echo.damage);
                 QuestHandler.progressQuest(echo.owner, Quest.ECHO_HIT, 1);
             }
 

@@ -1,13 +1,14 @@
 package lNalator.Cultivationcraft.Client.Renderers;
 
+import com.mojang.math.Axis;
 import lNalator.Cultivationcraft.Common.Qi.Elements.Elements;
 import lNalator.Cultivationcraft.Common.Qi.QiProjectile;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Matrix3f;
-import com.mojang.math.Matrix4f;
-import com.mojang.math.Vector3f;
+import org.joml.Matrix3f;
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -35,7 +36,7 @@ public class QiProjectileRenderer extends EntityRenderer<QiProjectile> {
         p_114083_.pushPose();
         p_114083_.scale(size, size, size);
         p_114083_.mulPose(this.entityRenderDispatcher.cameraOrientation());
-        p_114083_.mulPose(Vector3f.YP.rotationDegrees(180.0F));
+        p_114083_.mulPose(Axis.YP.rotationDegrees(180.0F));
         PoseStack.Pose posestack$pose = p_114083_.last();
         Matrix4f matrix4f = posestack$pose.pose();
         Matrix3f matrix3f = posestack$pose.normal();

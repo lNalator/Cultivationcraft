@@ -70,8 +70,8 @@ public final class PillCommands {
     }
 
     public static int help(CommandSourceStack source) {
-        source.sendSuccess(Component.literal("/cultivation givepill <player> <family> <id> <purity> <quantity> [affinity]"), false);
-        source.sendSuccess(Component.literal("Tab suggests families and matching pill IDs/names. Purity: 0-100; quantity: 1-1024. "
+        source.sendSuccess(() -> Component.literal("/cultivation givepill <player> <family> <id> <purity> <quantity> [affinity]"), false);
+        source.sendSuccess(() -> Component.literal("Tab suggests families and matching pill IDs/names. Purity: 0-100; quantity: 1-1024. "
                 + "Cultivation pills default to Wood; optional affinity selects another element. Pills remain unidentified."), false);
         return 1;
     }
@@ -93,7 +93,7 @@ public final class PillCommands {
         }
         var player = EntityArgument.getPlayer(ctx, "player");
         int purity = IntegerArgumentType.getInteger(ctx, "purity"), quantity = IntegerArgumentType.getInteger(ctx, "quantity");
-        ItemStack template = PillStacks.create(player.getLevel(), definition, purity, affinity);
+        ItemStack template = PillStacks.create(player.serverLevel(), definition, purity, affinity);
         for (int remaining = quantity; remaining > 0;) {
             ItemStack stack = template.copy();
             int count = Math.min(remaining, stack.getMaxStackSize());
@@ -103,13 +103,13 @@ public final class PillCommands {
                 var drop = player.drop(stack, false);
                 if (drop != null) {
                     drop.setNoPickUpDelay();
-                    drop.setOwner(player.getUUID());
+                    drop.setTarget(player.getUUID());
                 }
             }
             remaining -= count;
         }
         player.containerMenu.broadcastChanges();
-        source.sendSuccess(Component.literal("Gave " + quantity + "x " + template.getTag().getString("PillName")
+        source.sendSuccess(() -> Component.literal("Gave " + quantity + "x " + template.getTag().getString("PillName")
                 + " (" + purity + "% purity) to " + player.getGameProfile().getName()), true);
         return quantity;
     }

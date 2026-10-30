@@ -8,7 +8,7 @@ import lNalator.Cultivationcraft.Common.Qi.QiSource;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
-import com.mojang.math.Vector3f;
+import org.joml.Vector3f;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -45,7 +45,7 @@ public class Blood {
     }
 
     public boolean staminaHealing(Player player) {
-        boolean flag = player.level.getGameRules().getBoolean(GameRules.RULE_NATURAL_REGENERATION);
+        boolean flag = player.level().getGameRules().getBoolean(GameRules.RULE_NATURAL_REGENERATION);
         QiFoodStats food = (QiFoodStats) player.getFoodData();
 
         if (flag && food.getSaturationLevel() > 0.0F && player.isHurt() && food.getFoodLevel() >= food.getMaxFood()) {
@@ -53,7 +53,7 @@ public class Blood {
             if (food.tickTimer >= 10) {
                 float f = Math.min(food.getSaturationLevel(), 6);
 
-                if (!player.level.isClientSide) {
+                if (!player.level().isClientSide) {
                     QuestHandler.progressQuest(player, Quest.HEAL, f / staminaHealingModifier);
                 }
 
@@ -69,13 +69,13 @@ public class Blood {
     }
 
     public void naturalHealing(Player player) {
-        boolean flag = player.level.getGameRules().getBoolean(GameRules.RULE_NATURAL_REGENERATION);
+        boolean flag = player.level().getGameRules().getBoolean(GameRules.RULE_NATURAL_REGENERATION);
         QiFoodStats food = (QiFoodStats) player.getFoodData();
 
         if (flag && food.getFoodLevel() >= food.getMaxFood() * 0.9 && player.isHurt()) {
             ++food.tickTimer;
             if (food.tickTimer >= 80) {
-                if (!player.level.isClientSide) {
+                if (!player.level().isClientSide) {
                     QuestHandler.progressQuest(player, Quest.HEAL, 1.0F);
                 }
 

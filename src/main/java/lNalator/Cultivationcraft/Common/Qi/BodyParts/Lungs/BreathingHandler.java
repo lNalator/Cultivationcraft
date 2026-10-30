@@ -43,15 +43,15 @@ public class BreathingHandler {
             return fluidBreaths.get(player.getEyeInFluidType());
         }
 
-        if (blockBreaths.containsKey(player.level.getBlockState(player.blockPosition()))) {
-            return blockBreaths.get(player.level.getBlockState(player.blockPosition()));
+        if (blockBreaths.containsKey(player.level().getBlockState(player.blockPosition()))) {
+            return blockBreaths.get(player.level().getBlockState(player.blockPosition()));
         }
 
         if (player.isOnFire()) {
             return Breath.FIRE;
         }
 
-        if (player.getEyeInFluidType().isAir() && !player.level.getBlockState(new BlockPos(player.getX(), player.getEyeY(), player.getZ())).is(Blocks.BUBBLE_COLUMN)) {
+        if (player.getEyeInFluidType().isAir() && !player.level().getBlockState(BlockPos.containing(player.getX(), player.getEyeY(), player.getZ())).is(Blocks.BUBBLE_COLUMN)) {
             return Breath.AIR;
         }
 

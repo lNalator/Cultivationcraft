@@ -9,7 +9,7 @@ import net.minecraft.world.phys.Vec3;
 public class PlayerUtils {
 
     public static boolean isClientPlayerCharacter(Player player) {
-        return (player.level.isClientSide && Minecraft.getInstance().player.getUUID().compareTo(player.getUUID()) == 0);
+        return (player.level().isClientSide && Minecraft.getInstance().player.getUUID().compareTo(player.getUUID()) == 0);
     }
 
     public static Direction vectorToDirection(Vec3 direction) {

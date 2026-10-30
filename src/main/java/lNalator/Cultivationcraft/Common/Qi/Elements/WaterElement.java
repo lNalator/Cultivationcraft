@@ -27,13 +27,13 @@ public class WaterElement extends Element {
     }
 
     public void applyStatusEffect(QiDamageSource source, Entity target, float damageAmount) {
-        if (target.isOnFire() && source.getEntity() instanceof Player player && !target.level.isClientSide) {
+        if (target.isOnFire() && source.getEntity() instanceof Player player && !target.level().isClientSide) {
             QuestHandler.progressQuest(player, Quest.EXTINGUISH, 1);
         }
 
         target.clearFire();
 
-        if (damageAmount > 0 && target instanceof LivingEntity living && !target.level.isClientSide) {
+        if (damageAmount > 0 && target instanceof LivingEntity living && !target.level().isClientSide) {
             living.addEffect(new MobEffectInstance(ElementalStates.WET.get(), 160));
 
             // Light push away from the source

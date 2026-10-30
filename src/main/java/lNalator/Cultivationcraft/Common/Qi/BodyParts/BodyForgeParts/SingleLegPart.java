@@ -34,7 +34,7 @@ public class SingleLegPart extends MovementOverridePart {
         Vec3 delta = Physics.getDelta(player);
 
         // "Retract" leg whilst falling
-        if (!player.isOnGround() && !genericClientFunctions.getPlayer().isInWater() && delta.y < 0) {
+        if (!player.onGround() && !genericClientFunctions.getPlayer().isInWater() && delta.y < 0) {
             PoseHandler.addPose(player.getUUID(), Idle);
         }
     }
@@ -43,7 +43,7 @@ public class SingleLegPart extends MovementOverridePart {
     public boolean overwriteForward() {
         Player player = genericClientFunctions.getPlayer();
         // If the player presses forward and is on the ground, then hop forward
-        if (player.isOnGround() && !player.isInWater()) {
+        if (player.onGround() && !player.isInWater()) {
             Vec3 direction = player.getForward().normalize();
             float weight = BodyPartStatControl.getPlayerStatControl(player).getLegWeightModifier();
             float speed = player.getSpeed() * weight;
@@ -63,7 +63,7 @@ public class SingleLegPart extends MovementOverridePart {
 
     @Override
     public boolean overwriteLeft() {
-        if (genericClientFunctions.getPlayer().isOnGround() && !genericClientFunctions.getPlayer().isInWater()) {
+        if (genericClientFunctions.getPlayer().onGround() && !genericClientFunctions.getPlayer().isInWater()) {
             return true;
         }
 
@@ -72,7 +72,7 @@ public class SingleLegPart extends MovementOverridePart {
 
     @Override
     public boolean overwriteRight() {
-        if (genericClientFunctions.getPlayer().isOnGround() && !genericClientFunctions.getPlayer().isInWater()) {
+        if (genericClientFunctions.getPlayer().onGround() && !genericClientFunctions.getPlayer().isInWater()) {
             return true;
         }
 
@@ -81,7 +81,7 @@ public class SingleLegPart extends MovementOverridePart {
 
     @Override
     public boolean overwriteBackward() {
-        if (genericClientFunctions.getPlayer().isOnGround() && !genericClientFunctions.getPlayer().isInWater()) {
+        if (genericClientFunctions.getPlayer().onGround() && !genericClientFunctions.getPlayer().isInWater()) {
             return true;
         }
 

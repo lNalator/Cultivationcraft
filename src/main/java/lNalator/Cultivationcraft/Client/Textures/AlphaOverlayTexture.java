@@ -1,5 +1,6 @@
 package lNalator.Cultivationcraft.Client.Textures;
 
+import net.minecraft.util.FastColor;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -57,15 +58,15 @@ public class AlphaOverlayTexture extends SimpleTexture {
 
                 // Alpha is 0 if the alpha texture is out of bounds
                 if (alphaX > -1 && alphaX < alphaImage.getWidth() && alphaY > -1 && alphaY < alphaImage.getHeight()) {
-                    alpha = NativeImage.getA(alphaImage.getPixelRGBA(alphaX, alphaY));
+                    alpha = FastColor.ABGR32.alpha(alphaImage.getPixelRGBA(alphaX, alphaY));
                 }
 
                 int baseRgba = image.getPixelRGBA(finalX, finalY);
 
                 // Set the alpha value to be the lowest alpha of the two images
-                alpha = Math.min(alpha, NativeImage.getA(baseRgba));
+                alpha = Math.min(alpha, FastColor.ABGR32.alpha(baseRgba));
 
-                int rgba = NativeImage.combine(alpha, NativeImage.getB(baseRgba), NativeImage.getG(baseRgba), NativeImage.getR(baseRgba));
+                int rgba = FastColor.ABGR32.color(alpha, FastColor.ABGR32.blue(baseRgba), FastColor.ABGR32.green(baseRgba), FastColor.ABGR32.red(baseRgba));
 
                 if (!RenderSystem.isOnRenderThreadOrInit()) {
                     RenderSystem.recordRenderCall(()

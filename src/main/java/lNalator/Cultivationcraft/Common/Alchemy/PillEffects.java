@@ -87,7 +87,7 @@ public final class PillEffects {
     }
 
     private static long now(Player player) {
-        return player instanceof ServerPlayer server ? server.server.overworld().getGameTime() : player.level.getGameTime();
+        return player instanceof ServerPlayer server ? server.server.overworld().getGameTime() : player.level().getGameTime();
     }
 
     public static double absorptionBonus(Player player) {

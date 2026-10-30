@@ -22,13 +22,13 @@ public class EvolvedLimbTrigger extends SimpleCriterionTrigger<EvolvedLimbTrigge
     }
 
     @Override
-    public EvolvedLimbTrigger.Instance createInstance(JsonObject json, EntityPredicate.Composite composite, DeserializationContext context) {
+    public EvolvedLimbTrigger.Instance createInstance(JsonObject json, ContextAwarePredicate composite, DeserializationContext context) {
         return new EvolvedLimbTrigger.Instance(composite);
     }
 
     public static class Instance extends AbstractCriterionTriggerInstance {
 
-        public Instance(EntityPredicate.Composite composite) {
+        public Instance(ContextAwarePredicate composite) {
             super(ID, composite);
         }
     }

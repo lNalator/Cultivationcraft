@@ -113,7 +113,7 @@ public class JetTechnique extends MovementOverrideTechnique {
     public void deactivate(Player player) {
         forward = false;
 
-        if (player.level.isClientSide) {
+        if (player.level().isClientSide) {
             enableJets(false, player);
         }
 
@@ -166,7 +166,7 @@ public class JetTechnique extends MovementOverrideTechnique {
             on = true;
         }
 
-        if (!player.level.isClientSide()) {
+        if (!player.level().isClientSide()) {
             enabled = on;
         } else {
             enableJets(on, player);

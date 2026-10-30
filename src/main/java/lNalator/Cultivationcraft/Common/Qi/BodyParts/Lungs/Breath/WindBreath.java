@@ -41,7 +41,7 @@ public class WindBreath extends Breath {
 
     // Returns whether the specified block is mineable
     public boolean canBeMined(Player player, BlockPos pos, Direction direction, Technique source) {
-        if (player.level.getBlockState(pos).getBlock() instanceof LeavesBlock) {
+        if (player.level().getBlockState(pos).getBlock() instanceof LeavesBlock) {
             return true;
         }
 
@@ -50,7 +50,7 @@ public class WindBreath extends Breath {
 
     // Returns whether this block should be destroyed on hit or not
     public boolean doBlockAttack(Player player, BlockPos pos, Direction direction) {
-        if (player.level.getBlockState(pos).getBlock() instanceof LeavesBlock) {
+        if (player.level().getBlockState(pos).getBlock() instanceof LeavesBlock) {
             return true;
         }
 

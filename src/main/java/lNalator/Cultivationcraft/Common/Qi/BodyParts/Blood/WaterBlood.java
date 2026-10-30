@@ -2,7 +2,7 @@ package lNalator.Cultivationcraft.Common.Qi.BodyParts.Blood;
 
 import lNalator.Cultivationcraft.Client.Renderers.BloodRenderer;
 import lNalator.Cultivationcraft.Common.Qi.Elements.Elements;
-import com.mojang.math.Vector3f;
+import org.joml.Vector3f;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
@@ -25,10 +25,10 @@ public class WaterBlood extends CultivatorBlood {
 
     @Override
     public void regen(Player player) {
-        BlockPos blockpos = new BlockPos(player.position());
+        BlockPos blockpos = BlockPos.containing(player.position());
 
         // Only heal if in water
-        if (player.level.getBlockState(blockpos).is(Blocks.WATER)) {
+        if (player.level().getBlockState(blockpos).is(Blocks.WATER)) {
             if (!staminaHealing(player)) {
                 naturalHealing(player);
             }
@@ -46,7 +46,7 @@ public class WaterBlood extends CultivatorBlood {
 
     // Called when player takes damage
     public void onHit(Player player, Vec3 source, double amount) {
-        if (player.level.isClientSide) {
+        if (player.level().isClientSide) {
             return;
         }
 
@@ -58,9 +58,9 @@ public class WaterBlood extends CultivatorBlood {
             waterLevel = 2;
         }
 
-        BlockPos blockpos = new BlockPos(player.position());
+        BlockPos blockpos = BlockPos.containing(player.position());
 
-        placeWater(player.level, blockpos, waterLevel);
+        placeWater(player.level(), blockpos, waterLevel);
 
         Vec3 dir = BloodRenderer.getBloodDirection(player, source);
 
@@ -79,16 +79,16 @@ public class WaterBlood extends CultivatorBlood {
             z = -1;
         }
 
-        BlockPos addWaterSpawn = new BlockPos(player.position().x + x, player.position().y, player.position().z + z);
+        BlockPos addWaterSpawn = BlockPos.containing(player.position().x + x, player.position().y, player.position().z + z);
 
-        placeWater(player.level, addWaterSpawn, waterLevel - 1);
+        placeWater(player.level(), addWaterSpawn, waterLevel - 1);
 
         if (x != 0 && z != 0) {
-            addWaterSpawn = new BlockPos(player.position().x, player.position().y, player.position().z + z);
-            placeWater(player.level, addWaterSpawn, waterLevel - 1);
+            addWaterSpawn = BlockPos.containing(player.position().x, player.position().y, player.position().z + z);
+            placeWater(player.level(), addWaterSpawn, waterLevel - 1);
 
-            addWaterSpawn = new BlockPos(player.position().x + x, player.position().y, player.position().z);
-            placeWater(player.level, addWaterSpawn, waterLevel - 1);
+            addWaterSpawn = BlockPos.containing(player.position().x + x, player.position().y, player.position().z);
+            placeWater(player.level(), addWaterSpawn, waterLevel - 1);
         }
     }
 
