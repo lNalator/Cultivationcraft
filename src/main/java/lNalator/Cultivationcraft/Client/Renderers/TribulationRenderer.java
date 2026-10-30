@@ -488,6 +488,12 @@ public final class TribulationRenderer {
     }
 
     // How dark the sky is for this camera: full under the storm, fading out up to 2.5 radii away
+    // Vanilla clouds give way to the storm (see LevelRendererMixin, ClientLevelMixin): near it they darken and fade out,
+    // so the clouds under the storm never cover it when the player is high up
+    public static float vanillaCloudCover() {
+        return storms.isEmpty() ? 0 : darkness(Minecraft.getInstance().gameRenderer.getMainCamera().getPosition());
+    }
+
     private static float darkness(Vec3 camera) {
         float dark = 0;
 

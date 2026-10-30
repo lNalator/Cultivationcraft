@@ -6,7 +6,9 @@
   "refmap": "cultivationcraft.refmap.json",
   "mixins": [],
   "client": [
+    "ClientLevelMixin",
     "EntityMixin",
+    "LevelRendererMixin",
     "MinecraftMixin"
   ],
   "injectors": {

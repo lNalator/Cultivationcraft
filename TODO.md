@@ -2,6 +2,10 @@
 
 Grouped by chantier/category. Each item has a priority (P1 = next, P2 = soon, P3 = later) and a size (S / M / L).
 
+## Minecraft versions (not tied to a mod version)
+
+- **P1 · L** Provide the mod for Minecraft versions above 1.19.2, up to at least 1.21, and ideally 26.x. Includes porting mlmAnimator to the same versions.
+
 ## 0.4.5
 
 ### Concepts (Core Forming)
@@ -30,6 +34,13 @@ Grouped by chantier/category. Each item has a priority (P1 = next, P2 = soon, P3
 - **P3 · M** Idea to explore: Divine Sense creature outlines without Mixin. Draw the sensed entities ourselves into vanilla's outline buffer (`OutlineBufferSource`) with our colour after the entities stage, then run the outline shader (`LevelRenderer.entityEffect`, private: reflection) ourselves, also when no vanilla entity glows that frame (otherwise filled silhouettes). Would allow a distance fade and per-entity transparency, unlike the current Glowing mixins (`MinecraftMixin`, `EntityMixin`). Risks: depends on a private field and the render order, possible conflicts with Distant Horizons and shaders.
 - **P3 · S** Remove the vanilla freeze damage (1 every 2 s) while frozen? (undecided)
 - **P3 · M** Ice Walk in the air (option B), later.
+
+## Divine Sense
+
+- **P2 · M** Probe a target: looking at a player or a mob shows its HP, realm and stage, and core element under the crosshair, like the Qi source line. A realm above the observer's shows "???".
+- **P2 · M** Aura concealment: a technique or concept lowering the player's apparent realm for vigilance and blur, at a Qi cost. The PvP counter to Divine Sense.
+- **P3 · M** Divine Sense pulse: holding the key sends a wave revealing everything within twice the detection radius for a moment, but it pings every player it reaches, whatever their realm.
+- **P3 · L** Qi traces: players and strong mobs leave a trail visible in Divine Sense for a few minutes, to track someone.
 
 ## Formations
 
