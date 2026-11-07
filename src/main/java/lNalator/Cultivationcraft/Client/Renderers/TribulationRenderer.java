@@ -90,7 +90,12 @@ public final class TribulationRenderer {
     private static final double PULSE_SPEED = 0.15;
     private static final double CHARGED_PULSE_SPEED = 0.9;
 
+    // Wind: vanilla clouds drift up to this many times faster near a storm (see LevelRendererMixin)
+    private static final float WIND_SPEED = 6;
+
     private static final Map<Integer, Storm> storms = new HashMap<>();
+    // Extra ticks added to the vanilla clouds' drift, accumulated so the speed changes without the clouds jumping
+    private static float windTicks = 0;
     private static final Random random = new Random();
 
     public static void update(int entityId, Vec3 center, int tick, int strikes) {
@@ -149,6 +154,8 @@ public final class TribulationRenderer {
         if (Minecraft.getInstance().isPaused()) {
             return;
         }
+
+        windTicks += (WIND_SPEED - 1) * vanillaCloudCover();
 
         storms.values().removeIf(storm -> {
             storm.sinceUpdate++;
@@ -490,6 +497,10 @@ public final class TribulationRenderer {
     // How dark the sky is for this camera: full under the storm, fading out up to 2.5 radii away
     // Vanilla clouds give way to the storm (see LevelRendererMixin, ClientLevelMixin): near it they darken and fade out,
     // so the clouds under the storm never cover it when the player is high up
+    public static int vanillaCloudWindTicks() {
+        return (int) windTicks;
+    }
+
     public static float vanillaCloudCover() {
         return storms.isEmpty() ? 0 : darkness(Minecraft.getInstance().gameRenderer.getMainCamera().getPosition());
     }

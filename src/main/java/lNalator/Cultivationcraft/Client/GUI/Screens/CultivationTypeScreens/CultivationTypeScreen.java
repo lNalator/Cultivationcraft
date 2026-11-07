@@ -47,6 +47,10 @@ public class CultivationTypeScreen {
         return false;
     }
 
+    // Drawn after everything else in the cultivation screen
+    public void renderTooltips(PoseStack poseStack, int mouseX, int mouseY, Screen screen, CultivationType cultivation) {
+    }
+
     public void render(PoseStack PoseStack, float partialTicks, int xPos, int yPos, Screen screen, CultivationType cultivation, Font font) {
         RenderSystem.setShaderTexture(0, TEXTURE);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);

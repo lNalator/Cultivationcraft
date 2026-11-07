@@ -14,6 +14,7 @@ import lNalator.Cultivationcraft.Common.Qi.BodyParts.PlayerHealthManager;
 import lNalator.Cultivationcraft.Common.Qi.Quests.Quest;
 import lNalator.Cultivationcraft.Common.Qi.Quests.QuestHandler;
 import lNalator.Cultivationcraft.Common.Qi.Cultivation.CultivationType;
+import lNalator.Cultivationcraft.Common.Qi.Cultivation.QiCondenserCultivation;
 import lNalator.Cultivationcraft.Common.Qi.CultivationTypes;
 import lNalator.Cultivationcraft.Common.Qi.Elements.Elements;
 import lNalator.Cultivationcraft.Common.Qi.QiSource;
@@ -97,6 +98,17 @@ public class MeditateTechnique extends MovementOverrideTechnique {
 
             for (QiSource source : sources) {
                 QuestHandler.progressQuest(event.player, Quest.QI_SOURCE_MEDITATION, 1.0 / 20.0, source.getElement().toString());
+            }
+
+            // Purge beside cultivation, at a quarter of the absorption speed, before absorbing so the void can be filled this tick
+            if (cultivation instanceof QiCondenserCultivation condenser && condenser.isPurging()) {
+                double purge = cultivation.getCultivationStat(event.player, DefaultCultivationStatIDs.qiAbsorbSpeed) / 20.0 * QiCondenserCultivation.PURGE_SPEED;
+
+                if (sources.stream().anyMatch(source -> Elements.presses(source.getElement(), condenser.getPurgingElement()))) {
+                    purge *= QiCondenserCultivation.DOMINANT_PURGE_BONUS;
+                }
+
+                condenser.purge(event.player, (float) purge);
             }
 
             // absorb Qi through blood first

@@ -126,5 +126,7 @@ public class CultivationScreen extends GenericTabScreen {
 
         reset.setPos(edgeSpacingX + statsXPos, edgeSpacingY + statsYPos + 20);
         reset.render(PoseStack, mouseX, mouseY, this);
+
+        cultivation.getScreen().renderTooltips(PoseStack, mouseX, mouseY, this, cultivation);
     }
 }

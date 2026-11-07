@@ -7,6 +7,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(LevelRenderer.class)
@@ -34,5 +35,11 @@ public abstract class LevelRendererMixin {
             RenderSystem.setShaderColor(1, 1, 1, 1);
             cultivationcraft$fadedClouds = false;
         }
+    }
+
+    // Wind: near a storm the clouds drift faster, their offset follows the render ticks
+    @Redirect(method = "renderClouds", at = @At(value = "FIELD", target = "Lnet/minecraft/client/renderer/LevelRenderer;ticks:I"))
+    private int cultivationcraft$windClouds(LevelRenderer renderer) {
+        return ((LevelRendererAccessor) renderer).cultivationcraft$getTicks() + TribulationRenderer.vanillaCloudWindTicks();
     }
 }

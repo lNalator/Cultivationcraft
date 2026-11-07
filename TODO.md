@@ -11,7 +11,6 @@ Grouped by chantier/category. Each item has a priority (P1 = next, P2 = soon, P3
 ### Concepts (Core Forming)
 
 - **P2 · L** Core textures: each concept's core texture, rendered in the Core Forming cultivation screen, becomes a specific animated texture (`coreTexture`, an `animatedTexture` sprite sheet in `textures/cores/` with its number of frames and speed), e.g. Warp an ender-like disappearance, Ice a frozen look. Already animated, to review: Aura (4 frames), Explosion (4), Warp (20), Water (6). Static, to animate: Ice, Earth. Every other concept still uses `blank.png`. Ideas are noted as `TODO core texture` above each concept's constructor (`Common/Qi/Techniques/TechniqueModifiers/*Modifier.java`).
-- **P2 · M** Purge an absorbed element: slowly clear (at a low rate) the Qi of one element absorbed during Qi Condensation, so a player can still advance their realm and, if they spend the time, change their main element to get a different or rarer core.
 - **P3 · M** Undecided offers: Warp flight jumps beyond 9 blocks (server-side teleport; speed past the cap now shortens the Warp Delay instead); Haste reducing the techniques' 0.25 s cooldown.
 - **P3 · S** Warp teleporting Qi projectiles (`WarpModifier.QiProjectileSpawnOverride`).
 - **P3 · L** Synergies between cores (e.g. Aura + Explosion, Infusion + Warp, Fire + Explosion).
