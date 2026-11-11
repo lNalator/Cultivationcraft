@@ -114,6 +114,11 @@ public class PlayerStatControl {
             newStats.combine(passive.getStats());
         }
 
+        // Innate Divine Sense, outside the technique slots
+        if (techs.getDivineSense() != null && techs.getDivineSense().isActive() && techs.getDivineSense().getStats() != null) {
+            newStats.combine(techs.getDivineSense().getStats());
+        }
+
         calculateRealmBonuses(player, newStats);
         calculateVariantResistances(player, newStats);
         calculateSizeStatChanges(newStats);

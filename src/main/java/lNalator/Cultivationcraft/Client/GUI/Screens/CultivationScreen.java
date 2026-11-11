@@ -4,6 +4,7 @@ import lNalator.Cultivationcraft.Client.GUI.GUIButton;
 import lNalator.Cultivationcraft.Client.GUI.TextField;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.CultivatorStats;
 import lNalator.Cultivationcraft.Common.Qi.Cultivation.CultivationType;
+import lNalator.Cultivationcraft.Common.Qi.Techniques.DivineSenseTechnique;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import lNalator.Cultivationcraft.Network.ClientPacketHandler;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -16,6 +17,8 @@ public class CultivationScreen extends GenericTabScreen {
     protected GUIButton stats;
     protected GUIButton breakthroughButton;
     protected GUIButton reset;
+    // Opens the Divine Sense page (Divine Sense is innate, its stats are not in the technique screen)
+    protected GUIButton divineSense;
 
     protected int statsXPos = 20;
     protected int statsYPos = 120;
@@ -35,6 +38,7 @@ public class CultivationScreen extends GenericTabScreen {
         stats = new GUIButton("STATS", Component.translatable("cultivationcraft.gui.stats").getString());
         breakthroughButton = new GUIButton("BREAKTHROUGH", Component.translatable("cultivationcraft.gui.breakthrough").getString());
         reset = new GUIButton("RESET", Component.translatable("cultivationcraft.gui.reset").getString());
+        divineSense = new GUIButton("DIVINESENSE", Component.translatable("cultivationcraft.divinesense.screen").getString());
 
         breakthrough.setSize(120, 60);
     }
@@ -61,6 +65,11 @@ public class CultivationScreen extends GenericTabScreen {
                 ClientPacketHandler.sendBreakthroughToServer(false);
             }
 
+            return true;
+        }
+
+        if (DivineSenseTechnique.find(minecraft.player) != null && divineSense.mouseClick((int) mouseX, (int) mouseY, buttonPressed)) {
+            Minecraft.getInstance().forceSetScreen(new DivineSenseScreen());
             return true;
         }
 
@@ -126,6 +135,11 @@ public class CultivationScreen extends GenericTabScreen {
 
         reset.setPos(edgeSpacingX + statsXPos, edgeSpacingY + statsYPos + 20);
         reset.render(PoseStack, mouseX, mouseY, this);
+
+        if (DivineSenseTechnique.find(minecraft.player) != null) {
+            divineSense.setPos(edgeSpacingX + statsXPos, edgeSpacingY + statsYPos + 40);
+            divineSense.render(PoseStack, mouseX, mouseY, this);
+        }
 
         cultivation.getScreen().renderTooltips(PoseStack, mouseX, mouseY, this, cultivation);
     }

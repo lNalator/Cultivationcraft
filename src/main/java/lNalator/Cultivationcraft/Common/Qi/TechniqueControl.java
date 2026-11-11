@@ -74,7 +74,10 @@ public class TechniqueControl {
         ArrayList<Supplier<Technique>> available = new ArrayList<Supplier<Technique>>();
 
         for (Supplier<Technique> technique : techniques) {
-            if (technique.get().isValid(player)) {
+            Technique created = technique.get();
+
+            // Divine Sense is innate, it is not put in a slot (still registered to read saves and packets)
+            if (!(created instanceof DivineSenseTechnique) && created.isValid(player)) {
                 available.add(technique);
             }
         }

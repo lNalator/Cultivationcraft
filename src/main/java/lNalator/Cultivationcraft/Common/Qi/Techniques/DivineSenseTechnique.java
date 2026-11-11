@@ -78,10 +78,10 @@ public class DivineSenseTechnique extends Technique {
         sendInfo(senseMask);
     }
 
-    // Every category OFF turns Divine Sense off; switching at least one back ON from the menu turns it on again
+    // The radial menu is the only switch: every category OFF turns Divine Sense off, at least one ON turns it on
+    // (the menu's centre sends every category to turn it on, none to turn it off)
     @Override
     public void processInfo(Player player, int info) {
-        int previous = senseMask;
         senseMask = info & SENSE_ALL;
 
         if (player.level.isClientSide) {
@@ -91,13 +91,13 @@ public class DivineSenseTechnique extends Technique {
         if (senseMask == 0 && isActive()) {
             deactivate(player);
             PacketHandler.sendCultivatorTechniquesToClient(player);
-        } else if (previous == 0 && senseMask != 0 && !isActive()) {
+        } else if (senseMask != 0 && !isActive()) {
             activate(player);
             PacketHandler.sendCultivatorTechniquesToClient(player);
         }
     }
 
-    // Turned on by hand (its key) with every category OFF: sense everything again
+    // Turned on with every category OFF (not possible from the menu): sense everything
     @Override
     public void activate(Player player) {
         if (senseMask == 0) {
@@ -122,17 +122,12 @@ public class DivineSenseTechnique extends Technique {
         senseMask = nbt.contains("senseMask") ? nbt.getInt("senseMask") & SENSE_ALL : SENSE_ALL;
     }
 
-    // The player's Divine Sense technique in their technique slots, active or not
+    // The player's innate Divine Sense, active or not, when they can use it (it never takes a technique slot)
     public static DivineSenseTechnique find(Player player) {
         ICultivatorTechniques techniques = CultivatorTechniques.getCultivatorTechniques(player);
+        DivineSenseTechnique sense = techniques.getDivineSense();
 
-        for (int i = 0; i < CultivatorTechniques.numberOfTechniques; i++) {
-            if (techniques.getTechnique(i) instanceof DivineSenseTechnique sense && sense.isValid(player)) {
-                return sense;
-            }
-        }
-
-        return null;
+        return sense != null && sense.isValid(player) ? sense : null;
     }
 
     // The player's Divine Sense when it is active, on both sides
@@ -167,14 +162,20 @@ public class DivineSenseTechnique extends Technique {
     public static SenseProfile getSenseProfile(Player player) {
         var cultivation = CultivatorStats.getCultivatorStats(player).getCultivation();
         int minorStage = Mth.clamp(cultivation.getStage(), 1, Math.max(1, cultivation.getMaxStage())) - 1;
+
+        return getSenseProfile(getRealm(player), minorStage);
+    }
+
+    // Profile at a realm (see getRealm) and a stage counted from 0; also used to show the next stage and realm (DivineSenseScreen)
+    public static SenseProfile getSenseProfile(int realm, int minorStage) {
         // Realm entry bonuses are deliberately larger than the gains within a realm.
-        if (cultivation instanceof CoreFormingCultivation) {
+        if (realm == 3) {
             return new SenseProfile(192 + minorStage * 8, 128 + minorStage * 8, 0.94 + minorStage * 0.005);
         }
-        if (cultivation instanceof QiCondenserCultivation) {
+        if (realm == 2) {
             return new SenseProfile(64 + minorStage * 4, 64 + minorStage * 4, 0.85 + minorStage * 0.01);
         }
-        if (cultivation instanceof FoundationEstablishmentCultivation) {
+        if (realm == 1) {
             return new SenseProfile(16 + minorStage * 2, 30 + minorStage * 2, 0.75 + minorStage * 0.02);
         }
         return new SenseProfile(16, 30, 0.75);

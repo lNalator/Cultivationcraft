@@ -19,6 +19,7 @@ import lNalator.Cultivationcraft.Common.Qi.Quests.QuestHandler;
 import lNalator.Cultivationcraft.Common.Qi.CultivationTypes;
 import lNalator.Cultivationcraft.Common.Qi.Damage.Damage;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.AttackTechnique;
+import lNalator.Cultivationcraft.Common.Qi.Techniques.DivineSenseTechnique;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.PassiveTechniques.PassiveTechnique;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.Technique;
 import lNalator.Cultivationcraft.Network.PacketHandler;
@@ -72,6 +73,22 @@ public class ServerListeners {
                     passive.tickServer(event); 
                 }else {
                     passive.tickInactiveServer(event);
+                }
+            }
+
+            // Innate Divine Sense, outside the technique slots: turned off when the player loses the right to it
+            DivineSenseTechnique sense = techs.getDivineSense();
+
+            if (sense != null) {
+                if (sense.isValid(event.player)) {
+                    if (sense.isActive()) {
+                        sense.tickServer(event);
+                    } else {
+                        sense.tickInactiveServer(event);
+                    }
+                } else if (sense.isActive()) {
+                    sense.deactivate(event.player);
+                    PacketHandler.sendCultivatorTechniquesToClient(event.player);
                 }
             }
 

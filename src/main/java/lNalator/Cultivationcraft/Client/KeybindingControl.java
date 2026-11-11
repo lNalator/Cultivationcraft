@@ -58,7 +58,7 @@ public class KeybindingControl {
     public static void init(RegisterKeyMappingsEvent event) {
         keyBindings = new KeyMapping[4];
         keyBindings[0] = new KeyMapping("Switch Hotbar", GLFW_KEY_GRAVE_ACCENT, "Cultivation");
-        // Held to show the Divine Sense radial menu
+        // Held to show the Divine Sense radial menu, the only way to turn Divine Sense on or off (it is innate, not in a technique slot)
         keyBindings[1] = new KeyMapping("Divine Sense Menu", GLFW_KEY_G, "Cultivation");
         keyBindings[3] = new KeyMapping("Cultivation Menu", GLFW_KEY_K, "Cultivation");
 

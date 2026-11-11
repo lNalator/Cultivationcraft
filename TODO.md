@@ -76,10 +76,10 @@ Reference for the whole project. Design: `project-files/cultivationcraft/approfo
 
 ## Divine Sense
 
-- **P2 · M** Divine Sense cost and progression (the Shen): its own mind-fatigue gauge (separate from Qi), drained by active use (more with a large radius or many highlights), refilled at rest and faster while meditating, with a temporary malus when empty. Progression: mainly from accumulated knowledge (entries weighted by importance), secondarily from use, capped by the realm. No detection category is locked; each tier improves a parameter instead (radius, number of highlights, mind-fatigue efficiency, precision of the target info, cone focus mode, pinning a target, stealth from other cultivators).
+- **P2 · M** Divine Sense cost and progression (the Shen): its own mind-fatigue gauge (separate from Qi), drained by active use (more with a large radius or many highlights), refilled at rest and faster while meditating, with a temporary malus when empty. Progression: mainly from accumulated knowledge (entries weighted by importance), secondarily from use, capped by the realm. No detection category is locked; each tier improves a parameter instead (radius, number of highlights, mind-fatigue efficiency, precision of the target info, cone focus mode, pinning a target, stealth from other cultivators). The gauge and the tiers go on the Divine Sense page of the cultivation menu (`DivineSenseScreen`) and in the radial menu's stats panel.
 - **P2 · M** Probe a target: looking at a player or a mob shows its HP, realm and stage, and core element under the crosshair, like the Qi source line. A realm above the observer's shows "???".
 - **P2 · M** Aura concealment: a technique or concept lowering the player's apparent realm for vigilance and blur, at a Qi cost. The PvP counter to Divine Sense.
-- **P3 · M** Divine Sense pulse: holding the key sends a wave revealing everything within twice the detection radius for a moment, but it pings every player it reaches, whatever their realm.
+- **P3 · M** Divine Sense pulse: a dedicated key or a sector of the radial menu (holding the Divine Sense key already opens the menu) sends a wave revealing everything within twice the detection radius for a moment, but it pings every player it reaches, whatever their realm.
 - **P3 · L** Qi traces: players and strong mobs leave a trail visible in Divine Sense for a few minutes, to track someone.
 
 ## Qi sources

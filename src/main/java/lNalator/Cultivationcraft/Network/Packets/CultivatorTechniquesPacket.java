@@ -2,6 +2,7 @@ package lNalator.Cultivationcraft.Network.Packets;
 
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorTechniques.CultivatorTechniques;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorTechniques.ICultivatorTechniques;
+import lNalator.Cultivationcraft.Common.Qi.Techniques.DivineSenseTechnique;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.Technique;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import lNalator.Cultivationcraft.Network.PacketHandler;
@@ -18,6 +19,8 @@ public class CultivatorTechniquesPacket extends Packet {
 
     UUID owner;
     Technique[] techniques = new Technique[CultivatorTechniques.numberOfTechniques];
+    // Innate Divine Sense: only read by clients, the server keeps its own
+    DivineSenseTechnique divineSense;
 
     public CultivatorTechniquesPacket(UUID player, ICultivatorTechniques techs) {
         owner = player;
@@ -26,6 +29,8 @@ public class CultivatorTechniquesPacket extends Packet {
             for (int i = 0; i < CultivatorTechniques.numberOfTechniques; i++) {
                 techniques[i] = techs.getTechnique(i);
             }
+
+            divineSense = techs.getDivineSense();
         }
     }
 
@@ -40,6 +45,13 @@ public class CultivatorTechniquesPacket extends Packet {
             } else {
                 buffer.writeBoolean(false);
             }
+        }
+
+        if (divineSense != null) {
+            buffer.writeBoolean(true);
+            divineSense.writeBuffer(buffer);
+        } else {
+            buffer.writeBoolean(false);
         }
     }
 
@@ -58,6 +70,8 @@ public class CultivatorTechniquesPacket extends Packet {
                     techs.setTechnique(i, null);
                 }
             }
+
+            techs.setDivineSense(buffer.readBoolean() && Technique.readBuffer(buffer) instanceof DivineSenseTechnique sense ? sense : null);
 
             return new CultivatorTechniquesPacket(owner, techs);
         } catch (IllegalArgumentException | IndexOutOfBoundsException e) {
@@ -98,6 +112,10 @@ public class CultivatorTechniquesPacket extends Packet {
             techs.setTechnique(i, techniques[i]);
         }
 
+        if (divineSense != null) {
+            techs.setDivineSense(divineSense);
+        }
+
     }
 
     // Process received packet on server
@@ -111,6 +129,11 @@ public class CultivatorTechniquesPacket extends Packet {
         }
 
         for (int i = 0; i < CultivatorTechniques.numberOfTechniques; i++) {
+            // Divine Sense is innate and never goes in a slot
+            if (techniques[i] instanceof DivineSenseTechnique) {
+                techniques[i] = null;
+            }
+
             // Ensure the technique is valid
             // Only add multiple copies of a technique if the technique allows it
             if (techniques[i] == null || (techniques[i].isValid(player) && (techniques[i].allowMultiple() || !techs.techniqueExists(techniques[i])))) {

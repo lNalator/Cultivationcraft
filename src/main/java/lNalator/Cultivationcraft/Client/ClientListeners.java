@@ -127,6 +127,17 @@ public class ClientListeners {
                 }
             }
 
+            // Innate Divine Sense, outside the technique slots
+            DivineSenseTechnique sense = DivineSenseTechnique.find(event.player);
+
+            if (sense != null) {
+                if (sense.isActive()) {
+                    sense.tickClient(event);
+                } else {
+                    sense.tickInactiveClient(event);
+                }
+            }
+
             // Tick through all body modifications on the player
             IBodyModifications modifications = BodyModifications.getBodyModifications(event.player);
 

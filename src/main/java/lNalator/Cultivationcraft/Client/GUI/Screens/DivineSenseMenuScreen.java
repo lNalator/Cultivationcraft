@@ -8,7 +8,10 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.math.Matrix4f;
+import lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.CultivatorStats;
+import lNalator.Cultivationcraft.Common.Qi.CultivationTypes;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.DivineSenseTechnique;
+import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueStats.DefaultTechniqueStatIDs;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
@@ -20,8 +23,11 @@ import net.minecraft.util.Mth;
 import org.lwjgl.glfw.GLFW;
 
 /**
- * Divine Sense radial menu, like the action menu of Dragon Block C: shown while its key is held, each click switches a
- * category ON or OFF, the centre switches them all. The mask is kept by the Divine Sense technique.
+ * Divine Sense radial menu, like the action menu of Dragon Block C: shown while its key is held. It is the only way to
+ * turn Divine Sense on or off: the centre is its ON/OFF switch (turning it on senses every category), each sector
+ * switches a category ON or OFF. Switching every category OFF turns Divine Sense off, switching one ON while it is off
+ * turns it on with that category only. A panel beside the wheel shows Divine Sense's current stats. The mask is kept by
+ * the Divine Sense technique.
  */
 public class DivineSenseMenuScreen extends Screen {
 
@@ -45,6 +51,10 @@ public class DivineSenseMenuScreen extends Screen {
     private static final int SEGMENTS = 16;
 
     private static final int ON_COLOR = 0x91DCCD;
+    // Stats panel, right of the wheel
+    private static final int PANEL_GAP = 16;
+    private static final int PANEL_PADDING = 5;
+    private static final int PANEL_BACKGROUND = 0xA0101418;
     private static final int OFF_COLOR = 0x303030;
 
     // Hovered: -1 for the centre, -2 for nothing
@@ -119,10 +129,11 @@ public class DivineSenseMenuScreen extends Screen {
             return super.mouseClicked(mouseX, mouseY, button);
         }
 
-        int mask = sense.getSenseMask();
+        // Off, Divine Sense senses nothing: every category shows OFF
+        int mask = sense.isActive() ? sense.getSenseMask() : 0;
 
         if (target == CENTER) {
-            mask = mask == DivineSenseTechnique.SENSE_ALL ? 0 : DivineSenseTechnique.SENSE_ALL;
+            mask = sense.isActive() ? 0 : DivineSenseTechnique.SENSE_ALL;
         } else {
             mask ^= SECTORS[target].category();
         }
@@ -157,11 +168,10 @@ public class DivineSenseMenuScreen extends Screen {
         for (int i = 0; i < SECTORS.length; i++) {
             double start = i * span - span / 2 + GAP / 2, end = i * span + span / 2 - GAP / 2;
             ring(buffer, matrix, centerX, centerY, INNER_RADIUS, OUTER_RADIUS, start, end,
-                    sense.senses(SECTORS[i].category()) ? ON_COLOR : OFF_COLOR, hovered == i ? 0.8f : 0.55f);
+                    sensed(sense, SECTORS[i].category()) ? ON_COLOR : OFF_COLOR, hovered == i ? 0.8f : 0.55f);
         }
 
-        boolean all = sense.getSenseMask() == DivineSenseTechnique.SENSE_ALL;
-        ring(buffer, matrix, centerX, centerY, 0, CENTER_RADIUS, 0, 360, all ? ON_COLOR : OFF_COLOR, hovered == CENTER ? 0.8f : 0.55f);
+        ring(buffer, matrix, centerX, centerY, 0, CENTER_RADIUS, 0, 360, sense.isActive() ? ON_COLOR : OFF_COLOR, hovered == CENTER ? 0.8f : 0.55f);
 
         Tesselator.getInstance().end();
 
@@ -173,16 +183,59 @@ public class DivineSenseMenuScreen extends Screen {
             float labelRadius = (INNER_RADIUS + OUTER_RADIUS) / 2;
             int x = Math.round(centerX + (float) Math.sin(angle) * labelRadius);
             int y = Math.round(centerY - (float) Math.cos(angle) * labelRadius);
-            boolean on = sense.senses(SECTORS[i].category());
+            boolean on = sensed(sense, SECTORS[i].category());
 
             drawCenteredString(poseStack, font, Component.translatable(SECTORS[i].name()), x, y - 9, on ? 0xFFFFFF : 0x9A9A9A);
             drawCenteredString(poseStack, font, Component.translatable(on ? "cultivationcraft.divinesense.menu.on" : "cultivationcraft.divinesense.menu.off"),
                     x, y + 1, on ? 0x91DCCD : 0x9A9A9A);
         }
 
-        drawCenteredString(poseStack, font, Component.translatable("cultivationcraft.divinesense.menu.all"), Math.round(centerX), Math.round(centerY) - 4, 0xFFFFFF);
+        // The centre is Divine Sense's ON/OFF switch
+        drawCenteredString(poseStack, font, Component.translatable(sense.isActive() ? "cultivationcraft.divinesense.menu.on" : "cultivationcraft.divinesense.menu.off"),
+                Math.round(centerX), Math.round(centerY) - 4, 0xFFFFFF);
+
+        renderStats(poseStack, sense, Math.round(centerX + OUTER_RADIUS + PANEL_GAP), Math.round(centerY));
 
         super.render(poseStack, mouseX, mouseY, partialTick);
+    }
+
+    // A category is only shown ON while Divine Sense is on
+    private static boolean sensed(DivineSenseTechnique sense, int category) {
+        return sense.isActive() && sense.senses(category);
+    }
+
+    // Current Divine Sense stats, vertically centred on y; the full page is in the cultivation menu (DivineSenseScreen)
+    private void renderStats(PoseStack poseStack, DivineSenseTechnique sense, int x, int y) {
+        java.util.List<Component> lines = new java.util.ArrayList<>();
+        lines.add(Component.translatable("cultivationcraft.divinesense.menu.state",
+                Component.translatable(sense.isActive() ? "cultivationcraft.divinesense.menu.on" : "cultivationcraft.divinesense.menu.off")));
+        lines.add(Component.translatable("cultivationcraft.divinesense.stat.radius",
+                (int) sense.getTechniqueStat(DivineSenseTechnique.DETECTION_RADIUS, minecraft.player)));
+        lines.add(Component.translatable("cultivationcraft.divinesense.stat.highlights",
+                (int) sense.getTechniqueStat(DivineSenseTechnique.MAX_HIGHLIGHTS, minecraft.player)));
+
+        if (CultivatorStats.getCultivatorStats(minecraft.player).getCultivationType() == CultivationTypes.QI_CONDENSER) {
+            lines.add(Component.translatable("cultivationcraft.divinesense.stat.qicost",
+                    String.format("%.1f", sense.getTechniqueStat(DefaultTechniqueStatIDs.qiCost, minecraft.player))));
+        }
+
+        int panelWidth = 0;
+        for (Component line : lines) {
+            panelWidth = Math.max(panelWidth, font.width(line));
+        }
+
+        int lineHeight = font.lineHeight + 2;
+        int top = y - lines.size() * lineHeight / 2;
+
+        // Keep the panel on screen with a small GUI scale or a narrow window
+        x = Math.min(x, width - panelWidth - 2 * PANEL_PADDING - 2);
+
+        fill(poseStack, x - PANEL_PADDING, top - PANEL_PADDING, x + panelWidth + PANEL_PADDING, top + lines.size() * lineHeight + PANEL_PADDING - 2, PANEL_BACKGROUND);
+
+        for (int i = 0; i < lines.size(); i++) {
+            int color = i == 0 ? (sense.isActive() ? ON_COLOR : 0x9A9A9A) : i == lines.size() - 1 ? 0x9A9A9A : 0xFFFFFF;
+            drawString(poseStack, font, lines.get(i), x, top + i * lineHeight, color);
+        }
     }
 
     // A ring section from start to end degrees, clockwise from the top
