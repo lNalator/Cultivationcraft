@@ -55,6 +55,13 @@ public class SelectableText {
         text = Component.translatable(component.toLanguageKey().concat(".text"));
     }
 
+    // Own name and text, for a component (e.g. a concept with its synergies appended)
+    public SelectableText(ResourceLocation component, Component name, Component text) {
+        ID = component;
+        this.name = name;
+        this.text = text;
+    }
+
     public ResourceLocation getID() {
         return ID;
     }

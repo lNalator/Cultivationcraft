@@ -36,7 +36,7 @@ public final class GroundSlamRenderer {
 
     }
 
-    private record Slam(Vec3 center, float radius, long started, List<Piece> pieces) {
+    private record Slam(Vec3 center, float radius, float lift, long started, List<Piece> pieces) {
 
     }
 
@@ -49,7 +49,7 @@ public final class GroundSlamRenderer {
     private static final List<Slam> slams = new ArrayList<>();
     private static final MultiBufferSource.BufferSource BLOCKS = MultiBufferSource.immediate(new BufferBuilder(16384));
 
-    public static void add(Vec3 center, float radius) {
+    public static void add(Vec3 center, float radius, float lift) {
         ClientLevel level = Minecraft.getInstance().level;
 
         if (level == null) {
@@ -80,7 +80,7 @@ public final class GroundSlamRenderer {
 
                         for (int i = 0; i < 3; i++) {
                             level.addParticle(new BlockParticleOption(ParticleTypes.BLOCK, state), pos.getX() + Math.random(), pos.getY() + 1.05, pos.getZ() + Math.random(),
-                                    dx * 0.05, 0.15 + Math.random() * 0.15, dz * 0.05);
+                                    dx * 0.05, (0.15 + Math.random() * 0.15) * lift, dz * 0.05);
                         }
 
                         break;
@@ -89,7 +89,7 @@ public final class GroundSlamRenderer {
             }
         }
 
-        slams.add(new Slam(center, radius, level.getGameTime(), pieces));
+        slams.add(new Slam(center, radius, lift, level.getGameTime(), pieces));
     }
 
     @SubscribeEvent
@@ -143,7 +143,7 @@ public final class GroundSlamRenderer {
 
             for (Piece piece : slam.pieces) {
                 double falloff = 1 - piece.distance / (slam.radius + 1);
-                double lift = MAX_LIFT * rise * falloff;
+                double lift = MAX_LIFT * slam.lift * rise * falloff;
                 Vec3 away = new Vec3(piece.pos.getX() + 0.5 - slam.center.x, 0, piece.pos.getZ() + 0.5 - slam.center.z);
                 Vec3 axis = away.lengthSqr() < 0.01 ? new Vec3(1, 0, 0) : new Vec3(-away.z, 0, away.x).normalize();
 

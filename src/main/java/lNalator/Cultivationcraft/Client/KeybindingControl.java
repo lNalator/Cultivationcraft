@@ -60,10 +60,13 @@ public class KeybindingControl {
         keyBindings[0] = new KeyMapping("Switch Hotbar", GLFW_KEY_GRAVE_ACCENT, "Cultivation");
         // Held to show the Divine Sense radial menu, the only way to turn Divine Sense on or off (it is innate, not in a technique slot)
         keyBindings[1] = new KeyMapping("Divine Sense Menu", GLFW_KEY_G, "Cultivation");
+        // Levitation + Wind synergy: wraps the entity looked at in wind while flying, or releases everyone when looking at nothing
+        keyBindings[2] = new KeyMapping("Wind Wrap", GLFW_KEY_B, "Cultivation");
         keyBindings[3] = new KeyMapping("Cultivation Menu", GLFW_KEY_K, "Cultivation");
 
         event.register(keyBindings[0]);
         event.register(keyBindings[1]);
+        event.register(keyBindings[2]);
         event.register(keyBindings[3]);
 
         techniqueKeys = new KeyMapping[CultivatorTechniques.numberOfTechniques];
@@ -416,6 +419,11 @@ public class KeybindingControl {
             if (keyBindings[1].consumeClick()) {
                 DivineSenseMenuScreen.open(keyBindings[1]);
                 return;
+            }
+
+            // The server checks the synergy, the flight and what the player looks at
+            if (keyBindings[2].consumeClick()) {
+                ClientPacketHandler.sendKeypressToServer(Register.keyPresses.WIND_WRAP);
             }
 
             handleHotbarKeybinds();

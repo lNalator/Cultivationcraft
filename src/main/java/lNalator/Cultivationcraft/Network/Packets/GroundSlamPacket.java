@@ -9,22 +9,24 @@ import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
-public record GroundSlamPacket(Vec3 center, float radius) {
+// lift: how high the ground pieces rise, 1 = normal (Falling + Earth raises it)
+public record GroundSlamPacket(Vec3 center, float radius, float lift) {
 
     public void encode(FriendlyByteBuf buffer) {
         buffer.writeDouble(center.x);
         buffer.writeDouble(center.y);
         buffer.writeDouble(center.z);
         buffer.writeFloat(radius);
+        buffer.writeFloat(lift);
     }
 
     public static GroundSlamPacket decode(FriendlyByteBuf buffer) {
-        return new GroundSlamPacket(new Vec3(buffer.readDouble(), buffer.readDouble(), buffer.readDouble()), buffer.readFloat());
+        return new GroundSlamPacket(new Vec3(buffer.readDouble(), buffer.readDouble(), buffer.readDouble()), buffer.readFloat(), buffer.readFloat());
     }
 
     public void handle(Supplier<NetworkEvent.Context> supplier) {
         var context = supplier.get();
-        context.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> GroundSlamRenderer.add(center, radius)));
+        context.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> GroundSlamRenderer.add(center, radius, lift)));
         context.setPacketHandled(true);
     }
 }

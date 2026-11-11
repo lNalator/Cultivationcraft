@@ -120,10 +120,12 @@ public class WarpModifier extends TechniqueModifier {
             return inputProjectile;
         }
 
-        // Same cost as the other Warp teleports: 10 Qi per block. Without enough Qi, the projectile is shot normally
-        if (!CultivatorStats.getCultivatorStats(owner).getCultivation().consumeQi(owner, distance * 10)) {
+        // Same cost as the other Warp teleports: 10 Qi per block (less with Shrink). Without enough Qi, the projectile is shot normally
+        if (!CultivatorStats.getCultivatorStats(owner).getCultivation().consumeQi(owner, CoreSynergies.warpCost(owner, distance * 10))) {
             return inputProjectile;
         }
+
+        CoreSynergies.onWarp(owner, start);
 
         Vec3 destination = start.add(direction.scale(distance));
         ServerLevel level = (ServerLevel) owner.level;
@@ -154,11 +156,14 @@ public class WarpModifier extends TechniqueModifier {
             return false;
         }
 
-        // Spend Qi equal to the distance teleported * 10
+        // Spend Qi equal to the distance teleported * 10 (less with the Shrink + Warp synergy)
         double distance = entity.position().subtract(pos).length();
-        if (!CultivatorStats.getCultivatorStats(owner).getCultivation().consumeQi(owner, distance * 10)) {
+        if (!CultivatorStats.getCultivatorStats(owner).getCultivation().consumeQi(owner, CoreSynergies.warpCost(owner, distance * 10))) {
             return false;
         }
+
+        // Infusion + Warp synergy: an elemental zone where the teleport started
+        CoreSynergies.onWarp(owner, entity.position());
 
         QuestHandler.progressQuest(owner, Quest.ENDER_TELEPORT, 1);
 

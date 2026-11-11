@@ -67,7 +67,9 @@ public class PacketHandler {
     protected static final byte TRIBULATION = 108;
     protected static final byte DIVINE_SENSE_PING = 109;
     protected static final byte PURGE_ELEMENT = 110;
-    protected static final String PROTOCOL_VERSION = "11";
+    protected static final byte LIGHTNING_ARC = 111;
+    protected static final byte WIND_WRAP = 112;
+    protected static final String PROTOCOL_VERSION = "12";
 
     public static final SimpleChannel channel = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(Cultivationcraft.MODID, "main"),
@@ -112,6 +114,8 @@ public class PacketHandler {
         channel.registerMessage(QUEST_PROGRESS, QuestPacket.class, QuestPacket::encode, QuestPacket::decode, QuestPacket::handle);
         channel.registerMessage(QUEST_CANCEL, QuestCancelPacket.class, QuestCancelPacket::encode, QuestCancelPacket::decode, QuestCancelPacket::handle);
         channel.registerMessage(PURGE_ELEMENT, PurgeElementPacket.class, PurgeElementPacket::encode, PurgeElementPacket::decode, PurgeElementPacket::handle);
+        channel.registerMessage(LIGHTNING_ARC, LightningArcPacket.class, LightningArcPacket::encode, LightningArcPacket::decode, LightningArcPacket::handle);
+        channel.registerMessage(WIND_WRAP, WindWrapPacket.class, WindWrapPacket::encode, WindWrapPacket::decode, WindWrapPacket::handle);
         channel.registerMessage(FLYING_SWORD_NBT_ID, ConvertToFlyingPacket.class, ConvertToFlyingPacket::encode, ConvertToFlyingPacket::decode, ConvertToFlyingPacket::handle);
         channel.registerMessage(WIND_INSTANCE, WindPacket.class, WindPacket::encode, WindPacket::decode, WindPacket::handle);
         channel.registerMessage(BLOOD_SPAWN_ID, BloodPacket.class, BloodPacket::encode, BloodPacket::decode, BloodPacket::handle);

@@ -145,6 +145,7 @@ public class QiEmission extends Technique {
 
         Entity projectile = new QiProjectile(player.level, player, pos.x, pos.y, pos.z, getElement(), (int) (getTechniqueStat(DefaultTechniqueStatIDs.damage, player) * charge), (float) getTechniqueStat(DefaultTechniqueStatIDs.movementSpeed, player) * tempo, this, (float) getTechniqueStat(DefaultTechniqueStatIDs.lifetime, player));
         ((QiProjectile) projectile).setDirection(player.getLookAngle());
+        ((QiProjectile) projectile).setCharge(charge);
 
         for (TechniqueModifier mod : CultivatorStats.getCultivatorStats(player).getCultivation().getModifiers()) {
             projectile = mod.QiProjectileSpawnOverride(player, projectile);

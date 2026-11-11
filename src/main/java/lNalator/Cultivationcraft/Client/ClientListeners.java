@@ -237,6 +237,9 @@ public class ClientListeners {
             // Vigilance: where someone senses this player from
             DivineSensePingOverlay.render(event.getPoseStack(), event.getPartialTick());
 
+            // Levitation + Wind synergy: entities carried in wind
+            lNalator.Cultivationcraft.Client.GUI.WindWrapOverlay.render(event.getPoseStack());
+
             // Draw dynamic Tier/Age HUD when looking at a Procedural Plant (visible only during Divine Sense)
             if (Renderer.QiSourcesVisible) {
                 var mc = Minecraft.getInstance();

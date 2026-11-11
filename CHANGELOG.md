@@ -1,6 +1,8 @@
 # Changelog
 
-## [0.4.5] - WIP - Realm passives and Core Forming concepts
+## [0.5.0] - Realm passives and Core Forming concepts
+
+This release targets **Minecraft 1.19.2, Forge 43.1.52 or newer, and Java 17**, and requires **MLM Animator 0.2.3** or newer.
 
 ### New features and changes
 
@@ -33,6 +35,8 @@
 - Vanilla clouds react to a tribulation storm: near it they darken to the storm's colour and fade out, as much as the sky darkens, and they are no longer drawn under the storm, so a player high in the world no longer sees white clouds covering the storm. The wind also picks up: near the storm they drift up to 6 times faster, speeding up smoothly as the storm gathers.
 - Grow now also enlarges the flying swords' hitbox, matching their bigger model.
 - Elasticity's fall bounce costs half as much Qi (half the damage taken instead of all of it).
+- Elasticity: a Qi projectile now bounces on blocks 3 times at most and disappears on the next block hit, and each bounce keeps only 60% of its remaining lifetime (`bounce_max` and `bounce_life` in the server config). Its propulsion now bounces with it instead of still pushing towards the wall, and Qi projectiles are no longer pushed by explosions: with Explosion, they gained speed at every bounce.
+- Fixed Qi projectiles with a lifetime that is not a whole number of ticks (Levitation) never expiring: they only disappeared when their lifetime hit exactly 0.
 - Reverting a realm now goes through a single `CultivationType.revert()` method: the stage reached again must pass its tribulation again, and reverting is refused at the first stage.
 - Added the `multiplayer-test.ps1` script and the `-Pplayer`, `-PclientDir` and `-Pconnect` options of `runClient` in `build.gradle`, to test with several clients.
 - Divine Sense radial menu: hold G (Controls > Cultivation) to show it, and click a sector to switch it ON or OFF: Qi Sources, Spiritual Blocks (ores and plants, with the plant's Tier/Qi line), Creatures, Players and Tribulations. The choice is saved with Divine Sense and kept on the server.
@@ -47,6 +51,21 @@
 - Every concept now has its own animated core in the Core Forming cultivation screen: Bounce, Charge, Echo, Falling, Fire, Gravity, Grow, Haste, Infusion, Levitation, Lightning, Poison, Pure, Repulsion, Shrink, Wind and Wood got a new texture, the Earth and Ice cores are now animated (orbiting rocks, frost shine), and every core shares the same shaded turquoise base (Aura, Explosion, Warp and Water included).
 - Training the Aura's damage or effect intensity now raises its Qi cost a lot: +0.002 per damage level and +0.003 per intensity level, against +0.0005 per range level (e.g. 1000 damage levels, which double the damage, triple the cost). Levels already trained count right away.
 - The Aura's zone is now visible to every player nearby: a translucent bubble in the element's colour, nearly clear face on and brighter at its silhouette, with faint bands rising along it, and a bright ring on the ground at the edge of the zone. Seen from inside (the owner included), the bubble shows as a light veil all around, brighter towards the horizon, so it reads as well as from outside. It fades in and out in 0.4 s. With Divine Sense, a sensed player using their aura also has a copy of their hitbox swelling and fading every second, and a dashed circle turning at their feet along the edge of the zone, seen through walls. Other players also stop seeing it when the aura runs out of Qi.
+- Synergies between cores: owning two given cores together adds a new effect, never a multiplier of their bonuses. They are fixed (they do not grow with the cores' ranks) and their values are in the server config (new "Core Synergies" section). They are hidden: in the Concepts menu, a concept shows "Synergy with X: ?" for each synergy with a core already owned, and the effect is revealed once both cores are owned. There is no synergy between two elemental cores, and Haste never affects Warp. The 13 synergies:
+  - Aura + Explosion: one aura pulse in three explodes around the player, with a radius of half the aura's range, without breaking blocks.
+  - Infusion + Warp: every teleport (flying swords, Qi projectiles, the dodge when hit, Warp flight jumps) leaves a 2-block zone of the core's element where it started, for 3 s.
+  - Fire + Explosion: explosions are Fire explosions, so they burn what they hit (normal Burn, no damage bonus), and they set the ground on fire.
+  - Gravity + Explosion: on a technique's impact, Gravity pulls the targets together and the explosion goes off 0.5 s later, announced by smoke and a fuse sound. Rooted targets are not pulled.
+  - Repulsion + Ice: enemy projectiles slowed by Repulsion within 1.5 blocks of the impact freeze (snowflakes) and drop.
+  - Echo + Lightning: each echo jumps to the nearest other target within 4 blocks of the last one hit, never twice on the same one, drawn as a flickering lightning arc between the two targets (our own render, not a vanilla lightning bolt). With no other target, the echo is lost.
+  - Echo + Charge: the echoes of a charged Qi Emission shot keep its charge. Without this synergy, echoes now repeat the uncharged hit.
+  - Poison + Infusion: Infusion zones (trail, impact and Warp zones) also block regeneration, until 1 s after leaving them.
+  - Falling + Earth: the landing ground slam stuns (1 s) and knocks back enemies on the ground within 2 blocks, and the ground rises twice as high.
+  - Falling + Wood: the landing ground slam roots enemies on the ground within 2 blocks for 1 s, with roots coming out of the ground.
+  - Levitation + Wind: gliding down while flying costs no Qi. While flying, the new "Wind Wrap" key (B by default, Controls > Cultivation) wraps the entity looked at within 4 blocks in wind, and it is carried along behind the player with wind swirling around it; looking at a wrapped entity releases it, looking at nothing releases everyone. Up to 3 entities, each costing 2 Qi per second plus 2 per realm (mobs are realm 0). A carried player breaks free by sneaking for 1 s, at once if their realm is higher than the carrier's. Everyone is released with 5 s of Slow Falling when the flight stops or the Qi runs out. A "Wind 2/3" counter shows above the Qi orb.
+  - Grow + Aura: the aura reaches 1 block further (its zone is drawn bigger too).
+  - Shrink + Warp: teleports, warped projectiles and Warp flight jumps cost 30% less Qi.
+  Network protocol version 12.
 
 ### Fixes
 

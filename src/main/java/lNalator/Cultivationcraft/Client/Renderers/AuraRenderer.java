@@ -88,7 +88,7 @@ public final class AuraRenderer {
             }
 
             Zone zone = zones.computeIfAbsent(player.getUUID(), id -> new Zone());
-            zone.range = aura.getTechniqueStat(DefaultTechniqueStatIDs.range, player);
+            zone.range = aura.getRange(player);
 
             // Lightened element colour, so dark elements (Earth...) stay visible
             Element element = Elements.getElement(element(player));

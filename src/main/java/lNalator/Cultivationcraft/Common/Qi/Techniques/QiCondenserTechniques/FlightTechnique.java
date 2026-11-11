@@ -9,6 +9,7 @@ import lNalator.Cultivationcraft.Common.Qi.Elements.Elements;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.Technique;
 import lNalator.Cultivationcraft.Common.Qi.Quests.Quest;
 import lNalator.Cultivationcraft.Common.Qi.Quests.QuestHandler;
+import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers.CoreSynergies;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers.TechniqueModifier;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers.WarpModifier;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueStats.DefaultTechniqueStatIDs;
@@ -110,7 +111,10 @@ public class FlightTechnique extends Technique {
     @Override
     public void tickServer(TickEvent.PlayerTickEvent event) {
         if (!event.player.isOnGround()) {
-            if (!spendExternalQi(event.player, 0.05)) {
+            // Levitation + Wind synergy: gliding down costs no Qi
+            boolean gliding = lastWarpPos != null && event.player.getY() < lastWarpPos.y - 0.01 && CoreSynergies.has(event.player, CoreSynergies.LEVITATION_WIND);
+
+            if (!gliding && !spendExternalQi(event.player, 0.05)) {
                 deactivate(event.player);
                 lNalator.Cultivationcraft.Network.PacketHandler.sendCultivatorTechniquesToClient(event.player);
                 return;
@@ -219,11 +223,13 @@ public class FlightTechnique extends Technique {
             return;
         }
 
-        if (!CultivatorStats.getCultivatorStats(player).getCultivation().consumeQi(player, distance * 10)) {
+        if (!CultivatorStats.getCultivatorStats(player).getCultivation().consumeQi(player, CoreSynergies.warpCost(player, distance * 10))) {
             deactivate(player);
             lNalator.Cultivationcraft.Network.PacketHandler.sendCultivatorTechniquesToClient(player);
             return;
         }
+
+        CoreSynergies.onWarp(player, lastWarpPos);
 
         QuestHandler.progressQuest(player, Quest.ENDER_TELEPORT, 1);
         ((ServerLevel) player.level).sendParticles(ParticleTypes.PORTAL, lastWarpPos.x, lastWarpPos.y + 1, lastWarpPos.z, 16, 0.3, 0.5, 0.3, 0.5);

@@ -3,7 +3,7 @@
 A Minecraft Forge mod about cultivation: Qi sources, realms (Foundation Establishment, Qi Condensation, Core Forming), elemental cores, concepts and techniques.
 
 - Minecraft **1.19.2**, Forge **43.1.52**, official Mojang mappings
-- Requires the **MLM Animator** mod ([lNalator/MultilLimbedModel](https://github.com/lNalator/MultilLimbedModel)), version 0.2.2 or later
+- Requires the **MLM Animator** mod ([lNalator/MultilLimbedModel](https://github.com/lNalator/MultilLimbedModel)), version 0.2.3 or later
 
 ## Requirements
 
@@ -32,7 +32,7 @@ If MLM Animator is somewhere else, pass its path to every Gradle command, or set
 ./gradlew build -PmlmSourceDir=/path/to/MultilLimbedModel
 ```
 
-`settings.gradle` includes that checkout as a composite build, so changes made in MLM Animator are picked up directly. Use a MLM Animator revision compatible with this mod: CI builds against the `v0.2.2` tag.
+`settings.gradle` includes that checkout as a composite build, so changes made in MLM Animator are picked up directly. Use a MLM Animator revision compatible with this mod: CI builds against the `v0.2.3` tag.
 
 If your default Java is not 17, point Gradle to a JDK 17 first:
 

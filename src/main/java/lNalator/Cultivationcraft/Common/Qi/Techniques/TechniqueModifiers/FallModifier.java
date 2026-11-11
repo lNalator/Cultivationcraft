@@ -3,7 +3,16 @@ package lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers;
 import lNalator.Cultivationcraft.Client.GUI.animatedTexture;
 import lNalator.Cultivationcraft.Network.PacketHandler;
 import lNalator.Cultivationcraft.Network.Packets.GroundSlamPacket;
+import lNalator.Cultivationcraft.Common.Config;
+import lNalator.Cultivationcraft.Common.Qi.Elements.ElementalStates;
+import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.TamableAnimal;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.sounds.SoundSource;
 import net.minecraftforge.network.PacketDistributor;
 import lNalator.Cultivationcraft.Common.FlyingSwordEntity;
@@ -83,9 +92,56 @@ public class FallModifier extends TechniqueModifier {
             }
         }
 
-        // Ground slam visual for everyone around, and a heavy impact sound
-        PacketHandler.channel.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> owner), new GroundSlamPacket(owner.position(), range));
+        // Falling + Earth synergy stuns and knocks back, Falling + Wood roots (a player never has both elements)
+        boolean earth = CoreSynergies.has(owner, CoreSynergies.FALL_EARTH);
+        boolean wood = CoreSynergies.has(owner, CoreSynergies.FALL_WOOD);
+
+        if (earth || wood) {
+            slamSynergy(owner, center, earth);
+        }
+
+        // Ground slam visual for everyone around, and a heavy impact sound. Earth makes the ground rise higher
+        PacketHandler.channel.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> owner), new GroundSlamPacket(owner.position(), range, earth ? 2 : 1));
         owner.level.playSound(null, owner.blockPosition(), SoundEvents.ANVIL_LAND, SoundSource.PLAYERS, 0.6f, 0.5f);
+    }
+
+    // Fixed radius around the landing, whatever the fall: the slam is seen and heard, so it can be jumped over
+    protected void slamSynergy(Player owner, Vec3 center, boolean earth) {
+        double radius = Config.Server.fallingSlamRadius();
+        ServerLevel level = (ServerLevel) owner.level;
+
+        for (LivingEntity target : level.getEntitiesOfClass(LivingEntity.class, new AABB(center, center).inflate(radius, 1, radius),
+                e -> e != owner && e.isAlive() && e.isOnGround() && !e.isSpectator() && !(e instanceof TamableAnimal pet && pet.isOwnedBy(owner)))) {
+            double dx = target.getX() - center.x;
+            double dz = target.getZ() - center.z;
+
+            if (dx * dx + dz * dz > radius * radius) {
+                continue;
+            }
+
+            if (earth) {
+                target.addEffect(new MobEffectInstance(ElementalStates.STUNNED.get(), Config.Server.fallingEarthStunTicks()), owner);
+
+                // Rooted targets hold their ground, like against Gravity
+                if (!target.hasEffect(ElementalStates.ROOTED.get())) {
+                    Vec3 away = new Vec3(dx, 0, dz);
+                    away = away.lengthSqr() < 1.0E-4 ? new Vec3(Math.random() - 0.5, 0, Math.random() - 0.5) : away;
+                    away = away.normalize().scale(Config.Server.fallingEarthKnockback());
+                    target.setDeltaMovement(target.getDeltaMovement().add(away.x, 0.35, away.z));
+                    target.hurtMarked = true;
+                }
+            } else {
+                target.addEffect(new MobEffectInstance(ElementalStates.ROOTED.get(), Config.Server.fallingWoodRootTicks()), owner);
+
+                // Roots coming out of the ground around the target's feet
+                level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, Blocks.ROOTED_DIRT.defaultBlockState()), target.getX(), target.getY() + 0.1, target.getZ(), 20, 0.3, 0.1, 0.3, 0.1);
+                level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, Blocks.HANGING_ROOTS.defaultBlockState()), target.getX(), target.getY() + 0.4, target.getZ(), 12, 0.25, 0.3, 0.25, 0.05);
+            }
+        }
+
+        if (!earth) {
+            level.playSound(null, owner.blockPosition(), SoundEvents.ROOTED_DIRT_BREAK, SoundSource.PLAYERS, 1, 0.6f);
+        }
     }
 
     public Vec3 flyingSwordTargetOverride(FlyingSwordEntity sword, Entity target, Vec3 targetPos) {

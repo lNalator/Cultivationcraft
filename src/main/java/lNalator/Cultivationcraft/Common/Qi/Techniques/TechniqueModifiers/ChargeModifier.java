@@ -16,6 +16,9 @@ public class ChargeModifier extends TechniqueModifier {
     // Ticks to reach the full charge
     public static final int CHARGE_TICKS = 40;
 
+    // Charge of the Qi projectile hitting right now (1 outside of a charged hit), set by QiProjectile around its modifiers' onHitEntity
+    public static float hitCharge = 1;
+
     public ChargeModifier() {
         ID = CHARGE_ID;
         coreTexture = new animatedTexture(new ResourceLocation(Cultivationcraft.MODID, "textures/cores/charge.png"), 12, 3);

@@ -1,12 +1,15 @@
 package lNalator.Cultivationcraft.Common.Qi.Techniques;
 
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.CultivatorStats;
+import lNalator.Cultivationcraft.Common.Config;
 import lNalator.Cultivationcraft.Common.Qi.Damage.QiDamageSource;
 import lNalator.Cultivationcraft.Common.Qi.Elements.Element;
 import lNalator.Cultivationcraft.Common.Qi.Elements.Elements;
 import lNalator.Cultivationcraft.Common.Qi.Quests.Quest;
 import lNalator.Cultivationcraft.Common.Qi.Quests.QuestHandler;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers.AuraModifier;
+import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers.CoreSynergies;
+import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers.ExplosionModifier;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers.TechniqueModifier;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueStats.DefaultTechniqueStatIDs;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueStats.TechniqueStatModification;
@@ -24,6 +27,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.level.Explosion;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.TickEvent;
 
@@ -39,6 +43,8 @@ public class AuraTechnique extends Technique {
     // Released mode also affects blocks; Contained (default) only entities. Chosen by sneaking when activating.
     protected boolean released = false;
     protected int pulseTimer = 0;
+    // Aura + Explosion synergy: pulses since the last explosion
+    protected int explosionPulses = 0;
 
     public AuraTechnique() {
         super();
@@ -93,6 +99,7 @@ public class AuraTechnique extends Technique {
         if (!player.level.isClientSide) {
             released = player.isShiftKeyDown();
             pulseTimer = 0;
+            explosionPulses = 0;
             player.displayClientMessage(Component.translatable(langLocation + (released ? ".released" : ".contained")), true);
         }
     }
@@ -100,7 +107,7 @@ public class AuraTechnique extends Technique {
     @Override
     public void tickServer(TickEvent.PlayerTickEvent event) {
         Player player = event.player;
-        double range = getTechniqueStat(DefaultTechniqueStatIDs.range, player);
+        double range = getRange(player);
 
         // A bigger zone costs more
         if (!spendExternalQi(player, 0.05 * range / 4)) {
@@ -127,6 +134,17 @@ public class AuraTechnique extends Technique {
         }
 
         super.tickServer(event);
+    }
+
+    // Grow + Aura synergy: the aura reaches a little further. Also used by AuraRenderer, so the zone drawn matches
+    public double getRange(Player player) {
+        double range = getTechniqueStat(DefaultTechniqueStatIDs.range, player);
+
+        if (CoreSynergies.has(player, CoreSynergies.GROW_AURA)) {
+            range += Config.Server.growAuraRange();
+        }
+
+        return range;
     }
 
     protected void pulse(Player player, ResourceLocation element, double range) {
@@ -167,6 +185,12 @@ public class AuraTechnique extends Technique {
         }
 
         ring(player, el, range);
+
+        // Aura + Explosion synergy: one pulse in three explodes at the centre, without breaking blocks. Its steady rhythm can be learnt
+        if (CoreSynergies.has(player, CoreSynergies.AURA_EXPLOSION) && ++explosionPulses >= Config.Server.auraExplosionPulses()) {
+            explosionPulses = 0;
+            ExplosionModifier.explode(player, player.position(), element, (float) (range * Config.Server.auraExplosionRadius()), Explosion.BlockInteraction.NONE);
+        }
     }
 
     // Wind aura pushes enemy projectiles away

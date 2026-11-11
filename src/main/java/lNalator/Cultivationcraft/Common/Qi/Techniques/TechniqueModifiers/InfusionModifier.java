@@ -1,12 +1,15 @@
 package lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers;
 
 import lNalator.Cultivationcraft.Client.GUI.animatedTexture;
+import lNalator.Cultivationcraft.Common.Config;
 import lNalator.Cultivationcraft.Common.Qi.Damage.QiDamageSource;
+import lNalator.Cultivationcraft.Common.Qi.Elements.ElementalStates;
 import lNalator.Cultivationcraft.Common.Qi.Elements.Elements;
 import lNalator.Cultivationcraft.Common.Qi.Quests.Quest;
 import lNalator.Cultivationcraft.Common.Qi.Quests.QuestHandler;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -85,14 +88,24 @@ public class InfusionModifier extends TechniqueModifier {
     }
 
     protected void infuse(Player owner, Vec3 pos, ResourceLocation element, double radius, float strength) {
-        if (element == null || element.equals(Elements.noElement)) {
+        boolean elemental = element != null && !element.equals(Elements.noElement);
+        // Poison + Infusion synergy: the zones also block regeneration, a moment after leaving them
+        boolean noRegen = CoreSynergies.has(owner, CoreSynergies.POISON_INFUSION);
+
+        if (!elemental && !noRegen) {
             return;
         }
 
-        QiDamageSource source = new QiDamageSource("infusion", owner, element, true);
+        QiDamageSource source = elemental ? new QiDamageSource("infusion", owner, element, true) : null;
 
         for (Entity target : owner.level.getEntities(owner, new AABB(pos, pos).inflate(radius), entity -> entity instanceof LivingEntity && entity.isAlive())) {
-            Elements.getElement(element).applyStatusEffect(source, target, strength * INFUSED_STRENGTH);
+            if (elemental) {
+                Elements.getElement(element).applyStatusEffect(source, target, strength * INFUSED_STRENGTH);
+            }
+
+            if (noRegen) {
+                ((LivingEntity) target).addEffect(new MobEffectInstance(ElementalStates.NO_REGEN.get(), Config.Server.poisonInfusionTicks()), owner);
+            }
         }
     }
 }

@@ -4,6 +4,7 @@ import lNalator.Cultivationcraft.Client.GUI.GUIButton;
 import lNalator.Cultivationcraft.Client.GUI.SelectableTextField;
 import lNalator.Cultivationcraft.Client.GUI.TextField;
 import lNalator.Cultivationcraft.Common.Qi.ExternalCultivationHandler;
+import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers.CoreSynergies;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers.TechniqueModifier;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import lNalator.Cultivationcraft.Network.ClientPacketHandler;
@@ -96,13 +97,15 @@ public class ConceptScreen extends GenericTabScreen {
             for (ResourceLocation location : entry.getValue()) {
                 // An owned core chosen again is reinforced: show the rank it would reach
                 int rank = CultivatorStats.getCultivatorStats(Minecraft.getInstance().player).getCultivation().getModifierRank(location);
+                // Synergies with the cores already owned: "?" until both cores are owned
+                Component text = Component.translatable(location.toLanguageKey().concat(".text")).append(CoreSynergies.describe(player, location));
 
                 if (selectable && rank > 0) {
-                    category.addItem(new SelectableText(location, Component.translatable(location.toLanguageKey()).append(" ").append(Component.translatable("cultivationcraft.gui.rank", rank + 1))));
+                    category.addItem(new SelectableText(location, Component.translatable(location.toLanguageKey()).append(" ").append(Component.translatable("cultivationcraft.gui.rank", rank + 1)), text));
                 } else if (showCores) {
-                    category.addItem(new SelectableText(location, Component.translatable(location.toLanguageKey()).append(" ").append(Component.translatable("cultivationcraft.gui.rank", rank))));
+                    category.addItem(new SelectableText(location, Component.translatable(location.toLanguageKey()).append(" ").append(Component.translatable("cultivationcraft.gui.rank", rank)), text));
                 } else {
-                    category.addItem(new SelectableText(location));
+                    category.addItem(new SelectableText(location, Component.translatable(location.toLanguageKey()), text));
                 }
             }
 

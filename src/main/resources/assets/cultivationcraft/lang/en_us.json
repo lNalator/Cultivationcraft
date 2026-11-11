@@ -687,5 +687,20 @@
   "block.cultivationcraft.spirit_stone_ore": "Deepslate Spirit Stone Ore",
   "item.cultivationcraft.jade_chunk": "Jade Chunk",
   "item.cultivationcraft.spirit_stone": "Spirit Stone",
-  "cultivationcraft.spirit_stone.refine": "Refine for 5 cultivation progress and 50 Qi (external cultivation)."
+  "cultivationcraft.spirit_stone.refine": "Refine for 5 cultivation progress and 50 Qi (external cultivation).",
+  "cultivationcraft.synergy.with": "Synergy with %s:",
+  "cultivationcraft.synergy.aura_explosion": "One aura pulse in three explodes around you, without breaking blocks.",
+  "cultivationcraft.synergy.infusion_warp": "Every teleport (swords, projectiles, dodge, Warp flight jumps) leaves a zone of your element where it started.",
+  "cultivationcraft.synergy.fire_explosion": "Your explosions burn what they hit and set the ground on fire.",
+  "cultivationcraft.synergy.gravity_explosion": "Gravity pulls the targets together half a second before the explosion goes off.",
+  "cultivationcraft.synergy.repulsion_ice": "Enemy projectiles slowed right at your impacts freeze and drop.",
+  "cultivationcraft.synergy.echo_lightning": "Echoes jump to another target within 4 blocks as a lightning arc, instead of striking the same one.",
+  "cultivationcraft.synergy.echo_charge": "The echoes of a charged shot keep its charge.",
+  "cultivationcraft.synergy.poison_infusion": "Your Infusion zones also block regeneration, until a moment after leaving them.",
+  "cultivationcraft.synergy.fall_earth": "Your ground slam stuns and knocks back nearby enemies.",
+  "cultivationcraft.synergy.fall_wood": "Your ground slam roots nearby enemies.",
+  "cultivationcraft.synergy.levitation_wind": "Gliding down while flying costs no Qi. While flying, the Wind Wrap key wraps the entity you look at in wind to carry it along (up to 3, Qi per second growing with their realm); looking at nothing releases everyone. A carried player breaks free by sneaking.",
+  "cultivationcraft.synergy.grow_aura": "Your aura reaches 1 block further.",
+  "cultivationcraft.synergy.shrink_warp": "Teleports and Warp flight jumps cost 30% less Qi.",
+  "cultivationcraft.windwrap.counter": "Wind %s/%s"
 }
