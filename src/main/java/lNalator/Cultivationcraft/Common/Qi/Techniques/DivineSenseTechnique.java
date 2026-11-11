@@ -3,6 +3,7 @@ package lNalator.Cultivationcraft.Common.Qi.Techniques;
 import lNalator.Cultivationcraft.Common.PlayerUtils;
 import lNalator.Cultivationcraft.Common.Qi.BodyParts.BodyPartNames;
 import lNalator.Cultivationcraft.Client.Renderer;
+import lNalator.Cultivationcraft.Client.genericClientFunctions;
 import lNalator.Cultivationcraft.Common.Capabilities.BodyModifications.BodyModifications;
 import lNalator.Cultivationcraft.Common.Capabilities.BodyModifications.IBodyModifications;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.CultivatorStats;
@@ -65,15 +66,45 @@ public class DivineSenseTechnique extends Technique {
         return (senseMask & category) != 0;
     }
 
-    // Client side, from the radial menu: kept on the server so it is saved with the technique
+    // Client side, from the radial menu: kept on the server so it is saved with the technique.
+    // Switching every category OFF turns Divine Sense off, it would sense nothing (the server does the same, see processInfo)
     public void setSenseMask(int mask) {
         senseMask = mask & SENSE_ALL;
+
+        if (senseMask == 0 && isActive()) {
+            deactivate(genericClientFunctions.getPlayer());
+        }
+
         sendInfo(senseMask);
     }
 
+    // Every category OFF turns Divine Sense off; switching at least one back ON from the menu turns it on again
     @Override
     public void processInfo(Player player, int info) {
+        int previous = senseMask;
         senseMask = info & SENSE_ALL;
+
+        if (player.level.isClientSide) {
+            return;
+        }
+
+        if (senseMask == 0 && isActive()) {
+            deactivate(player);
+            PacketHandler.sendCultivatorTechniquesToClient(player);
+        } else if (previous == 0 && senseMask != 0 && !isActive()) {
+            activate(player);
+            PacketHandler.sendCultivatorTechniquesToClient(player);
+        }
+    }
+
+    // Turned on by hand (its key) with every category OFF: sense everything again
+    @Override
+    public void activate(Player player) {
+        if (senseMask == 0) {
+            senseMask = SENSE_ALL;
+        }
+
+        super.activate(player);
     }
 
     @Override

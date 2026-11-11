@@ -10,20 +10,60 @@ Grouped by chantier/category. Each item has a priority (P1 = next, P2 = soon, P3
 
 ### Concepts (Core Forming)
 
-- **P2 · L** Core textures: each concept's core texture, rendered in the Core Forming cultivation screen, becomes a specific animated texture (`coreTexture`, an `animatedTexture` sprite sheet in `textures/cores/` with its number of frames and speed), e.g. Warp an ender-like disappearance, Ice a frozen look. Already animated, to review: Aura (4 frames), Explosion (4), Warp (20), Water (6). Static, to animate: Ice, Earth. Every other concept still uses `blank.png`. Ideas are noted as `TODO core texture` above each concept's constructor (`Common/Qi/Techniques/TechniqueModifiers/*Modifier.java`).
-- **P3 · M** Undecided offers: Warp flight jumps beyond 9 blocks (server-side teleport; speed past the cap now shortens the Warp Delay instead); Haste reducing the techniques' 0.25 s cooldown.
-- **P3 · S** Warp teleporting Qi projectiles (`WarpModifier.QiProjectileSpawnOverride`).
-- **P3 · L** Synergies between cores (e.g. Aura + Explosion, Infusion + Warp, Fire + Explosion).
-- **P3 · L** Paused axes: Body (Blood / Vitality) and Perception (Light / Shadow).
+- **P2 · L** Core textures: each concept's core texture, rendered in the Core Forming cultivation screen, becomes a specific animated texture (`coreTexture`, an `animatedTexture` sprite sheet in `textures/cores/` with its number of frames and speed), e.g. Warp an ender-like disappearance, Ice a frozen look. Already animated, to review: Aura (4 frames), Explosion (4), Warp (20), Water (6). Static, to animate: Ice, Earth. Every other concept still uses `blank.png`. Ideas per concept:
+  - Aura: a pulsing halo radiating around the core (aura.png: 4 frames, to review);
+  - Bounce: a rubbery core that squashes and springs back, like a slime (no texture yet, uses blank.png);
+  - Charge: light slowly filling the core, then a bright flash when full (no texture yet, uses blank.png);
+  - Earth: rough stone with cracks and small rocks orbiting (earth.png is static: make it animated);
+  - Echo: concentric rings rippling out of the core, repeating with a delay (no texture yet, uses blank.png);
+  - Explosion: unstable glowing cracks throwing sparks (explosion.png: 4 frames, to review);
+  - Fall: a heavy, meteor-like core with a streak trailing below it (no texture yet, uses blank.png);
+  - Fire: flickering flames and rising embers (no texture yet, uses blank.png);
+  - Gravity: a dark core bending the light around it, with debris pulled into orbit (no texture yet, uses blank.png);
+  - Grow: a core slowly swelling and shrinking, with growth rings (no texture yet, uses blank.png);
+  - Haste: a fast spin with motion-blur streaks (no texture yet, uses blank.png);
+  - Ice: a frozen, crystalline core covered in frost with a cold shine (ice.png is static: make it animated);
+  - Infusion: veins of Qi flowing into the core (no texture yet, uses blank.png);
+  - Levitation: a core gently bobbing up and down, with light wisps beneath it (no texture yet, uses blank.png);
+  - Lightning: crackling electric arcs jumping across the core (no texture yet, uses blank.png);
+  - Poison: a sickly green core bubbling and dripping (no texture yet, uses blank.png);
+  - Pure Qi: a soft, pure white-blue glow (no texture yet, uses blank.png);
+  - Repulsion: shockwaves pushing particles away from the core (no texture yet, uses blank.png);
+  - Shrink: a dense core pulled inwards, with Qi rings contracting onto it (no texture yet, uses blank.png);
+  - Warp: an ender-like disappearance: the core flickers, vanishes and reappears with purple portal particles (warp.png: 20 frames, to review);
+  - Water: a flowing, wavy liquid surface (water.png: 6 frames, to review);
+  - Wind: air currents swirling around the core (no texture yet, uses blank.png);
+  - Wood: bark and leaves, with vines sprouting from the core (no texture yet, uses blank.png).
+- **P3 · M** Undecided offers: Warp flight jumps beyond 9 blocks (server-side teleport; speed past the cap now shortens the Warp Delay instead); Haste reducing the techniques' 0.25 s cooldown. Decided: Haste never affects Warp (neither the jump length nor the Warp Delay), Warp is already strong enough; keep it that way if Haste gets a cooldown or flight effect.
+- **P3 · L** Synergies between cores: a new effect when two given cores are owned together, never a multiplier; fixed (no rank scaling), with a counter in PvP, values in the server config. Hidden: the Concepts menu shows "?" for a possible synergy with an owned core and reveals it once both are owned. No synergy between two elemental cores (a player never has two). Haste never affects Warp, even through a synergy. Approved list (11/11, design: Claude doc "Synergies entre cœurs"): Aura + Explosion, Infusion + Warp, Fire + Explosion, Gravity + Explosion, Repulsion + Ice, Echo + Lightning (the echo jumps to another target within 4 blocks, rendered as our own lightning arc between the two targets, not vanilla lightning bolts), Echo + Charge, Poison + Infusion, Falling + Earth (the ground slam stuns and knocks back nearby enemies, with a taller slam visual), Falling + Wood (the ground slam roots nearby enemies), Levitation + Wind (gliding down while flying costs no Qi, and the player can wrap one or more entities in wind to make them levitate and carry them along in flight, at a Qi cost per second growing with each carried entity's realm; up to 3 entities within 4 blocks; an unwilling player breaks free by sneaking for 1 s, at once if their realm is higher; a dedicated "Wind wrap" key (Controls > Cultivation), only active with the synergy while flying: looking at an entity wraps or releases it, looking at nothing releases everyone; everyone is released with a few seconds of Slow Falling when the flight stops or the Qi runs out; wind particles swirl around wrapped entities and a "2/3" counter shows near the Qi bar), Grow + Aura, Shrink + Warp.
+- **P3 · L** Paused axes: Body (Blood / Vitality) and Perception (Light / Shadow). Approved for later (04/11): Body ties to the Jing (body), Perception to the Shen (Divine Sense).
 - **P3 · L** Let the player modify a concept's effect, on chosen techniques or directly. Groundwork for the technique rework below.
 
 ### Tribulation
 
 - **P3 · S** A ray of light on the player when they survive the tribulation, as the clouds part.
 
-## Minecraft versions
+## Taoist framework (Yin/Yang, Wu Xing, Three Treasures)
 
-- **P1 · L** Provide the mod for Minecraft versions above 1.19.2, up to at least 1.21, or even v26.
+Reference for the whole project. Design: `project-files/cultivationcraft/approfondissement-taoisme.md` (parts 4 and 5 = Enzo's decisions of 04/11 to 07/11) and `conception-trois-purs.md`. The mod already follows chapter 42 of the Tao Te King: mortal = Tao, Foundation Establishment = the One (raw Qi, Pure), Qi Condensation = the Two (elements, Yin/Yang), Core Forming = the Three, concepts, plants and alchemy = the ten thousand things. The cultivator climbs this chain back towards the Tao, and goes down it when acting on the world. The two paths keep their name for players (a path is a progression preset, final, pushing one treasure more than the others); the three treasures (Jing body, Qi, Shen mind), Yin/Yang and the five phases sit underneath every system.
+
+- **P2 · S** Lore reframing: knowledge entries and realm screens tell the ascent (Tao → One → Two → Three); Ice and Lightning shown as mutated roots (Water pushed to extreme Yin, Wind to extreme Yang); concept axis poles shown as Yin / Yang, with a shared symbol in the Concepts screen.
+- **P2 · M** Elements: keep the pressing loop Fire > Wood > Wind > Earth > Water > Fire (Wind stays a full element) and add the generating cycle Fire → Earth → Wood → Water → Wind → Fire; give every element an effect (Earth and Wood have none). Over-domination / insult (quantity-based) later. The generating cycle also feeds plants, alchemy, synergies between cores and refilling the void after a purge.
+- **P2 · M** Pure: generates every element, presses none; weakens the elemental part of what it hits (shorter burn, weaker push, shorter freeze) instead of a damage bonus, kept moderate so it is not a universal counter.
+- **P2 · M** Knowledge as revelations: entries unlocked by blind discoveries and actions (crafting the cauldron without help, meditating at night by a water source, seeing a plant grow faster near its generating source, emptying the Divine Sense gauge). Jade slips stay the book route to the same entries.
+- **P2 · M** Read vs realised knowledge: an entry learned from a jade slip is "read" and gives a small part of the Divine Sense progression; realising it yourself (revelation) gives the rest and marks it understood. Reading first eases the revelation condition; reading then realising gives as much as realising directly. Read-but-not-realised entries are flagged in the compendium.
+- **P2 · M** Spiritual plants: growth depends on elemental conditions and on nearby Qi sources (own or generating element speeds up, dominating element slows down). Worldgen follows the same neighbourhood logic, so players can read where plants grow.
+- **P2 · L** Alchemy rework: useful for both paths, same pill with a path-dependent effect (pills for the body too); ingredients interact through the Wu Xing cycles and Yin/Yang balance (purity); procedural plants as the raw material. Current score / purity / failure system stays the base.
+- **P3 · M** Spiritual plant storage: a pouch or ring dedicated to spiritual plants (jade box idea: could slow the Qi loss of picked plants).
+- **P3 · M** Plant reproduction: turn a plant into seeds that carry its genome, plus an alchemy raw material; sowing near a source of another element could mutate it (to think through).
+- **P3 · M** Craftable blank jade slip: inscribe a known knowledge entry, costing Shen / concentration by the entry's importance (always more Shen for the writer than what the reader gains, so knowledge cannot be farmed), so an experienced player can teach a new one.
+- **P3 · M** Cultivator polarity (element + axis poles): balanced gives a Harmony bonus (the "Three" as harmony of the poles, in Core Forming), extreme gives a stronger specialty; tribulation shaped by the imbalance (Yang: fire and lightning, Yin: cold and darkness). The tribulation clouds already reacting are the starting point.
+- **P3 · L** Bridges between paths: the path stays final, but some actions let the player progress on the other path, slower and capped, for an advantage (internal: Divine Sense and a little Qi to refine the body, a few simple Qi techniques; external: no body forging, but body strengthening paid in Qi, physical stats up to a realm-based cap below the internal path, to define with the internal rework).
+- **P3 · L** Body organs with a phase, in the internal cultivation rework: lungs Wind, heart Fire, liver Wood, kidneys Water, stomach Earth. Forging an organ strengthens the affinity with its phase.
+- **P3 · L** Nascent Soul gated by the three treasures (body, Qi, Divine Sense): "three flowers gather at the summit", where both paths meet. Needs body realms for the internal path, aligned with the external ones (Skin/Flesh ≈ Foundation, Bone/Blood ≈ Qi Condensation, Marrow/Organs ≈ Core Forming).
+- **P3 · L** Third path, Gu (Shen): living Gu (insects or objects) hosted in the body, each taking part of the concentration; Gu have a phase and follow the Wu Xing cycles, are fed with plants / pills / elemental Qi, found in the world with Divine Sense, refined or merged, level up with use, and rebel if the Shen is too low. Inspired by Reverend Insanity's gameplay, with our own Gu. After the internal rework and Nascent Soul.
+- **P3 · M** The Three Pure Ones (Taiqing alchemy, Shangqing meditation, Lingbao talismans and formations) as lineages or lore only (undecided).
+- **P3 · M** Metal (undecided, not now): only as a mutation of Earth (condensed Earth), never as a sixth element, since the Wu Xing cycles only work with five.
 
 ## Elements and visual feedback
 
@@ -36,10 +76,15 @@ Grouped by chantier/category. Each item has a priority (P1 = next, P2 = soon, P3
 
 ## Divine Sense
 
+- **P2 · M** Divine Sense cost and progression (the Shen): its own mind-fatigue gauge (separate from Qi), drained by active use (more with a large radius or many highlights), refilled at rest and faster while meditating, with a temporary malus when empty. Progression: mainly from accumulated knowledge (entries weighted by importance), secondarily from use, capped by the realm. No detection category is locked; each tier improves a parameter instead (radius, number of highlights, mind-fatigue efficiency, precision of the target info, cone focus mode, pinning a target, stealth from other cultivators).
 - **P2 · M** Probe a target: looking at a player or a mob shows its HP, realm and stage, and core element under the crosshair, like the Qi source line. A realm above the observer's shows "???".
 - **P2 · M** Aura concealment: a technique or concept lowering the player's apparent realm for vigilance and blur, at a Qi cost. The PvP counter to Divine Sense.
 - **P3 · M** Divine Sense pulse: holding the key sends a wave revealing everything within twice the detection radius for a moment, but it pings every player it reaches, whatever their realm.
 - **P3 · L** Qi traces: players and strong mobs leave a trail visible in Divine Sense for a few minutes, to track someone.
+
+## Qi sources
+
+- **P2 · M** Qi sources adjustment, the rest after the reserves (bonuses only, never blocking): time polarity (Yang elements Fire/Wind/Lightning stronger by day, Yin elements Water/Ice at night, Earth/Wood steady, Nether boosts Yang, End boosts Yin); neighbouring sources and plants influence each other through the Wu Xing cycles; at high Divine Sense tiers, the source's element polarity is shown. Detection range stays 4 × the Divine Sense radius until players give feedback.
 
 ## Formations
 
@@ -78,7 +123,7 @@ Grouped by chantier/category. Each item has a priority (P1 = next, P2 = soon, P3
 
 ## Later realms
 
-- **P3 · L** Realms after Core Forming: Nascent Soul with a customisable domain (the Aura technique is the prototype). Remove the stage 9 block in `CoreFormingCultivation.canBreakthrough`.
+- **P3 · L** Realms after Core Forming: Nascent Soul. The customisable domain is cancelled (11/11): the realm needs another special ability, to think through. Remove the stage 9 block in `CoreFormingCultivation.canBreakthrough`.
 
 ## Known bugs
 

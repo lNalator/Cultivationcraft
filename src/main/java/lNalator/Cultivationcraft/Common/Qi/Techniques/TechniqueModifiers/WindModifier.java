@@ -7,7 +7,6 @@ import net.minecraft.resources.ResourceLocation;
 
 public class WindModifier extends TechniqueModifier {
 
-    // TODO core texture (animated coreTexture shown in the cultivation screen): air currents swirling around the core (no texture yet, uses blank.png)
     public WindModifier() {
         ID = new ResourceLocation(Cultivationcraft.MODID, "concept.wind");
         CATEGORY = ELEMENTAL_CATEGORY;

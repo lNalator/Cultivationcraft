@@ -8,7 +8,6 @@ import net.minecraft.resources.ResourceLocation;
 
 public class WaterModifier extends TechniqueModifier {
 
-    // TODO core texture (animated coreTexture shown in the cultivation screen): a flowing, wavy liquid surface (water.png: 6 frames, to review)
     public WaterModifier() {
         ID = new ResourceLocation(Cultivationcraft.MODID, "concept.water");
         CATEGORY = ELEMENTAL_CATEGORY;

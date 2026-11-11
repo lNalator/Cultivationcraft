@@ -41,7 +41,6 @@ public class EchoModifier extends TechniqueModifier {
     private static final HashMap<UUID, long[]> streaks = new HashMap<>();
     private static long serverTick = 0;
 
-    // TODO core texture (animated coreTexture shown in the cultivation screen): concentric rings rippling out of the core, repeating with a delay (no texture yet, uses blank.png)
     public EchoModifier() {
         ID = new ResourceLocation(Cultivationcraft.MODID, "concept.echo");
         CATEGORY = MODIFIER_CATEGORY;

@@ -11,7 +11,6 @@ import net.minecraft.world.phys.Vec3;
 
 public class GrowModifier extends TechniqueModifier {
 
-    // TODO core texture (animated coreTexture shown in the cultivation screen): a core slowly swelling and shrinking, with growth rings (no texture yet, uses blank.png)
     public GrowModifier() {
         ID = new ResourceLocation(Cultivationcraft.MODID, "concept.grow");
         CATEGORY = SIZE_CATEGORY;

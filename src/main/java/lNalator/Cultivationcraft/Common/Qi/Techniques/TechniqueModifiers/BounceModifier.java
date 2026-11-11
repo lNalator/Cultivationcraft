@@ -14,7 +14,6 @@ import net.minecraft.world.phys.Vec3;
 
 public class BounceModifier extends TechniqueModifier {
 
-    // TODO core texture (animated coreTexture shown in the cultivation screen): a rubbery core that squashes and springs back, like a slime (no texture yet, uses blank.png)
     public BounceModifier() {
         ID = new ResourceLocation(Cultivationcraft.MODID, "concept.bounce");
         unique = true;

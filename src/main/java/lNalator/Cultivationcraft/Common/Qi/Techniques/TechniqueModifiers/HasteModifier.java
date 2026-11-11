@@ -8,7 +8,6 @@ import net.minecraft.world.entity.player.Player;
 // Rhythm axis: everything faster but weaker. Charge is the opposite pole
 public class HasteModifier extends TechniqueModifier {
 
-    // TODO core texture (animated coreTexture shown in the cultivation screen): a fast spin with motion-blur streaks (no texture yet, uses blank.png)
     public HasteModifier() {
         ID = new ResourceLocation(Cultivationcraft.MODID, "concept.haste");
         CATEGORY = RHYTHM_CATEGORY;

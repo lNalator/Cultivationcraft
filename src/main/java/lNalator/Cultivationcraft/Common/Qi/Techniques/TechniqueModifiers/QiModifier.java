@@ -9,7 +9,6 @@ public class QiModifier extends TechniqueModifier {
 
     public static final ResourceLocation QI_ID = new ResourceLocation(Cultivationcraft.MODID, "concept.pure");
 
-    // TODO core texture (animated coreTexture shown in the cultivation screen): a soft, pure white-blue glow (no texture yet, uses blank.png)
     public QiModifier() {
         ID = QI_ID;
         CATEGORY = ELEMENTAL_CATEGORY;
