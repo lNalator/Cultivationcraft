@@ -63,7 +63,10 @@ public class AuraTechnique extends Technique {
         rangeModification.addStatChange(DefaultTechniqueStatIDs.range, 0.002);
         rangeModification.addStatChange(DefaultTechniqueStatIDs.qiCost, 0.0005);
         damageModification.addStatChange(DefaultTechniqueStatIDs.damage, 0.001);
+        // Damage and effect intensity make the aura much hungrier for Qi
+        damageModification.addStatChange(DefaultTechniqueStatIDs.qiCost, 0.002);
         intensityModification.addStatChange(intensity, 0.0005);
+        intensityModification.addStatChange(DefaultTechniqueStatIDs.qiCost, 0.003);
 
         addTechniqueStat(DefaultTechniqueStatIDs.qiCost, 1, qiCostModification);
         addTechniqueStat(DefaultTechniqueStatIDs.range, 4, rangeModification);

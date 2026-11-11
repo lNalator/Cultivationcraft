@@ -1,5 +1,6 @@
 package lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers;
 
+import lNalator.Cultivationcraft.Client.GUI.animatedTexture;
 import lNalator.Cultivationcraft.Network.PacketHandler;
 import lNalator.Cultivationcraft.Network.Packets.GroundSlamPacket;
 import net.minecraft.sounds.SoundEvents;
@@ -23,6 +24,7 @@ public class FallModifier extends TechniqueModifier {
 
     public FallModifier() {
         ID = new ResourceLocation(Cultivationcraft.MODID, "concept.fall");
+        coreTexture = new animatedTexture(new ResourceLocation(Cultivationcraft.MODID, "textures/cores/fall.png"), 6, 2);
         CATEGORY = MASS_CATEGORY;
 
         unlockQuest = new Quest(Quest.DAMAGE_TAKEN, 1, DamageSource.FALL.msgId);

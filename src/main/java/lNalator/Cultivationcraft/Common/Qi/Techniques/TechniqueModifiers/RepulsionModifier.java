@@ -1,5 +1,6 @@
 package lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers;
 
+import lNalator.Cultivationcraft.Client.GUI.animatedTexture;
 import lNalator.Cultivationcraft.Common.Qi.Quests.Quest;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import net.minecraft.resources.ResourceLocation;
@@ -12,6 +13,7 @@ public class RepulsionModifier extends GravityModifier {
 
     public RepulsionModifier() {
         ID = new ResourceLocation(Cultivationcraft.MODID, "concept.repulsion");
+        coreTexture = new animatedTexture(new ResourceLocation(Cultivationcraft.MODID, "textures/cores/repulsion.png"), 8, 2);
 
         unlockQuest = new Quest(Quest.KNOCKBACK_TAKEN, 50);
         stabiliseQuest = new Quest(Quest.FIELD_MOVED, 1000);

@@ -19,7 +19,7 @@ public class EarthModifier extends TechniqueModifier {
         unlockQuest = new Quest(Quest.QI_SOURCE_MEDITATION, 1, Element.toString());
         stabiliseQuest = new Quest(Quest.DAMAGE_DEALT, 1000, Element.toString());
 
-        coreTexture = new animatedTexture(new ResourceLocation(Cultivationcraft.MODID, "textures/cores/earth.png"));
+        coreTexture = new animatedTexture(new ResourceLocation(Cultivationcraft.MODID, "textures/cores/earth.png"), 12, 4);
 
         flyingMount = true;
     }

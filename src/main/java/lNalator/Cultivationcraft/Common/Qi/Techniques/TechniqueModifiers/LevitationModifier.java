@@ -1,5 +1,6 @@
 package lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers;
 
+import lNalator.Cultivationcraft.Client.GUI.animatedTexture;
 import lNalator.Cultivationcraft.Common.Qi.QiProjectile;
 import lNalator.Cultivationcraft.Common.Qi.Quests.Quest;
 import lNalator.Cultivationcraft.Cultivationcraft;
@@ -21,6 +22,7 @@ public class LevitationModifier extends TechniqueModifier {
 
     public LevitationModifier() {
         ID = LEVITATION_ID;
+        coreTexture = new animatedTexture(new ResourceLocation(Cultivationcraft.MODID, "textures/cores/levitation.png"), 12, 3);
         CATEGORY = MASS_CATEGORY;
 
         unlockQuest = new Quest(Quest.SLOW_FALL, 60);

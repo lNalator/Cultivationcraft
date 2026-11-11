@@ -1,5 +1,6 @@
 package lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers;
 
+import lNalator.Cultivationcraft.Client.GUI.animatedTexture;
 import lNalator.Cultivationcraft.Common.Qi.Quests.Quest;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import net.minecraft.resources.ResourceLocation;
@@ -11,6 +12,7 @@ public class ShrinkModifier extends TechniqueModifier {
 
     public ShrinkModifier() {
         ID = new ResourceLocation(Cultivationcraft.MODID, "concept.shrink");
+        coreTexture = new animatedTexture(new ResourceLocation(Cultivationcraft.MODID, "textures/cores/shrink.png"), 8, 3);
         CATEGORY = SIZE_CATEGORY;
 
         unlockQuest = new Quest(Quest.CRAWL, 60);

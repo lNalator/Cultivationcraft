@@ -1,5 +1,6 @@
 package lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers;
 
+import lNalator.Cultivationcraft.Client.GUI.animatedTexture;
 import lNalator.Cultivationcraft.Client.Physics;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.CultivatorStats;
 import lNalator.Cultivationcraft.Common.Qi.Damage.QiDamageSource;
@@ -16,6 +17,7 @@ public class BounceModifier extends TechniqueModifier {
 
     public BounceModifier() {
         ID = new ResourceLocation(Cultivationcraft.MODID, "concept.bounce");
+        coreTexture = new animatedTexture(new ResourceLocation(Cultivationcraft.MODID, "textures/cores/bounce.png"), 8, 2);
         unique = true;
         CATEGORY = MODIFIER_CATEGORY;
 

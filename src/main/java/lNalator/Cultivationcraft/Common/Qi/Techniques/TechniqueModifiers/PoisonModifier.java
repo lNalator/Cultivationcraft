@@ -1,5 +1,6 @@
 package lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers;
 
+import lNalator.Cultivationcraft.Client.GUI.animatedTexture;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.CultivatorStats;
 import lNalator.Cultivationcraft.Common.Qi.Elements.ElementalStates;
 import lNalator.Cultivationcraft.Common.Qi.Quests.Quest;
@@ -30,6 +31,7 @@ public class PoisonModifier extends TechniqueModifier {
 
     public PoisonModifier() {
         ID = POISON_ID;
+        coreTexture = new animatedTexture(new ResourceLocation(Cultivationcraft.MODID, "textures/cores/poison.png"), 12, 3);
         CATEGORY = MODIFIER_CATEGORY;
         allowSameCategory = true;
 

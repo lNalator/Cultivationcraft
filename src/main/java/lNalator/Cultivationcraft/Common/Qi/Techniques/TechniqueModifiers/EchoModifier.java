@@ -1,5 +1,6 @@
 package lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers;
 
+import lNalator.Cultivationcraft.Client.GUI.animatedTexture;
 import lNalator.Cultivationcraft.Common.Config;
 import lNalator.Cultivationcraft.Common.Qi.Damage.QiDamageSource;
 import lNalator.Cultivationcraft.Common.Qi.Quests.Quest;
@@ -43,6 +44,7 @@ public class EchoModifier extends TechniqueModifier {
 
     public EchoModifier() {
         ID = new ResourceLocation(Cultivationcraft.MODID, "concept.echo");
+        coreTexture = new animatedTexture(new ResourceLocation(Cultivationcraft.MODID, "textures/cores/echo.png"), 8, 3);
         CATEGORY = MODIFIER_CATEGORY;
         allowSameCategory = true;
 

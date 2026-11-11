@@ -1,5 +1,6 @@
 package lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers;
 
+import lNalator.Cultivationcraft.Client.GUI.animatedTexture;
 import lNalator.Cultivationcraft.Common.Qi.Quests.Quest;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import net.minecraft.resources.ResourceLocation;
@@ -10,6 +11,7 @@ public class HasteModifier extends TechniqueModifier {
 
     public HasteModifier() {
         ID = new ResourceLocation(Cultivationcraft.MODID, "concept.haste");
+        coreTexture = new animatedTexture(new ResourceLocation(Cultivationcraft.MODID, "textures/cores/haste.png"), 8, 1);
         CATEGORY = RHYTHM_CATEGORY;
 
         unlockQuest = new Quest(Quest.TECHNIQUE_STREAK, 1);

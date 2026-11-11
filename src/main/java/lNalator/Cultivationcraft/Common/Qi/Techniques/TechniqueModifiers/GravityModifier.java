@@ -1,5 +1,6 @@
 package lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers;
 
+import lNalator.Cultivationcraft.Client.GUI.animatedTexture;
 import lNalator.Cultivationcraft.Common.Qi.Elements.ElementalStates;
 import lNalator.Cultivationcraft.Common.Qi.Quests.Quest;
 import lNalator.Cultivationcraft.Common.Qi.Quests.QuestHandler;
@@ -22,6 +23,7 @@ public class GravityModifier extends TechniqueModifier {
 
     public GravityModifier() {
         ID = new ResourceLocation(Cultivationcraft.MODID, "concept.gravity");
+        coreTexture = new animatedTexture(new ResourceLocation(Cultivationcraft.MODID, "textures/cores/gravity.png"), 12, 3);
         CATEGORY = FIELD_CATEGORY;
 
         unlockQuest = new Quest(Quest.DAMAGE_TAKEN, 50, DamageSource.FALL.msgId);

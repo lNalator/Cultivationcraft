@@ -1,5 +1,6 @@
 package lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers;
 
+import lNalator.Cultivationcraft.Client.GUI.animatedTexture;
 import lNalator.Cultivationcraft.Common.Qi.Quests.Quest;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.QiCondenserTechniques.ItemEnhanceTechnique;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.QiCondenserTechniques.QiBarrierTechnique;
@@ -13,6 +14,7 @@ public class GrowModifier extends TechniqueModifier {
 
     public GrowModifier() {
         ID = new ResourceLocation(Cultivationcraft.MODID, "concept.grow");
+        coreTexture = new animatedTexture(new ResourceLocation(Cultivationcraft.MODID, "textures/cores/grow.png"), 16, 3);
         CATEGORY = SIZE_CATEGORY;
 
         unlockQuest = new Quest(Quest.GROWPLANT, 1);

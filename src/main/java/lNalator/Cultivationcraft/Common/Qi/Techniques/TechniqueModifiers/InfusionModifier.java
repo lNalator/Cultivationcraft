@@ -1,5 +1,6 @@
 package lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers;
 
+import lNalator.Cultivationcraft.Client.GUI.animatedTexture;
 import lNalator.Cultivationcraft.Common.Qi.Damage.QiDamageSource;
 import lNalator.Cultivationcraft.Common.Qi.Elements.Elements;
 import lNalator.Cultivationcraft.Common.Qi.Quests.Quest;
@@ -36,6 +37,7 @@ public class InfusionModifier extends TechniqueModifier {
 
     public InfusionModifier() {
         ID = new ResourceLocation(Cultivationcraft.MODID, "concept.infusion");
+        coreTexture = new animatedTexture(new ResourceLocation(Cultivationcraft.MODID, "textures/cores/infusion.png"), 8, 3);
         unique = true;
         CATEGORY = MODIFIER_CATEGORY;
 

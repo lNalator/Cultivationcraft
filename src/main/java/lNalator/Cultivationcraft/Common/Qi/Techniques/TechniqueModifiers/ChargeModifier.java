@@ -1,5 +1,6 @@
 package lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers;
 
+import lNalator.Cultivationcraft.Client.GUI.animatedTexture;
 import lNalator.Cultivationcraft.Common.Qi.Quests.Quest;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.QiCondenserTechniques.FlyingSwordFormationTechnique;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.Technique;
@@ -17,6 +18,7 @@ public class ChargeModifier extends TechniqueModifier {
 
     public ChargeModifier() {
         ID = CHARGE_ID;
+        coreTexture = new animatedTexture(new ResourceLocation(Cultivationcraft.MODID, "textures/cores/charge.png"), 12, 3);
         CATEGORY = RHYTHM_CATEGORY;
 
         unlockQuest = new Quest(Quest.BIG_HIT, 10);
