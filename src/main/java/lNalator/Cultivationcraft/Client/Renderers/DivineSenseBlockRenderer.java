@@ -81,6 +81,9 @@ public final class DivineSenseBlockRenderer {
     private static final BufferBuilder BUFFER = new BufferBuilder(32768);
     private static final BufferBuilder PLANT_BUFFER = new BufferBuilder(16384);
     private static final BufferBuilder PLAYER_BUFFER = new BufferBuilder(16384);
+    // Aura marker on sensed players: one hitbox pulse per second, dashes along the edge of the zone
+    private static final int AURA_PULSE_TICKS = 20;
+    private static final int AURA_DASHES = 32;
     private static ClientLevel scannedLevel;
     private static int scanTicks;
 
@@ -432,6 +435,7 @@ public final class DivineSenseBlockRenderer {
             }
             int color = entityColor(mc.level, entity);
             AABB relativeBounds = bounds.move(-camera.x, -camera.y, -camera.z);
+            auraMarker(matrix, target, relativeBounds, position.subtract(camera), color, alpha, partialTick);
             if (blur <= 0) {
                 outline(PLAYER_BUFFER, matrix, relativeBounds, color, alpha);
                 continue;
@@ -444,6 +448,28 @@ public final class DivineSenseBlockRenderer {
                         Math.sin(phase * 0.7 + 1) * blur * 0.4).inflate(blur * 0.15 * copy);
                 outline(PLAYER_BUFFER, matrix, shifted, color, alpha);
             }
+        }
+    }
+
+    // A player using their aura: a copy of their hitbox swells and fades every second, and the edge of the zone
+    // shows as a dashed circle at their feet, turning slowly. Seen through walls like the hitbox
+    private static void auraMarker(Matrix4f matrix, Player target, AABB bounds, Vec3 feet, int color, int alpha, float partialTick) {
+        double range = AuraRenderer.zoneRange(target);
+        int shown = Math.round(alpha * AuraRenderer.zoneFade(target, partialTick));
+        if (range <= 0 || shown <= 0) {
+            return;
+        }
+        double time = target.level.getGameTime() + partialTick;
+        double pulse = (time % AURA_PULSE_TICKS) / AURA_PULSE_TICKS;
+        outline(PLAYER_BUFFER, matrix, bounds.inflate(pulse * 0.8), color, (int) Math.round(shown * (1 - pulse)));
+        double turn = time * 0.02;
+        int dashAlpha = (int) Math.round(shown * 0.6);
+        for (int dash = 0; dash < AURA_DASHES; dash++) {
+            double start = turn + Math.PI * 2 * dash / AURA_DASHES;
+            // Dashes and gaps of the same length
+            double end = start + Math.PI / AURA_DASHES;
+            line(PLAYER_BUFFER, matrix, feet.x + Math.cos(start) * range, feet.y + 0.05, feet.z + Math.sin(start) * range,
+                    feet.x + Math.cos(end) * range, feet.y + 0.05, feet.z + Math.sin(end) * range, color, dashAlpha);
         }
     }
 

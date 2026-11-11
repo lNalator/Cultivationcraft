@@ -11,6 +11,7 @@ import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers.Techniq
 import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueStats.DefaultTechniqueStatIDs;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueStats.TechniqueStatModification;
 import lNalator.Cultivationcraft.Cultivationcraft;
+import lNalator.Cultivationcraft.Network.PacketHandler;
 import com.mojang.math.Vector3f;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.DustParticleOptions;
@@ -104,6 +105,8 @@ public class AuraTechnique extends Technique {
         // A bigger zone costs more
         if (!spendExternalQi(player, 0.05 * range / 4)) {
             deactivate(player);
+            // Other players stop seeing the aura's zone
+            PacketHandler.sendCultivatorTechniquesToClient(player);
             return;
         }
 
