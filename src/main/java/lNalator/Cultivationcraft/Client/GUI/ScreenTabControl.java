@@ -1,5 +1,6 @@
 package lNalator.Cultivationcraft.Client.GUI;
 
+import lNalator.Cultivationcraft.Client.GUI.Screens.CultivationTypeScreens.CultivationScreens;
 import lNalator.Cultivationcraft.Client.GUI.Screens.*;
 import lNalator.Cultivationcraft.Client.genericClientFunctions;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.CultivatorStats;
@@ -95,7 +96,7 @@ public class ScreenTabControl {
                     CultivationType cultivation = CultivatorStats.getCultivatorStats(genericClientFunctions.getPlayer()).getCultivation();
 
                     if (cultivationType == CultivationTypes.QI_CONDENSER && cultivation.getAdvancingCultivation() != null) {
-                        Minecraft.getInstance().forceSetScreen(cultivation.getAdvancingCultivation().getAdvancmentOptionScreen());
+                        CultivationScreens.openAdvancementOption(cultivation.getAdvancingCultivation());
                     } else if (cultivationType == CultivationTypes.QI_CONDENSER && cultivation.hasTribulated()) {
                         Minecraft.getInstance().forceSetScreen(new SelectNewCultivationScreen());
                     } else {

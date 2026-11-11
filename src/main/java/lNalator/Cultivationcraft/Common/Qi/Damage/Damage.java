@@ -1,6 +1,9 @@
 package lNalator.Cultivationcraft.Common.Qi.Damage;
 
 import lNalator.Cultivationcraft.Cultivationcraft;
+import lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.CultivatorStats;
+import lNalator.Cultivationcraft.Common.Config;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.core.Registry;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.LivingEntity;
@@ -16,6 +19,7 @@ import lNalator.Cultivationcraft.Common.Qi.Stats.PlayerStatModifications;
 import lNalator.Cultivationcraft.Common.Qi.Stats.StatIDs;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.PassiveTechniques.PassiveTechnique;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.Technique;
+import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers.TechniqueModifier;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.CombatRules;
@@ -35,6 +39,7 @@ public class Damage {
 
         float amount = resistDamage(event.getAmount(), source.damageElement, (Player) event.getEntity());
         amount = doTechniqueResistances(source, amount, (Player) event.getEntity());
+        amount *= pressureMultiplier(source.getEntity(), (Player) event.getEntity());
 
         // Double the invincibility time when hit by lightning so lighting bolts don't double hit
         if (source.getElement().compareTo(Elements.lightningElement) == 0) {
@@ -42,6 +47,23 @@ public class Damage {
         }
 
         return amount;
+    }
+
+    // Golden Core: extra damage when the attacker's core element presses the target's core element
+    public static float pressureMultiplier(Entity attacker, Player target) {
+        if (!(attacker instanceof Player attackingPlayer)) {
+            return 1;
+        }
+
+        for (ResourceLocation attackElement : CultivatorStats.getCultivatorStats(attackingPlayer).getCultivation().getElements()) {
+            for (ResourceLocation targetElement : CultivatorStats.getCultivatorStats(target).getCultivation().getElements()) {
+                if (Elements.presses(attackElement, targetElement)) {
+                    return Config.Server.pressureDamageMultiplier();
+                }
+            }
+        }
+
+        return 1;
     }
 
     public static float doTechniqueResistances(QiDamageSource source, float amount, Player player) {
@@ -95,8 +117,24 @@ public class Damage {
                 return;
             }
 
-            Elements.getElement(source.getElement()).applyStatusEffect(source, event.getEntity(), event.getAmount());
+            Elements.getElement(source.getElement()).applyStatusEffect(source, event.getEntity(), event.getAmount() * elementRankMultiplier(source));
         }
+    }
+
+    // A reinforced elemental core makes its states 25% longer and stronger per extra rank.
+    // States scale with the damage they are given, so only that amount is raised, not the hit itself
+    public static float elementRankMultiplier(QiDamageSource source) {
+        if (!(source.getEntity() instanceof Player attacker)) {
+            return 1;
+        }
+
+        for (TechniqueModifier mod : CultivatorStats.getCultivatorStats(attacker).getCultivation().getModifiers()) {
+            if (mod.hasElement() && mod.getElement().equals(source.getElement())) {
+                return 1 + 0.25f * (mod.getRank(attacker) - 1);
+            }
+        }
+
+        return 1;
     }
 
     public static float damageEntity(LivingHurtEvent event) {
@@ -104,6 +142,11 @@ public class Damage {
 
         if (event.getSource().getEntity() != null && event.getSource().getEntity() instanceof ServerPlayer) {
             QuestHandler.damageProgress((Player) event.getSource().getEntity(), damageSourceToQiDamageSource(event.getSource()), damage);
+
+            // Charge unlock: heavy single hits
+            if (damage >= 20) {
+                QuestHandler.progressQuest((Player) event.getSource().getEntity(), Quest.BIG_HIT, 1);
+            }
         }
 
         return damage;

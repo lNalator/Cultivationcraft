@@ -67,7 +67,7 @@ public class CultivatorBlood extends Blood {
             double speed = (percent * maxSpeed) * (Math.random() * 0.5 + 0.5);
             direction = direction.scale(speed);
 
-            float height = PoseHandler.getPlayerPoseHandler(player.getUUID()).getPlayerModel().getHeightAdjustment();
+            float height = PoseHandler.getHeightAdjustment(player.getUUID());
 
             player.level.addParticle(particle, player.getX(), player.getY() + height, player.getZ(), direction.x, direction.y, direction.z);
         }

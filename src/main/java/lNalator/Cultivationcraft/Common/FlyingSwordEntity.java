@@ -34,6 +34,7 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraftforge.network.NetworkHooks;
@@ -121,9 +122,20 @@ public class FlyingSwordEntity extends ItemEntity {
         return defaultTurnSpeed;
     }
 
+    // Rhythm concepts (Haste, Charge) speed the swords up or slow them down
+    protected float getTempo() {
+        float tempo = 1;
+
+        for (TechniqueModifier mod : CultivatorStats.getCultivatorStats(owner).getCultivation().getModifiers()) {
+            tempo *= mod.getTempoMultiplier(owner);
+        }
+
+        return tempo;
+    }
+
     public float getSpeed() {
         if (formation != null) {
-            return (float) formation.getTechniqueStat(FlyingSwordFormationTechnique.flyingswordspeed, owner) / 100f;
+            return (float) formation.getTechniqueStat(FlyingSwordFormationTechnique.flyingswordspeed, owner) / 100f * getTempo();
         }
 
         return defaultspeed;
@@ -137,7 +149,7 @@ public class FlyingSwordEntity extends ItemEntity {
         float damage = (float) formation.getTechniqueStat(DefaultTechniqueStatIDs.damage, owner);
 
         for (TechniqueModifier mod : CultivatorStats.getCultivatorStats(owner).getCultivation().getModifiers()) {
-            damage *= mod.getDamageMultiplier(formation);
+            damage *= mod.getDamageMultiplier(owner, formation);
         }
 
         return damage;
@@ -145,7 +157,7 @@ public class FlyingSwordEntity extends ItemEntity {
 
     public float getMaxSpeed() {
         if (formation != null) {
-            return (float) formation.getTechniqueStat(FlyingSwordFormationTechnique.flyingswordmaxspeed, owner) / 100f;
+            return (float) formation.getTechniqueStat(FlyingSwordFormationTechnique.flyingswordmaxspeed, owner) / 100f * getTempo();
         }
 
         return defaultmaxSpeed;
@@ -359,7 +371,12 @@ public class FlyingSwordEntity extends ItemEntity {
 
     protected void handleEntityCollisions() {
         // Get a list of entities within this entities bounding box
-        List<Entity> collisionEntities = this.level.getEntities(this, getBoundingBox());
+        // Grow enlarges the sword model: scale the hitbox the same way
+        AABB box = getBoundingBox();
+        double scale = (formation != null && owner != null ? formation.getSize(owner).x : 1) - 1;
+        box = box.inflate(box.getXsize() * scale / 2, box.getYsize() * scale / 2, box.getZsize() * scale / 2);
+
+        List<Entity> collisionEntities = this.level.getEntities(this, box);
 
         // If there are entities within this entities bounding box
         if (!collisionEntities.isEmpty()) {

@@ -1,5 +1,6 @@
 package lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers;
 
+import lNalator.Cultivationcraft.Client.GUI.animatedTexture;
 import lNalator.Cultivationcraft.Common.Qi.Elements.Elements;
 import lNalator.Cultivationcraft.Common.Qi.Quests.Quest;
 import lNalator.Cultivationcraft.Cultivationcraft;
@@ -11,9 +12,13 @@ public class QiModifier extends TechniqueModifier {
 
     public QiModifier() {
         ID = QI_ID;
+        coreTexture = new animatedTexture(new ResourceLocation(Cultivationcraft.MODID, "textures/cores/pure.png"), 12, 3);
         CATEGORY = ELEMENTAL_CATEGORY;
 
         stabiliseQuest = new Quest(Quest.DAMAGE_DEALT, 1000, Elements.noElement.toString());
+
+        // Pure stays outside the Golden Core pressure loop but makes techniques cheaper
+        qiMult = 0.9f;
         unlockQuest = new Quest(Quest.QI_SOURCE_MEDITATION, 1, Elements.noElement.toString());
     }
 }

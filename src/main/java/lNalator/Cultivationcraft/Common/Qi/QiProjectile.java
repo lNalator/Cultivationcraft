@@ -5,6 +5,7 @@ import lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.CultivatorS
 import lNalator.Cultivationcraft.Common.Qi.Elements.Elements;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.QiCondenserTechniques.QiEmission;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.Technique;
+import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers.ChargeModifier;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers.TechniqueModifier;
 import lNalator.Cultivationcraft.Common.Register;
 import lNalator.Cultivationcraft.Server.CultivatorAttackLogic;
@@ -31,6 +32,10 @@ public class QiProjectile extends AbstractHurtingProjectile {
 
     int damage = 0;
     QiEmission tech;
+    // Charge concept: how much this shot was charged (1 = not charged), for the Echo + Charge synergy. Server only
+    float charge = 1;
+    // Elasticity concept: bounces on blocks so far. Server only
+    int bounces = 0;
 
     public QiProjectile(EntityType<? extends QiProjectile> entityType, Level level) {
         super(entityType, level);
@@ -55,6 +60,28 @@ public class QiProjectile extends AbstractHurtingProjectile {
         entityData.define(ID_ELEMENT, Elements.noElement.toString());
         entityData.define(ID_SPEED, 0f);
         entityData.define(ID_LIFE, 0f);
+    }
+
+    public int getBounces() {
+        return bounces;
+    }
+
+    public void addBounce() {
+        bounces++;
+    }
+
+    // Explosions (its own, with Explosion + Elasticity) must not push it: it kept gaining speed at every bounce
+    @Override
+    public boolean ignoreExplosion() {
+        return true;
+    }
+
+    public void setCharge(float charge) {
+        this.charge = charge;
+    }
+
+    public void scaleLife(float multiplier) {
+        entityData.set(ID_LIFE, entityData.get(ID_LIFE) * multiplier);
     }
 
     public float getAlpha() {
@@ -93,7 +120,8 @@ public class QiProjectile extends AbstractHurtingProjectile {
             Technique.tickTechniqueModifiers((Player) getOwner(), position(), getElement());
         }
 
-        if (entityData.get(ID_LIFE) == 0) {
+        // <= : a scaled lifetime (Levitation, Elasticity) is not a whole number, so it never hit exactly 0 and the projectile never died
+        if (entityData.get(ID_LIFE) <= 0) {
             this.discard();
         }
 
@@ -134,9 +162,16 @@ public class QiProjectile extends AbstractHurtingProjectile {
             return;
         }
 
-        for (TechniqueModifier mod : CultivatorStats.getCultivatorStats((Player) getOwner()).getCultivation().getModifiers()) {
-            mod.onHitEntity((Player) getOwner(), hit.getEntity(), damage, getElement(), position());
-            damage *= mod.getDamageMultiplier(new QiEmission());
+        // The modifiers can tell a charged shot from a plain one (Echo + Charge synergy)
+        ChargeModifier.hitCharge = charge;
+
+        try {
+            for (TechniqueModifier mod : CultivatorStats.getCultivatorStats((Player) getOwner()).getCultivation().getModifiers()) {
+                mod.onHitEntity((Player) getOwner(), hit.getEntity(), damage, getElement(), position());
+                damage *= mod.getDamageMultiplier((Player) getOwner(), new QiEmission());
+            }
+        } finally {
+            ChargeModifier.hitCharge = 1;
         }
 
         CultivatorAttackLogic.attackEntity((Player) getOwner(), hit.getEntity(), -1, damage, null, getElement(), "QiProjectile");

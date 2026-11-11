@@ -1,7 +1,8 @@
 package lNalator.Cultivationcraft.Common.Qi.Cultivation;
 
+import lNalator.Cultivationcraft.Common.Qi.Stats.BodyPartStatControl;
+import lNalator.Cultivationcraft.Client.GUI.Screens.CultivationTypeScreens.CultivationScreens;
 import lNalator.Cultivationcraft.Client.GUI.Screens.CultivationTypeScreens.CultivationTypeScreen;
-import lNalator.Cultivationcraft.Client.GUI.Screens.GenericTabScreen;
 import lNalator.Cultivationcraft.Common.Advancements.CultivationAdvancements;
 import lNalator.Cultivationcraft.Common.Capabilities.ChunkQiSources.ChunkQiSources;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.CultivatorStats;
@@ -51,7 +52,8 @@ public class CultivationType {
 
     protected PassiveTechnique passive = new PassiveTechnique();
 
-    protected CultivationTypeScreen screen = new CultivationTypeScreen();
+    // Created on first use, client side only (see CultivationScreens)
+    protected CultivationTypeScreen screen;
 
     protected ArrayList<CultivationType> advancements = new ArrayList<>();
 
@@ -137,20 +139,34 @@ public class CultivationType {
         return StaminaHandler.consumeStamina(player, (float) qiToConsume);
     }
 
+    // Each core once, even when reinforced: its rank comes from getModifierRank
     public ArrayList<TechniqueModifier> getModifiers() {
         ArrayList<TechniqueModifier> totalModifiers = new ArrayList<>();
 
-        for (TechniqueModifier mod : modifiers) {
-            totalModifiers.add(mod);
-        }
-
-        if (getPreviousCultivation() != null) {
-            for (TechniqueModifier mod : getPreviousCultivation().getModifiers()) {
-                totalModifiers.add(mod);
+        for (CultivationType cultivation = this; cultivation != null; cultivation = cultivation.getPreviousCultivation()) {
+            for (TechniqueModifier mod : cultivation.modifiers) {
+                if (totalModifiers.stream().noneMatch(added -> added.ID.equals(mod.ID))) {
+                    totalModifiers.add(mod);
+                }
             }
         }
 
         return totalModifiers;
+    }
+
+    // Number of stages that chose this core (1 when taken once, +1 per reinforcement)
+    public int getModifierRank(ResourceLocation id) {
+        int rank = 0;
+
+        for (CultivationType cultivation = this; cultivation != null; cultivation = cultivation.getPreviousCultivation()) {
+            for (TechniqueModifier mod : cultivation.modifiers) {
+                if (mod.ID.equals(id)) {
+                    rank++;
+                }
+            }
+        }
+
+        return rank;
     }
 
     public boolean canBreakthrough(Player player) {
@@ -236,10 +252,6 @@ public class CultivationType {
         return advancingCultivation;
     }
 
-    public GenericTabScreen getAdvancmentOptionScreen() {
-        return null;
-    }
-
     public boolean hasAdvancementOptions() {
         return false;
     }
@@ -257,10 +269,26 @@ public class CultivationType {
     }
 
     public void tick(Player player) {
-        ((QiFoodStats) player.getFoodData()).setFoodLevel(((QiFoodStats) player.getFoodData()).getTrueFoodLevel() + (float) (getCultivationStat(player, DefaultCultivationStatIDs.qiPassiveSpeed) / 20.0));
+        // Realm bonuses (max HP, speed) follow the current cultivation, whatever changed it
+        if (BodyPartStatControl.getPlayerStatControl(player).realmBonusSource != this) {
+            BodyPartStatControl.updateStats(player);
+        }
+
+        for (TechniqueModifier mod : getModifiers()) {
+            mod.playerTick(player);
+        }
+
+        QiFoodStats food = (QiFoodStats) player.getFoodData();
+        boolean qiFull = food.getTrueFoodLevel() >= food.getMaxFood();
+        food.setFoodLevel(food.getTrueFoodLevel() + (float) (getCultivationStat(player, DefaultCultivationStatIDs.qiPassiveSpeed) / 20.0));
 
         if (player.level.isClientSide) {
             return;
+        }
+
+        // Sea of Qi (Qi Condensation signature): with full Qi, the surplus slowly regenerates life
+        if (qiFull && hasSeaOfQi() && player.getHealth() < player.getMaxHealth()) {
+            player.heal(SEA_OF_QI_HEAL_PER_TICK);
         }
 
         if (isTribulating() && player.isAlive()) {
@@ -270,6 +298,22 @@ public class CultivationType {
                 PacketHandler.sendCultivatorStatsToClient(player);
             }
         }
+    }
+
+    // 1 HP every 4 seconds, the pace of vanilla natural regeneration
+    protected static final float SEA_OF_QI_HEAL_PER_TICK = 0.25f / 20f;
+
+    // Share of absorbed Qi of this element that turns into cultivation
+    public double getCultivationEfficiency(ResourceLocation element) {
+        return 1;
+    }
+
+    public double getTechniqueTrainingMultiplier() {
+        return 1;
+    }
+
+    public boolean hasSeaOfQi() {
+        return false;
     }
 
     public int getStage() {
@@ -306,6 +350,8 @@ public class CultivationType {
     }
 
     public CultivationTypeScreen getScreen() {
+        if (screen == null)
+            screen = CultivationScreens.create(this);
         return screen;
     }
 
@@ -440,8 +486,10 @@ public class CultivationType {
 
         // Calculate accepted Qi directly: subtracting two huge floats loses the
         // stage's remaining capacity when creative commands supply Integer.MAX_VALUE.
-        float accepted = (float) Math.min(Qi, techLevel - currentLevel);
-        increaseCultivationLevel(player, accepted);
+        // Qi of a less suited element is partly lost: the source still gives it all
+        double efficiency = getCultivationEfficiency(element);
+        float accepted = (float) Math.min(Qi, (techLevel - currentLevel) / efficiency);
+        increaseCultivationLevel(player, (float) (accepted * efficiency));
         return Qi - accepted;
     }
 
@@ -596,6 +644,10 @@ public class CultivationType {
     }
 
     public void levelTech(Technique tech, double amount, Player player) {
+        if (tech.getClass() != passive.getClass()) {
+            amount *= getTechniqueTrainingMultiplier();
+        }
+
         int max = getMaxTechLevel();
         int current = getTechLevelProgress(tech);
 
@@ -643,6 +695,20 @@ public class CultivationType {
         statLevels.get(tech.getClass().toString()).put(toLevel, currentLevel);
 
         PacketHandler.sendCultivatorStatsToClient(player);
+    }
+
+    // Falls back to the stage below, whose tribulation has to be passed again.
+    // Returns null at the first stage: a cultivator never goes back to no cultivation.
+    public CultivationType revert() {
+        if (previousCultivation == null || previousCultivation instanceof NoCultivation) {
+            return null;
+        }
+
+        previousCultivation.hasTribulated = false;
+        previousCultivation.isTribulating = false;
+        previousCultivation.tribulation.reset();
+
+        return previousCultivation;
     }
 
     public void setPreviousCultivation(CultivationType previous) {

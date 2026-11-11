@@ -44,7 +44,7 @@ public class TechniqueModifyScreen extends GenericTabScreen {
     protected void updateStats() {
         stats = new ArrayList<>();
 
-        for (ResourceLocation stat : selectedTech.getTechniqueStats()) {
+        for (ResourceLocation stat : selectedTech.getDisplayedStats(Minecraft.getInstance().player)) {
             stats.add(stat);
         }
 
@@ -87,7 +87,8 @@ public class TechniqueModifyScreen extends GenericTabScreen {
         }
 
         for (int i = 0; i < buttons.length; i++) {
-            if (buttons[i].mouseClick((int) mouseX, (int) mouseY, buttonPressed)) {
+            // Stats that cannot level have no button drawn
+            if (selectedTech.getStatChangesPerLevel(stats.get(i)) != null && buttons[i].mouseClick((int) mouseX, (int) mouseY, buttonPressed)) {
                 for (int j = 0; j < buttons.length; j++) {
                     buttons[j].unselect();
                 }
@@ -120,6 +121,11 @@ public class TechniqueModifyScreen extends GenericTabScreen {
     }
 
     protected TechniqueStatModification getStatModification() {
+        // No levelable stats (e.g. passive of a reverted cultivation)
+        if (selectedTech.getFirstStatChange() == null) {
+            return null;
+        }
+
         ResourceLocation focus = CultivatorStats.getCultivatorStats(Minecraft.getInstance().player).getTechniqueFocus(selectedTech);
 
         if (focus == null) {
@@ -155,11 +161,12 @@ public class TechniqueModifyScreen extends GenericTabScreen {
         TechniqueStatModification modifications = getStatModification();
 
         for (int stat = 0; stat < stats.size(); stat++) {
-            double statValue = selectedTech.getTechniqueStat(stats.get(stat), Minecraft.getInstance().player);
+            double statValue = selectedTech.getDisplayedStat(stats.get(stat), Minecraft.getInstance().player);
             drawStat(PoseStack, stat, stats.get(stat), statValue);
 
-            double value = modifications.getStatChange(stats.get(stat));
-            drawStatChanges(PoseStack, stat, stats.get(stat), value);
+            if (modifications != null) {
+                drawStatChanges(PoseStack, stat, stats.get(stat), modifications.getStatChange(stats.get(stat)));
+            }
 
             // Only draw button if this stat can level
             if (selectedTech.getStatChangesPerLevel(stats.get(stat)) != null) {
@@ -174,7 +181,7 @@ public class TechniqueModifyScreen extends GenericTabScreen {
 
         statValue = (int) (statValue * 1000) / 1000.0;
 
-        font.draw(PoseStack, Component.translatable(stat.getPath()).getString(), edgeSpacingX + statXPos, edgeSpacingY + statYPos + statYSpacing * pos, Color.black.getRGB());
+        font.draw(PoseStack, selectedTech.getStatName(stat, Minecraft.getInstance().player), edgeSpacingX + statXPos, edgeSpacingY + statYPos + statYSpacing * pos, Color.black.getRGB());
         font.draw(PoseStack, "" + statValue, edgeSpacingX + this.xSize - statXPosFromRight - font.width("" + statValue), edgeSpacingY + statYPos + statYSpacing * pos, Color.WHITE.getRGB());
     }
 

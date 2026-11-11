@@ -1,5 +1,6 @@
 package lNalator.Cultivationcraft.Client.GUI.Screens;
 
+import lNalator.Cultivationcraft.Client.GUI.GUIButton;
 import lNalator.Cultivationcraft.Client.GUI.TextField;
 import lNalator.Cultivationcraft.Client.genericClientFunctions;
 import lNalator.Cultivationcraft.Client.GUI.BodyPartGUI;
@@ -9,8 +10,10 @@ import lNalator.Cultivationcraft.Common.Capabilities.BodyModifications.IBodyModi
 import lNalator.Cultivationcraft.Common.Qi.BodyParts.BodyPart;
 import lNalator.Cultivationcraft.Common.Qi.BodyParts.BodyPartNames;
 import lNalator.Cultivationcraft.Common.Qi.Stats.BodyPartStatControl;
+import lNalator.Cultivationcraft.Common.Qi.Techniques.DivineSenseTechnique;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
@@ -28,11 +31,18 @@ public class StatScreen extends GenericTabScreen {
 
     protected TextField stats = new TextField();
 
+    // Opens the Divine Sense page, for body cultivators with Qi Sight (Divine Sense is innate, not in a technique slot)
+    protected GUIButton divineSense;
+    protected int divineSenseX = 16;
+    protected int divineSenseY = 160;
+
     public StatScreen() {
         super(0, Component.translatable("cultivationcraft.gui.stats"), new ResourceLocation(Cultivationcraft.MODID, "textures/gui/stats.png"));
 
         statString = BodyPartStatControl.getStats(genericClientFunctions.getPlayer()).toString();
         stats.resetScroll();
+
+        divineSense = new GUIButton("DIVINESENSE", Component.translatable("cultivationcraft.divinesense.screen").getString());
     }
 
     @Override
@@ -43,6 +53,11 @@ public class StatScreen extends GenericTabScreen {
 
         int edgeSpacingX = (this.width - this.xSize) / 2;
         int edgeSpacingY = (this.height - this.ySize) / 2;
+
+        if (DivineSenseTechnique.find(genericClientFunctions.getPlayer()) != null && divineSense.mouseClick((int) mouseX, (int) mouseY, buttonPressed)) {
+            Minecraft.getInstance().forceSetScreen(new DivineSenseScreen());
+            return true;
+        }
 
         if (mouseX > statTextX + edgeSpacingX && mouseX < statTextX + edgeSpacingX + statTextWidth) {
             if (mouseY > statTextY + edgeSpacingY && mouseY < statTextY + edgeSpacingY + statTextHeight) {
@@ -83,6 +98,11 @@ public class StatScreen extends GenericTabScreen {
 
         ResourceReadout.draw(PoseStack, font, genericClientFunctions.getPlayer(),
                 edgeSpacingX + statTextX, edgeSpacingY + 137, statTextWidth);
+
+        if (DivineSenseTechnique.find(genericClientFunctions.getPlayer()) != null) {
+            divineSense.setPos(edgeSpacingX + divineSenseX, edgeSpacingY + divineSenseY);
+            divineSense.render(PoseStack, mouseX, mouseY, this);
+        }
     }
 
     protected void drawBody(PoseStack PoseStack) {

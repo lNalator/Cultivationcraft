@@ -1,23 +1,106 @@
 # TODO
 
-Grouped by category. Each item has a priority (P1 = next, P2 = soon, P3 = later) and a size (S / M / L).
+Grouped by chantier/category. Each item has a priority (P1 = next, P2 = soon, P3 = later) and a size (S / M / L).
 
-## Visual feedback
+## Minecraft versions (not tied to a mod version)
 
-- **P2 · S** Divine Sense: spiritual plant markers should shrink/grow with the plant's current Qi amount (`Client/Renderers/DivineSenseBlockRenderer.java`).
-- **P2 · M** Elements: bigger visual feedback (particles, sounds) when an element hits a block or an entity, for clearer player feedback (`Common/Qi/Elements/*`).
+- **P1 · L** Provide the mod for Minecraft versions above 1.19.2, up to at least 1.21, and ideally 26.x. Includes porting mlmAnimator to the same versions.
+
+## 0.5.0
+
+### Concepts (Core Forming)
+
+- **P3 · M** Undecided offers: Warp flight jumps beyond 9 blocks (server-side teleport; speed past the cap now shortens the Warp Delay instead); Haste reducing the techniques' 0.25 s cooldown. Decided: Haste never affects Warp (neither the jump length nor the Warp Delay), Warp is already strong enough; keep it that way if Haste gets a cooldown or flight effect.
+- **P3 · L** Paused axes: Body (Blood / Vitality) and Perception (Light / Shadow). Approved for later (04/11): Body ties to the Jing (body), Perception to the Shen (Divine Sense).
+- **P3 · L** Let the player modify a concept's effect, on chosen techniques or directly. Groundwork for the technique rework below.
+
+### Tribulation
+
+- **P3 · S** A ray of light on the player when they survive the tribulation, as the clouds part.
+
+## Taoist framework (Yin/Yang, Wu Xing, Three Treasures)
+
+Reference for the whole project. Design: `project-files/cultivationcraft/approfondissement-taoisme.md` (parts 4 and 5 = Enzo's decisions of 04/11 to 07/11) and `conception-trois-purs.md`. The mod already follows chapter 42 of the Tao Te King: mortal = Tao, Foundation Establishment = the One (raw Qi, Pure), Qi Condensation = the Two (elements, Yin/Yang), Core Forming = the Three, concepts, plants and alchemy = the ten thousand things. The cultivator climbs this chain back towards the Tao, and goes down it when acting on the world. The two paths keep their name for players (a path is a progression preset, final, pushing one treasure more than the others); the three treasures (Jing body, Qi, Shen mind), Yin/Yang and the five phases sit underneath every system.
+
+- **P2 · S** Lore reframing: knowledge entries and realm screens tell the ascent (Tao → One → Two → Three); Ice and Lightning shown as mutated roots (Water pushed to extreme Yin, Wind to extreme Yang); concept axis poles shown as Yin / Yang, with a shared symbol in the Concepts screen.
+- **P2 · M** Elements: keep the pressing loop Fire > Wood > Wind > Earth > Water > Fire (Wind stays a full element) and add the generating cycle Fire → Earth → Wood → Water → Wind → Fire; give every element an effect (Earth and Wood have none). Over-domination / insult (quantity-based) later. The generating cycle also feeds plants, alchemy, synergies between cores and refilling the void after a purge.
+- **P2 · M** Pure: generates every element, presses none; weakens the elemental part of what it hits (shorter burn, weaker push, shorter freeze) instead of a damage bonus, kept moderate so it is not a universal counter.
+- **P2 · M** Knowledge as revelations: entries unlocked by blind discoveries and actions (crafting the cauldron without help, meditating at night by a water source, seeing a plant grow faster near its generating source, emptying the Divine Sense gauge). Jade slips stay the book route to the same entries.
+- **P2 · M** Read vs realised knowledge: an entry learned from a jade slip is "read" and gives a small part of the Divine Sense progression; realising it yourself (revelation) gives the rest and marks it understood. Reading first eases the revelation condition; reading then realising gives as much as realising directly. Read-but-not-realised entries are flagged in the compendium.
+- **P2 · M** Spiritual plants: growth depends on elemental conditions and on nearby Qi sources (own or generating element speeds up, dominating element slows down). Worldgen follows the same neighbourhood logic, so players can read where plants grow.
+- **P2 · L** Alchemy rework: useful for both paths, same pill with a path-dependent effect (pills for the body too); ingredients interact through the Wu Xing cycles and Yin/Yang balance (purity); procedural plants as the raw material. Current score / purity / failure system stays the base.
+- **P3 · M** Spiritual plant storage: a pouch or ring dedicated to spiritual plants (jade box idea: could slow the Qi loss of picked plants).
+- **P3 · M** Plant reproduction: turn a plant into seeds that carry its genome, plus an alchemy raw material; sowing near a source of another element could mutate it (to think through).
+- **P3 · M** Craftable blank jade slip: inscribe a known knowledge entry, costing Shen / concentration by the entry's importance (always more Shen for the writer than what the reader gains, so knowledge cannot be farmed), so an experienced player can teach a new one.
+- **P3 · M** Cultivator polarity (element + axis poles): balanced gives a Harmony bonus (the "Three" as harmony of the poles, in Core Forming), extreme gives a stronger specialty; tribulation shaped by the imbalance (Yang: fire and lightning, Yin: cold and darkness). The tribulation clouds already reacting are the starting point.
+- **P3 · L** Bridges between paths: the path stays final, but some actions let the player progress on the other path, slower and capped, for an advantage (internal: Divine Sense and a little Qi to refine the body, a few simple Qi techniques; external: no body forging, but body strengthening paid in Qi, physical stats up to a realm-based cap below the internal path, to define with the internal rework).
+- **P3 · L** Body organs with a phase, in the internal cultivation rework: lungs Wind, heart Fire, liver Wood, kidneys Water, stomach Earth. Forging an organ strengthens the affinity with its phase.
+- **P3 · L** Nascent Soul gated by the three treasures (body, Qi, Divine Sense): "three flowers gather at the summit", where both paths meet. Needs body realms for the internal path, aligned with the external ones (Skin/Flesh ≈ Foundation, Bone/Blood ≈ Qi Condensation, Marrow/Organs ≈ Core Forming).
+- **P3 · L** Third path, Gu (Shen): living Gu (insects or objects) hosted in the body, each taking part of the concentration; Gu have a phase and follow the Wu Xing cycles, are fed with plants / pills / elemental Qi, found in the world with Divine Sense, refined or merged, level up with use, and rebel if the Shen is too low. Inspired by Reverend Insanity's gameplay, with our own Gu. After the internal rework and Nascent Soul.
+- **P3 · M** The Three Pure Ones (Taiqing alchemy, Shangqing meditation, Lingbao talismans and formations) as lineages or lore only (undecided).
+- **P3 · M** Metal (undecided, not now): only as a mutation of Earth (condensed Earth), never as a sixth element, since the Wu Xing cycles only work with five.
+
+## Elements and visual feedback
+
+- **P2 · M** Elements: bigger visual feedback (particles, sounds) when an element hits a block or an entity (`Common/Qi/Elements/*`).
+- **P2 · M** QiGlowRenderer: element-coloured halo for Qi Barrier, meditation, breakthrough and tribulation, pill effects and higher realms seen in Divine Sense (`Client/Renderers/QiGlowRenderer.java`, `render()` is empty).
+- **P3 · S** Replace the placeholder icons of the elemental states.
+- **P3 · M** Idea to explore: Divine Sense creature outlines without Mixin. Draw the sensed entities ourselves into vanilla's outline buffer (`OutlineBufferSource`) with our colour after the entities stage, then run the outline shader (`LevelRenderer.entityEffect`, private: reflection) ourselves, also when no vanilla entity glows that frame (otherwise filled silhouettes). Would allow a distance fade and per-entity transparency, unlike the current Glowing mixins (`MinecraftMixin`, `EntityMixin`). Risks: depends on a private field and the render order, possible conflicts with Distant Horizons and shaders.
+- **P3 · S** Remove the vanilla freeze damage (1 every 2 s) while frozen? (undecided)
+- **P3 · M** Ice Walk in the air (option B), later.
+
+## Divine Sense
+
+- **P2 · M** Divine Sense cost and progression (the Shen): its own mind-fatigue gauge (separate from Qi), drained by active use (more with a large radius or many highlights), refilled at rest and faster while meditating, with a temporary malus when empty. Progression: mainly from accumulated knowledge (entries weighted by importance), secondarily from use, capped by the realm. No detection category is locked; each tier improves a parameter instead (radius, number of highlights, mind-fatigue efficiency, precision of the target info, cone focus mode, pinning a target, stealth from other cultivators). The gauge and the tiers go on the Divine Sense page of the cultivation menu (`DivineSenseScreen`) and in the radial menu's stats panel.
+- **P2 · M** Probe a target: looking at a player or a mob shows its HP, realm and stage, and core element under the crosshair, like the Qi source line. A realm above the observer's shows "???".
+- **P2 · M** Aura concealment: a technique or concept lowering the player's apparent realm for vigilance and blur, at a Qi cost. The PvP counter to Divine Sense.
+- **P3 · M** Divine Sense pulse: a dedicated key or a sector of the radial menu (holding the Divine Sense key already opens the menu) sends a wave revealing everything within twice the detection radius for a moment, but it pings every player it reaches, whatever their realm.
+- **P3 · L** Qi traces: players and strong mobs leave a trail visible in Divine Sense for a few minutes, to track someone.
+
+## Qi sources
+
+- **P2 · M** Qi sources adjustment, the rest after the reserves (bonuses only, never blocking): time polarity (Yang elements Fire/Wind/Lightning stronger by day, Yin elements Water/Ice at night, Earth/Wood steady, Nether boosts Yang, End boosts Yin); neighbouring sources and plants influence each other through the Wu Xing cycles; at high Divine Sense tiers, the source's element polarity is shown. Detection range stays 4 × the Divine Sense radius until players give feedback.
+
+## Formations
+
+- **P2 · L** Formations, a whole chantier: protection formations (a barrier around a zone), Qi gathering formations (e.g. faster regeneration of a Qi source), and others.
+
+## Flying swords
+
+- **P2 · M** Smooth controller: inertia, arc turns, U-turns, block avoidance, guard and attack modes. Fix the two TODOs in `Common/FlyingSwordEntity.java` and `FlyingSwordController.java` (bad reverse turning, a block commented "bugged as hell").
+- **P3 · L** Flying sword AI rework, to do together (Enzo + Claude). Includes the Levitation behaviour: swords hovering above the player between attacks.
+
+## Spiritual plants
+
+- **P2 · M** More plant presets: 6-8 variants per part instead of 2 stems, 2 foliages and 2 fruits, with new parts (flower, root, thorns, glow) weighted by element (`Common/Blocks/Plants/world/PlantVisuals.java`, `ProceduralPlantBakedModel` cache).
 
 ## Interface
 
 - **P2 · S** Widen the technique selection list so longer names fit.
 - **P2 · M** Humanize the knowledge (Help) texts so they read naturally (`data/cultivationcraft/knowledge/**`).
-
-## Concepts (Core Forming)
-
-- **P2 · M** Purge an absorbed element: slowly clear (at a low rate) the Qi of one element absorbed during Qi Condensation, so a player can still advance their realm and, if they spend the time, change their main element to get a different or rarer core.
-- **P2 · M** Menu showing the concepts the player owns and their effects.
-- **P3 · L** Let the player modify a concept's effect, on chosen techniques or directly. Groundwork for the technique rework below.
+- **P2 · M** Knowledge page rework: side navigation, search, illustrations, unread entries marked (`Client/GUI/Screens/HelpScreen.java`).
+- **P3 · M** Cultivation menu redesign (Enzo has a design idea).
 
 ## Techniques
 
 - **P3 · L** Technique rework: the player customises each technique by placing points in the stats they want, within the "technique training" level already unlocked.
+
+## Body cultivation (internal path)
+
+- **P3 · L** Internal cultivation rework, a big feature for later:
+  - body realms (Skin → Flesh → Bone → Blood → Marrow → Organs);
+  - power-oriented modifications (ice flesh, crystal bones...), to keep or remove (decision postponed);
+  - `BodyPartNames.java` moved to JSON;
+  - balance with the external path;
+  - forge and default quest thresholds, merge of "time alive" / "Live", player elemental resistances coming from the body, elemental body parts.
+- **P3 · S** Bone size effect only lasts one tick, because mlmAnimator resets the size to 1.
+- **P3 · S** Leftovers: "lock the body whilst drawing" TODO in `Client/GUI/Screens/BodyforgeScreen.java`; the "evolved limb" advancement fires when a forge is selected instead of when it evolves.
+
+## Later realms
+
+- **P3 · L** Realms after Core Forming: Nascent Soul. The customisable domain is cancelled (11/11): the realm needs another special ability, to think through. Remove the stage 9 block in `CoreFormingCultivation.canBreakthrough`.
+
+## Known bugs
+
+- **P2 · M** Client freeze after death (OpenAL), listed as a known issue since 0.4.0: needs a thread dump.
+- **P2 · S** The flying sword array deals no damage to the Ender Dragon (probably because the dragon only takes damage through its parts, `EnderDragonPart`).

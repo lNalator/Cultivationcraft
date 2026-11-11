@@ -1,5 +1,6 @@
 package lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers;
 
+import lNalator.Cultivationcraft.Client.GUI.animatedTexture;
 import lNalator.Cultivationcraft.Common.Qi.Quests.Quest;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.QiCondenserTechniques.ItemEnhanceTechnique;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.QiCondenserTechniques.QiBarrierTechnique;
@@ -13,6 +14,7 @@ public class GrowModifier extends TechniqueModifier {
 
     public GrowModifier() {
         ID = new ResourceLocation(Cultivationcraft.MODID, "concept.grow");
+        coreTexture = new animatedTexture(new ResourceLocation(Cultivationcraft.MODID, "textures/cores/grow.png"), 16, 3);
         CATEGORY = SIZE_CATEGORY;
 
         unlockQuest = new Quest(Quest.GROWPLANT, 1);
@@ -34,11 +36,9 @@ public class GrowModifier extends TechniqueModifier {
         return 1;
     }
 
+    // Each rank adds 25% size
     @Override
-    public void doResize(Player owner, Technique tech) {
-        super.doResize(owner, tech);
-
+    public Vec3 getSize(Player owner) {
+        return size.scale(1 + 0.25 * (getRank(owner) - 1));
     }
-
-    // TODO: FlyingSword hitbox resizing
 }

@@ -43,7 +43,8 @@ public class CultivatorStats implements ICultivatorStats {
     }
 
     public void setCultivation(CultivationType newCultivation) {
-        cultivation = newCultivation;
+        // Reverting past the first realm gives a null previous cultivation, which crashes every tick and every save
+        cultivation = newCultivation == null ? new NoCultivation() : newCultivation;
     }
 
     public ResourceLocation getTechniqueFocus(Technique tech) {

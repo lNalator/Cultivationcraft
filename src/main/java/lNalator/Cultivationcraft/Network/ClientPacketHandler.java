@@ -45,6 +45,11 @@ public class ClientPacketHandler {
         PacketHandler.channel.sendToServer(pack);
     }
 
+    public static void sendPurgeElementToServer(ResourceLocation element) {
+        PurgeElementPacket pack = new PurgeElementPacket(element);
+        PacketHandler.channel.sendToServer(pack);
+    }
+
     public static void sendTechniqueUseToServer(int slot, boolean keyDown) {
         TechniqueUsePacket pack = new TechniqueUsePacket(slot, keyDown);
         PacketHandler.channel.sendToServer(pack);

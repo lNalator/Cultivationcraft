@@ -1,6 +1,5 @@
 package lNalator.Cultivationcraft.Common.Qi.Cultivation;
 
-import lNalator.Cultivationcraft.Client.GUI.Screens.CultivationTypeScreens.FoundationEstablishmentScreen;
 import lNalator.Cultivationcraft.Common.Advancements.CultivationAdvancements;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.CultivatorStats;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.PassiveTechniques.CultivationPassives.FoundationPassive;
@@ -22,7 +21,6 @@ public class FoundationEstablishmentCultivation extends CultivationType {
         techLevel = 100;
         maxedTechsToBreakthrough = 3;
         maxStage = 5;
-        screen = new FoundationEstablishmentScreen();
         tribulation = new Tribulation(maxStage, 10, 0.2f);
 
         advancements.add(new QiCondenserCultivation(1));

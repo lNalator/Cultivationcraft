@@ -10,16 +10,20 @@ public class QiSourceConfig {
     public final static int MaxSources = 1;
     public final static int MaxSize = 64;
     public final static int MinSize = 16;
+    // Old Qi source reserves, still the unit of body cultivation (Qi absorb and costs, blood healing)
     public final static int MaxStorage = 100000000;
     public final static int MinStorage = 1000000;
+    // Qi source reserves: the smallest holds about 30 minutes of absorption for a starting Qi Condenser (10 Qi a second)
+    public final static int MaxReserve = 1800000;
+    public final static int MinReserve = 18000;
+    // Body cultivation draws from the smaller reserves at the same relative rate as from the old ones
+    public final static double BODY_QI_SCALE = (double) MaxStorage / MaxReserve;
 
     protected final static int defaultRarity = 40;
     protected static HashMap<ResourceKey<Level>, Integer> dimensionRarity = new HashMap<>();
 
-    // Ticks to fully regen
-    // 20 ticks a second x 60 seconds in a minute = 1200 ticks for one minute
-    public final static int MaxRegen = 1200;
-    // 20 ticks a second x 60 seconds in a minute x 60 minutes in an hour = 72000 ticks for an hour
+    // Ticks to fully regen, linear: from 1 Minecraft day (24000 ticks) to 3 days
+    public final static int MaxRegen = 24000;
     public final static int MinRegen = 72000;
 
     public static void init() {

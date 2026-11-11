@@ -4,6 +4,7 @@
 /gradle/*
 !/gradle/wrapper/
 /run/
+/run-client2/
 /bin/
 /.settings/
 /.vscode/

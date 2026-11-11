@@ -18,11 +18,17 @@ import lNalator.Cultivationcraft.Common.Qi.CultivationTypes;
 import lNalator.Cultivationcraft.Common.Qi.BodyParts.BodyPart;
 import lNalator.Cultivationcraft.Common.Qi.BodyParts.BodyPartOption;
 import lNalator.Cultivationcraft.Common.Qi.BodyParts.PlayerHealthManager;
+import lNalator.Cultivationcraft.Client.Renderers.QiSourceRenderer;
+import lNalator.Cultivationcraft.Common.Qi.Elements.Element;
 import lNalator.Cultivationcraft.Common.Qi.Elements.Elements;
+import lNalator.Cultivationcraft.Common.Qi.QiSource;
+import net.minecraft.network.chat.Component;
 import lNalator.Cultivationcraft.Common.Qi.Stats.BodyPartStatControl;
 import lNalator.Cultivationcraft.Common.Qi.Stats.PlayerStatModifications;
 import lNalator.Cultivationcraft.Common.Qi.Stats.StatIDs;
+import lNalator.Cultivationcraft.Common.Qi.Techniques.DivineSenseTechnique;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.Technique;
+import lNalator.Cultivationcraft.Client.GUI.DivineSensePingOverlay;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.PassiveTechniques.PassiveTechnique;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -118,6 +124,17 @@ public class ClientListeners {
                     } else {
                         passive.tickInactiveClient(event);
                     }
+                }
+            }
+
+            // Innate Divine Sense, outside the technique slots
+            DivineSenseTechnique sense = DivineSenseTechnique.find(event.player);
+
+            if (sense != null) {
+                if (sense.isActive()) {
+                    sense.tickClient(event);
+                } else {
+                    sense.tickInactiveClient(event);
                 }
             }
 
@@ -217,10 +234,16 @@ public class ClientListeners {
         if (event.getOverlay().id() == VanillaGuiOverlay.HOTBAR.id()) {
             SkillHotbarOverlay.PostRenderSkillHotbar(event.getPoseStack());
 
+            // Vigilance: where someone senses this player from
+            DivineSensePingOverlay.render(event.getPoseStack(), event.getPartialTick());
+
+            // Levitation + Wind synergy: entities carried in wind
+            lNalator.Cultivationcraft.Client.GUI.WindWrapOverlay.render(event.getPoseStack());
+
             // Draw dynamic Tier/Age HUD when looking at a Procedural Plant (visible only during Divine Sense)
             if (Renderer.QiSourcesVisible) {
                 var mc = Minecraft.getInstance();
-                if (mc.hitResult instanceof BlockHitResult bhr && mc.level != null) {
+                if (Renderer.senses(DivineSenseTechnique.SENSE_BLOCKS) && mc.hitResult instanceof BlockHitResult bhr && mc.level != null) {
                     BlockPos pos = bhr.getBlockPos();
                     var st = mc.level.getBlockState(pos);
                     if (st.getBlock() instanceof ProceduralPlantBlock) {
@@ -252,6 +275,18 @@ public class ClientListeners {
                             font.draw(event.getPoseStack(), text, x, y, 0xFFFFFF);
                         }
                     }
+                }
+
+                // Size, element and density tier of the Qi source looked at, under the plant line
+                QiSource source = QiSourceRenderer.focused;
+                if (source != null && Renderer.senses(DivineSenseTechnique.SENSE_QI_SOURCES)) {
+                    Font font = mc.font;
+                    Element element = Elements.getElement(source.getElement());
+                    String text = Component.translatable("cultivationcraft.qisource.tier", Component.translatable("cultivationcraft.qisource.size." + source.getSizeTier()),
+                            element.getName(), Component.translatable("cultivationcraft.qisource.tier." + source.getDensityTier())).getString();
+                    int x = (mc.getWindow().getGuiScaledWidth() - font.width(text)) / 2;
+                    int y = mc.getWindow().getGuiScaledHeight() / 2 + 24;
+                    font.draw(event.getPoseStack(), text, x, y, element.color.getRGB() & 0xFFFFFF);
                 }
             }
         }

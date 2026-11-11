@@ -1,5 +1,6 @@
 package lNalator.Cultivationcraft.Common.Capabilities.CultivatorTechniques;
 
+import lNalator.Cultivationcraft.Common.Qi.Techniques.DivineSenseTechnique;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.PassiveTechniques.PassiveTechnique;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.Technique;
 import net.minecraft.nbt.CompoundTag;
@@ -26,4 +27,9 @@ public interface ICultivatorTechniques {
     public ArrayList<PassiveTechnique> getPassives();
 
     public Technique getTechniqueByName(String name);
+
+    // Innate Divine Sense, outside the technique slots
+    public DivineSenseTechnique getDivineSense();
+
+    public void setDivineSense(DivineSenseTechnique sense);
 }

@@ -2,8 +2,10 @@ package lNalator.Cultivationcraft.Client.Particles;
 
 import lNalator.Cultivationcraft.Client.Renderer;
 import lNalator.Cultivationcraft.Client.Renderers.QiSourceRenderer;
+import lNalator.Cultivationcraft.Common.Qi.Elements.Element;
 import lNalator.Cultivationcraft.Common.Qi.QiSource;
 import lNalator.Cultivationcraft.Common.Qi.QiSourceConfig;
+import lNalator.Cultivationcraft.Common.Qi.Techniques.DivineSenseTechnique;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
@@ -15,9 +17,12 @@ import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+
+import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 import java.util.Random;
@@ -25,19 +30,36 @@ import java.util.Random;
 public class QiParticle extends TextureSheetParticle {
 
     Entity target;
+    // Stream particles (from a source to an absorbing player) show their arrival on the player
+    boolean stream = false;
+    Element element;
+
+    // Once it touches its target, the particle sticks to it and shrinks while fading out
+    static final int ARRIVAL_FADE_TICKS = 4;
+    int arrivalAge = -1;
+    Vec3 arrivalOffset;
+    float arrivalSize;
 
     static final ParticleRenderType QI_PARTICLE_RENDER_TYPE = new ParticleRenderType() {
+        // Qi is seen through everything. Disabling the depth test also stops depth writes, so the clouds,
+        // drawn after the particles, painted over them whether they were in front or behind. Instead the
+        // test always passes and writes the nearest depth, so nothing drawn later can cover the particles.
         public void begin(BufferBuilder p_107455_, TextureManager p_107456_) {
             RenderSystem.depthMask(true);
             RenderSystem.setShaderTexture(0, TextureAtlas.LOCATION_PARTICLES);
-            RenderSystem.disableDepthTest();
+            RenderSystem.enableDepthTest();
+            RenderSystem.depthFunc(GL11.GL_ALWAYS);
+            GL11.glDepthRange(0, 0);
             RenderSystem.enableBlend();
             RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
             p_107455_.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.PARTICLE);
         }
 
+        // The quads are drawn here, so the depth state is restored afterwards
         public void end(Tesselator p_107458_) {
             p_107458_.end();
+            GL11.glDepthRange(0, 1);
+            RenderSystem.depthFunc(GL11.GL_LEQUAL);
         }
 
         public String toString() {
@@ -83,22 +105,65 @@ public class QiParticle extends TextureSheetParticle {
         this.yo = this.y;
         this.zo = this.z;
 
+        if (arrivalAge >= 0) {
+            fadeOnTarget();
+            return;
+        }
+
         if (this.age++ >= this.lifetime) {
             this.remove();
-        } else {
-            this.move(this.xd, this.yd, this.zd);
+            return;
+        }
 
-            // If particle collides with absorbing player
-            if (target != null && target.getBoundingBox().intersects(this.getBoundingBox())) {
-                this.remove();
+        // Stream particles home in on their player, so they still reach them when they move
+        if (stream && target.isAlive()) {
+            Vec3 toTarget = target.getBoundingBox().getCenter().subtract(x, y, z).normalize().scale(new Vec3(xd, yd, zd).length());
+            xd = toTarget.x;
+            yd = toTarget.y;
+            zd = toTarget.z;
+        }
+
+        Vec3 from = new Vec3(x, y, z);
+        this.move(this.xd, this.yd, this.zd);
+
+        if (target == null) {
+            return;
+        }
+
+        // Check the whole path of this tick: a fast particle can cross the player between two ticks
+        AABB box = target.getBoundingBox();
+        Vec3 hit = box.contains(from) ? from : box.clip(from, new Vec3(x, y, z)).orElse(box.intersects(this.getBoundingBox()) ? new Vec3(x, y, z) : null);
+
+        if (hit != null) {
+            setPos(hit.x, hit.y, hit.z);
+            arrivalOffset = hit.subtract(target.position());
+            arrivalSize = quadSize;
+            arrivalAge = 0;
+
+            if (stream) {
+                QiSourceRenderer.arrive(hit.x, hit.y, hit.z, element);
             }
         }
+    }
+
+    protected void fadeOnTarget() {
+        if (++arrivalAge >= ARRIVAL_FADE_TICKS) {
+            this.remove();
+            return;
+        }
+
+        Vec3 pos = target.position().add(arrivalOffset);
+        setPos(pos.x, pos.y, pos.z);
+
+        float left = 1 - arrivalAge / (float) ARRIVAL_FADE_TICKS;
+        quadSize = arrivalSize * left;
+        alpha = 0.7F * left;
     }
 
     @Override
     public void render(VertexConsumer buffer, Camera renderInfo, float partialTicks) {
         // Don't render particles if they are not visible
-        if (!Renderer.QiSourcesVisible || renderInfo.getPosition().distanceToSqr(x, y, z) > 16 * Renderer.QiSenseRadius * Renderer.QiSenseRadius) {
+        if (!Renderer.senses(DivineSenseTechnique.SENSE_QI_SOURCES) || renderInfo.getPosition().distanceToSqr(x, y, z) > 16 * Renderer.QiSenseRadius * Renderer.QiSenseRadius) {
             return;
         }
 
@@ -127,14 +192,14 @@ public class QiParticle extends TextureSheetParticle {
             }
 
             // The distance particles should reach
-            float distance = 1f;
+            float distance = QiSourceRenderer.distanceScale;
 
             // Value from 0-1 signifying how dense this QiSource currently is
             float density = 0.05f;
 
             if (source != null) {
-                distance = source.getSize();
-                density = (float) (Math.sqrt(source.getQiCurrent()) / Math.sqrt((float) QiSourceConfig.MaxStorage));
+                distance = source.getSize() * QiSourceRenderer.distanceScale;
+                density = (float) (Math.sqrt(source.getQiCurrent()) / Math.sqrt((float) QiSourceConfig.MaxReserve));
             } else if (target != null) {
                 // If there is no QiSource set, particles move towards the entity's position
                 Vec3 pos = new Vec3(xPos, yPos, zPos);
@@ -151,8 +216,11 @@ public class QiParticle extends TextureSheetParticle {
                 // Determine the velocity of the particles based on their lifespan and the distance they need to travel
                 direction = direction.scale(distance / (float) life);
             } else {
-                life = (int) distance * 2;
-                direction = direction.scale(0.5);
+                // Live long enough to reach the player, wherever they are: the source radius was too short once
+                // the absorption range lets players meditate outside it
+                double toTarget = new Vec3(xPos, yPos, zPos).distanceTo(target.position());
+                life = (int) Math.ceil(toTarget / QiSourceRenderer.streamSpeed) + 5;
+                direction = direction.scale(QiSourceRenderer.streamSpeed);
             }
 
             QiParticle particle = new QiParticle(world, xPos, yPos, zPos, direction.x, direction.y, direction.z, life, sprites);
@@ -162,6 +230,8 @@ public class QiParticle extends TextureSheetParticle {
             particle.setColor(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);
 
             particle.target = target;
+            particle.stream = source != null && target != null;
+            particle.element = QiSourceRenderer.element;
 
             if (source == null && target != null) {
                 particle.scale(0.5f * (float) target.getBoundingBox().getSize());

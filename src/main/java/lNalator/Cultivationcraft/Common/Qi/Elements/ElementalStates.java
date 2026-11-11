@@ -58,6 +58,9 @@ public final class ElementalStates {
     public static final RegistryObject<MobEffect> ROOTED = EFFECTS.register("rooted", () -> new State(0x3E8E3E)
             .addAttributeModifier(Attributes.MOVEMENT_SPEED, "6c1f0b4e-5d3a-4f7e-9b1a-2c3d4e5f6a04", -1.0, AttributeModifier.Operation.MULTIPLY_TOTAL));
 
+    // Poison concept: blocks every regeneration while it lasts
+    public static final RegistryObject<MobEffect> NO_REGEN = EFFECTS.register("no_regen", () -> new State(0x4E9331));
+
     public static final int CHILL_DECAY_TICKS = 60;
     public static final int MAX_CHILL = 5;
     public static final int FROZEN_TICKS = 40;

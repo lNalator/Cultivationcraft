@@ -29,6 +29,15 @@ public class ExternalCultivationHandler {
         addModifier(WarpModifier.class);
         addModifier(BounceModifier.class);
         addModifier(GrowModifier.class);
+        addModifier(ShrinkModifier.class);
+        addModifier(InfusionModifier.class);
+        addModifier(LevitationModifier.class);
+        addModifier(GravityModifier.class);
+        addModifier(RepulsionModifier.class);
+        addModifier(HasteModifier.class);
+        addModifier(ChargeModifier.class);
+        addModifier(EchoModifier.class);
+        addModifier(PoisonModifier.class);
     }
 
     // List of all techniques available in the game

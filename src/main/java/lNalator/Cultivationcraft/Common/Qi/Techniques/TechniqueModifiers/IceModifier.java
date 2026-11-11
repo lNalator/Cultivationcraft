@@ -17,6 +17,6 @@ public class IceModifier extends TechniqueModifier {
         unlockQuest = new Quest(Quest.QI_SOURCE_MEDITATION, 1, Element.toString());
         stabiliseQuest = new Quest(Quest.DAMAGE_DEALT, 1000, Element.toString());
 
-        coreTexture = new animatedTexture(new ResourceLocation(Cultivationcraft.MODID, "textures/cores/ice.png"));
+        coreTexture = new animatedTexture(new ResourceLocation(Cultivationcraft.MODID, "textures/cores/ice.png"), 12, 3);
     }
 }

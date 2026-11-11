@@ -63,7 +63,13 @@ public class PacketHandler {
     protected static final byte ALCHEMY_PREVIEW = 104;
     protected static final byte QI_STREAM = 105;
     protected static final byte NOTIFICATION = 106;
-    protected static final String PROTOCOL_VERSION = "8";
+    protected static final byte GROUND_SLAM = 107;
+    protected static final byte TRIBULATION = 108;
+    protected static final byte DIVINE_SENSE_PING = 109;
+    protected static final byte PURGE_ELEMENT = 110;
+    protected static final byte LIGHTNING_ARC = 111;
+    protected static final byte WIND_WRAP = 112;
+    protected static final String PROTOCOL_VERSION = "12";
 
     public static final SimpleChannel channel = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(Cultivationcraft.MODID, "main"),
@@ -88,6 +94,15 @@ public class PacketHandler {
         channel.registerMessage(NOTIFICATION, lNalator.Cultivationcraft.Network.Packets.NotificationPacket.class, lNalator.Cultivationcraft.Network.Packets.NotificationPacket::encode,
                 lNalator.Cultivationcraft.Network.Packets.NotificationPacket::decode, lNalator.Cultivationcraft.Network.Packets.NotificationPacket::handle,
                 java.util.Optional.of(net.minecraftforge.network.NetworkDirection.PLAY_TO_CLIENT));
+        channel.registerMessage(GROUND_SLAM, lNalator.Cultivationcraft.Network.Packets.GroundSlamPacket.class, lNalator.Cultivationcraft.Network.Packets.GroundSlamPacket::encode,
+                lNalator.Cultivationcraft.Network.Packets.GroundSlamPacket::decode, lNalator.Cultivationcraft.Network.Packets.GroundSlamPacket::handle,
+                java.util.Optional.of(net.minecraftforge.network.NetworkDirection.PLAY_TO_CLIENT));
+        channel.registerMessage(TRIBULATION, lNalator.Cultivationcraft.Network.Packets.TribulationPacket.class, lNalator.Cultivationcraft.Network.Packets.TribulationPacket::encode,
+                lNalator.Cultivationcraft.Network.Packets.TribulationPacket::decode, lNalator.Cultivationcraft.Network.Packets.TribulationPacket::handle,
+                java.util.Optional.of(net.minecraftforge.network.NetworkDirection.PLAY_TO_CLIENT));
+        channel.registerMessage(DIVINE_SENSE_PING, lNalator.Cultivationcraft.Network.Packets.DivineSensePingPacket.class, lNalator.Cultivationcraft.Network.Packets.DivineSensePingPacket::encode,
+                lNalator.Cultivationcraft.Network.Packets.DivineSensePingPacket::decode, lNalator.Cultivationcraft.Network.Packets.DivineSensePingPacket::handle,
+                java.util.Optional.of(net.minecraftforge.network.NetworkDirection.PLAY_TO_CLIENT));
         channel.registerMessage(KEYPRESS, keypressPacket.class, keypressPacket::encode, keypressPacket::decode, keypressPacket::handle);
         channel.registerMessage(ATTACK, AttackPacket.class, AttackPacket::encode, AttackPacket::decode, AttackPacket::handle);
         channel.registerMessage(STAMINA_USE, StaminaUsePacket.class, StaminaUsePacket::encode, StaminaUsePacket::decode, StaminaUsePacket::handle);
@@ -98,6 +113,9 @@ public class PacketHandler {
         channel.registerMessage(PART_INFO, PartInfoPacket.class, PartInfoPacket::encode, PartInfoPacket::decode, PartInfoPacket::handle);
         channel.registerMessage(QUEST_PROGRESS, QuestPacket.class, QuestPacket::encode, QuestPacket::decode, QuestPacket::handle);
         channel.registerMessage(QUEST_CANCEL, QuestCancelPacket.class, QuestCancelPacket::encode, QuestCancelPacket::decode, QuestCancelPacket::handle);
+        channel.registerMessage(PURGE_ELEMENT, PurgeElementPacket.class, PurgeElementPacket::encode, PurgeElementPacket::decode, PurgeElementPacket::handle);
+        channel.registerMessage(LIGHTNING_ARC, LightningArcPacket.class, LightningArcPacket::encode, LightningArcPacket::decode, LightningArcPacket::handle);
+        channel.registerMessage(WIND_WRAP, WindWrapPacket.class, WindWrapPacket::encode, WindWrapPacket::decode, WindWrapPacket::handle);
         channel.registerMessage(FLYING_SWORD_NBT_ID, ConvertToFlyingPacket.class, ConvertToFlyingPacket::encode, ConvertToFlyingPacket::decode, ConvertToFlyingPacket::handle);
         channel.registerMessage(WIND_INSTANCE, WindPacket.class, WindPacket::encode, WindPacket::decode, WindPacket::handle);
         channel.registerMessage(BLOOD_SPAWN_ID, BloodPacket.class, BloodPacket::encode, BloodPacket::decode, BloodPacket::handle);
@@ -195,6 +213,10 @@ public class PacketHandler {
         // Send the cultivator's stats to the client
         BodyModificationsPacket pack = new BodyModificationsPacket(player.getUUID(), modifications);
         channel.send(distribute, pack);
+    }
+
+    public static void sendDivineSensePing(ServerPlayer target, Player observer) {
+        channel.send(PacketDistributor.PLAYER.with(() -> target), new lNalator.Cultivationcraft.Network.Packets.DivineSensePingPacket(observer.getId(), observer.getEyePosition()));
     }
 
     public static void sendTechniqueInfoToClients(TechniqueInfoPacket packet, Player except) {

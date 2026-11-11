@@ -3,17 +3,18 @@ package lNalator.Cultivationcraft.Common.Qi.Cultivation;
 import lNalator.Cultivationcraft.Common.Config;
 import lNalator.Cultivationcraft.Common.Qi.Quests.Quest;
 import lNalator.Cultivationcraft.Cultivationcraft;
-import lNalator.Cultivationcraft.Client.GUI.Screens.ConceptScreen;
-import lNalator.Cultivationcraft.Client.GUI.Screens.GenericTabScreen;
-import lNalator.Cultivationcraft.Client.GUI.Screens.CultivationTypeScreens.CoreFormingScreen;
+import lNalator.Cultivationcraft.Client.GUI.Screens.CultivationTypeScreens.CultivationScreens;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.CultivatorStats;
 import lNalator.Cultivationcraft.Common.Qi.ExternalCultivationHandler;
 import lNalator.Cultivationcraft.Common.Qi.Elements.Elements;
-import lNalator.Cultivationcraft.Common.Qi.Techniques.PassiveTechniques.CultivationPassives.QiCondenserPassive;
+import lNalator.Cultivationcraft.Common.Qi.Techniques.PassiveTechniques.CultivationPassives.CoreFormingPassive;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers.*;
-import net.minecraft.client.Minecraft;
+import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueStats.DefaultCultivationStatIDs;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
+
+import java.util.HashMap;
 
 public class CoreFormingCultivation extends CultivationType
 {
@@ -26,11 +27,8 @@ public class CoreFormingCultivation extends CultivationType
         super(cultivationStage);
         maxedTechsToBreakthrough = 0;
         maxStage = 9;
-        // TEMP
-        passive = new QiCondenserPassive();
-        screen = new CoreFormingScreen();
+        passive = new CoreFormingPassive();
         tribulation = new Tribulation(maxStage, 75, 0.6f);
-        statLeveling = false;
 
         ID = new ResourceLocation(Cultivationcraft.MODID, "cultivation.coreforming");
     }
@@ -91,7 +89,7 @@ public class CoreFormingCultivation extends CultivationType
     {
         TechniqueModifier mod = ExternalCultivationHandler.getModifier(new ResourceLocation(extra));
 
-        if (mod.canUse(player) && mod.hasLearnt(player))
+        if (mod.canChooseAsCore(player))
             setCore(mod);
         else
             return  false;
@@ -99,23 +97,27 @@ public class CoreFormingCultivation extends CultivationType
         return true;
     }
 
+    // Every Qi source can be cultivated, at an efficiency set by the core's element (Golden Core pressure)
     @Override
-    public GenericTabScreen getAdvancmentOptionScreen()
+    public double getCultivationEfficiency(ResourceLocation element)
     {
-        return new ConceptScreen(true);
-    }
+        for (ResourceLocation core : getElements())
+        {
+            // Pure Qi suits every core
+            if (element.equals(Elements.anyElement) || element.equals(Elements.noElement) || core.equals(Elements.noElement))
+                return 1;
 
-    @Override
-    public boolean canCultivate(ResourceLocation element)
-    {
-        if (element.compareTo(Elements.anyElement) == 0)
-            return true;
+            boolean variant = core.equals(Elements.iceElement) || core.equals(Elements.lightningElement);
 
-        for (ResourceLocation testElement : getElements())
-            if (testElement.compareTo(element) == 0 || testElement.compareTo(Elements.noElement) == 0 || testElement.compareTo(Elements.anyElement) == 0)
-                return true;
+            if (element.equals(core))
+                return variant ? Config.Server.variantOwnElementEfficiency() : Config.Server.ownElementEfficiency();
 
-        return false;
+            // Ice and Lightning are pressed by everything, so they only take the plain malus
+            if (!variant && Elements.presses(element, core))
+                return Config.Server.pressingElementEfficiency();
+        }
+
+        return Config.Server.otherElementEfficiency();
     }
 
     @Override
@@ -125,6 +127,33 @@ public class CoreFormingCultivation extends CultivationType
             return true;
 
         return false;
+    }
+
+    @Override
+    public boolean hasSeaOfQi() {
+        return true;
+    }
+
+    // Golden Core: each technique use trains 1 point plus 1 per Core Forming stage
+    @Override
+    public double getTechniqueTrainingMultiplier() {
+        return 1 + stage;
+    }
+
+    // Saves from before the Core Forming passive kept this stage's Qi as a plain level: move it into Max Qi
+    @Override
+    public void readNBT(CompoundTag nbt) {
+        super.readNBT(nbt);
+
+        String passiveKey = passive.getClass().toString();
+
+        if (qiLevel > 0 && !statLevels.containsKey(passiveKey)) {
+            HashMap<ResourceLocation, Double> levels = new HashMap<>();
+            levels.put(DefaultCultivationStatIDs.maxQi, Math.min(qiLevel, techLevel));
+            statLevels.put(passiveKey, levels);
+        }
+
+        qiLevel = 0;
     }
 
     public void stageCalculations()
@@ -143,7 +172,7 @@ public class CoreFormingCultivation extends CultivationType
     @Override
     public boolean clientPreBreakthrough(Player player)
     {
-        Minecraft.getInstance().forceSetScreen(new ConceptScreen(true));
+        CultivationScreens.openAdvancementOption(this);
 
         return false;
     }
@@ -159,8 +188,17 @@ public class CoreFormingCultivation extends CultivationType
             }
             else
             {
+                // The core comes from the client: check it can be chosen (learnt, allowed, not a unique core already owned)
+                TechniqueModifier core = ExternalCultivationHandler.getModifier(new ResourceLocation(conditionals));
+
+                if (core == null || !core.canChooseAsCore(player))
+                {
+                    Cultivationcraft.LOGGER.error("Tried to advance cultivation with an unavailable core " + conditionals);
+                    return;
+                }
+
                 CoreFormingCultivation newCultivation = new CoreFormingCultivation(stage + 1);
-                newCultivation.setCore(ExternalCultivationHandler.getModifier(new ResourceLocation(conditionals)));
+                newCultivation.setCore(core);
                 newCultivation.setPreviousCultivation(this);
 
                 CultivatorStats.getCultivatorStats(player).setCultivation(newCultivation);

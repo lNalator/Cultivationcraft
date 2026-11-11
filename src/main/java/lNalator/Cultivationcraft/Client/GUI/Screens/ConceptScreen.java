@@ -4,12 +4,15 @@ import lNalator.Cultivationcraft.Client.GUI.GUIButton;
 import lNalator.Cultivationcraft.Client.GUI.SelectableTextField;
 import lNalator.Cultivationcraft.Client.GUI.TextField;
 import lNalator.Cultivationcraft.Common.Qi.ExternalCultivationHandler;
+import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers.CoreSynergies;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers.TechniqueModifier;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import lNalator.Cultivationcraft.Network.ClientPacketHandler;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
+import lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.CultivatorStats;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.resources.ResourceLocation;
 
 import java.awt.*;
@@ -41,6 +44,11 @@ public class ConceptScreen extends GenericTabScreen {
     protected int selectButtonX = 127;
     protected int selectButtonY = 160;
 
+    // Outside of a breakthrough, the player switches between the concepts unlocked and the ones condensed into a core
+    protected boolean showCores = false;
+    protected GUIButton unlockedButton;
+    protected GUIButton coresButton;
+
     public ConceptScreen() {
         this(false);
     }
@@ -48,14 +56,18 @@ public class ConceptScreen extends GenericTabScreen {
     public ConceptScreen(boolean choose) {
         super(0, Component.translatable("cultivationcraft.gui.concept"), new ResourceLocation(Cultivationcraft.MODID, "textures/gui/stats.png"));
 
+        selectable = choose;
         generateText();
 
         selectText.setSize(selectTextWidth, selectTextHeight);
-        selectable = choose;
 
         if (selectable) {
             select = new GUIButton("select", Component.translatable("cultivationcraft.gui.select").getString());
             select.disable();
+        } else {
+            unlockedButton = new GUIButton("unlocked", Component.translatable("cultivationcraft.gui.concept.unlocked").getString());
+            coresButton = new GUIButton("cores", Component.translatable("cultivationcraft.gui.concept.cores").getString());
+            unlockedButton.select();
         }
     }
 
@@ -65,8 +77,12 @@ public class ConceptScreen extends GenericTabScreen {
         HashMap<ResourceLocation, ArrayList<ResourceLocation>> categories = new HashMap<>();
         selectText = new SelectableTextField();
 
+        Player player = Minecraft.getInstance().player;
+
         for (TechniqueModifier modifier : ExternalCultivationHandler.getModifiers()) {
-            if (modifier.canUse(Minecraft.getInstance().player) && modifier.hasLearnt(Minecraft.getInstance().player)) {
+            boolean owned = CultivatorStats.getCultivatorStats(player).getCultivation().getModifierRank(modifier.ID) > 0;
+
+            if (selectable ? modifier.canChooseAsCore(player) : showCores ? owned : modifier.hasLearnt(player) && !owned) {
                 if (!categories.containsKey(modifier.CATEGORY)) {
                     categories.put(modifier.CATEGORY, new ArrayList<>());
                 }
@@ -79,7 +95,18 @@ public class ConceptScreen extends GenericTabScreen {
             SelectableText category = new SelectableText(entry.getKey());
 
             for (ResourceLocation location : entry.getValue()) {
-                category.addItem(new SelectableText(location));
+                // An owned core chosen again is reinforced: show the rank it would reach
+                int rank = CultivatorStats.getCultivatorStats(Minecraft.getInstance().player).getCultivation().getModifierRank(location);
+                // Synergies with the cores already owned: "?" until both cores are owned
+                Component text = Component.translatable(location.toLanguageKey().concat(".text")).append(CoreSynergies.describe(player, location));
+
+                if (selectable && rank > 0) {
+                    category.addItem(new SelectableText(location, Component.translatable(location.toLanguageKey()).append(" ").append(Component.translatable("cultivationcraft.gui.rank", rank + 1)), text));
+                } else if (showCores) {
+                    category.addItem(new SelectableText(location, Component.translatable(location.toLanguageKey()).append(" ").append(Component.translatable("cultivationcraft.gui.rank", rank)), text));
+                } else {
+                    category.addItem(new SelectableText(location, Component.translatable(location.toLanguageKey()), text));
+                }
             }
 
             selectText.addSelectable(category);
@@ -97,6 +124,27 @@ public class ConceptScreen extends GenericTabScreen {
             this.onClose();
 
             return true;
+        }
+
+        if (!selectable) {
+            boolean unlockedClicked = unlockedButton.mouseClick((int) mouseX, (int) mouseY, buttonPressed);
+
+            if (unlockedClicked || coresButton.mouseClick((int) mouseX, (int) mouseY, buttonPressed)) {
+                showCores = !unlockedClicked;
+
+                if (showCores) {
+                    coresButton.select();
+                    unlockedButton.unselect();
+                } else {
+                    unlockedButton.select();
+                    coresButton.unselect();
+                }
+
+                generateText();
+                selectText.setSize(selectTextWidth, selectTextHeight);
+
+                return true;
+            }
         }
 
         int edgeSpacingX = (this.width - this.xSize) / 2;
@@ -146,6 +194,10 @@ public class ConceptScreen extends GenericTabScreen {
 
         String text = selectText.getText();
 
+        if (!selectable && selectText.getSelectables().isEmpty()) {
+            text = Component.translatable(showCores ? "cultivationcraft.gui.concept.nocores" : "cultivationcraft.gui.concept.nounlocked").getString();
+        }
+
         if (selectable) {
             select.disable();
         }
@@ -177,6 +229,11 @@ public class ConceptScreen extends GenericTabScreen {
         if (selectable) {
             select.setPos(edgeSpacingX + selectButtonX - select.width / 2, selectButtonY + edgeSpacingY);
             select.render(PoseStack, mouseX, mouseY, this);
+        } else {
+            unlockedButton.setPos(edgeSpacingX + selectButtonX - unlockedButton.width - 2, selectButtonY + edgeSpacingY);
+            unlockedButton.render(PoseStack, mouseX, mouseY, this);
+            coresButton.setPos(edgeSpacingX + selectButtonX + 2, selectButtonY + edgeSpacingY);
+            coresButton.render(PoseStack, mouseX, mouseY, this);
         }
     }
 }

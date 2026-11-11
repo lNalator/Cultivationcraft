@@ -3,6 +3,7 @@ package lNalator.Cultivationcraft.Common.Qi.Techniques;
 import lNalator.Cultivationcraft.Common.PlayerUtils;
 import lNalator.Cultivationcraft.Common.Qi.BodyParts.BodyPartNames;
 import lNalator.Cultivationcraft.Client.Renderer;
+import lNalator.Cultivationcraft.Client.genericClientFunctions;
 import lNalator.Cultivationcraft.Common.Capabilities.BodyModifications.BodyModifications;
 import lNalator.Cultivationcraft.Common.Capabilities.BodyModifications.IBodyModifications;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.CultivatorStats;
@@ -13,6 +14,11 @@ import lNalator.Cultivationcraft.Common.Qi.Elements.Elements;
 import lNalator.Cultivationcraft.Common.Qi.Stats.StatIDs;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueStats.DefaultTechniqueStatIDs;
 import lNalator.Cultivationcraft.Cultivationcraft;
+import lNalator.Cultivationcraft.Common.Capabilities.CultivatorTechniques.CultivatorTechniques;
+import lNalator.Cultivationcraft.Common.Capabilities.CultivatorTechniques.ICultivatorTechniques;
+import lNalator.Cultivationcraft.Network.PacketHandler;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.resources.ResourceLocation;
@@ -21,6 +27,9 @@ import net.minecraft.util.Mth;
 import lNalator.Cultivationcraft.Common.Qi.Cultivation.FoundationEstablishmentCultivation;
 import lNalator.Cultivationcraft.Common.Qi.Cultivation.QiCondenserCultivation;
 import lNalator.Cultivationcraft.Common.Qi.Cultivation.CoreFormingCultivation;
+
+import java.util.HashMap;
+import java.util.UUID;
 
 public class DivineSenseTechnique extends Technique {
 
@@ -33,17 +42,140 @@ public class DivineSenseTechnique extends Technique {
 
     }
 
+    // What Divine Sense shows, toggled in its radial menu (see DivineSenseMenuScreen): one bit per category
+    public static final int SENSE_QI_SOURCES = 1;
+    public static final int SENSE_BLOCKS = 2;
+    public static final int SENSE_CREATURES = 4;
+    public static final int SENSE_PLAYERS = 8;
+    public static final int SENSE_TRIBULATIONS = 16;
+    public static final int SENSE_ALL = SENSE_QI_SOURCES | SENSE_BLOCKS | SENSE_CREATURES | SENSE_PLAYERS | SENSE_TRIBULATIONS;
+
+    protected int senseMask = SENSE_ALL;
+
+    // Vigilance: a sensed player feels it, at most once every 5 s per observer (see DivineSensePingPacket)
+    protected static final int VIGILANCE_INTERVAL = 10;
+    protected static final int PING_COOLDOWN = 100;
+    // Server side: game time of the last ping sent to each player sensed
+    protected final HashMap<UUID, Long> lastPings = new HashMap<>();
+
+    public int getSenseMask() {
+        return senseMask;
+    }
+
+    public boolean senses(int category) {
+        return (senseMask & category) != 0;
+    }
+
+    // Client side, from the radial menu: kept on the server so it is saved with the technique.
+    // Switching every category OFF turns Divine Sense off, it would sense nothing (the server does the same, see processInfo)
+    public void setSenseMask(int mask) {
+        senseMask = mask & SENSE_ALL;
+
+        if (senseMask == 0 && isActive()) {
+            deactivate(genericClientFunctions.getPlayer());
+        }
+
+        sendInfo(senseMask);
+    }
+
+    // The radial menu is the only switch: every category OFF turns Divine Sense off, at least one ON turns it on
+    // (the menu's centre sends every category to turn it on, none to turn it off)
+    @Override
+    public void processInfo(Player player, int info) {
+        senseMask = info & SENSE_ALL;
+
+        if (player.level.isClientSide) {
+            return;
+        }
+
+        if (senseMask == 0 && isActive()) {
+            deactivate(player);
+            PacketHandler.sendCultivatorTechniquesToClient(player);
+        } else if (senseMask != 0 && !isActive()) {
+            activate(player);
+            PacketHandler.sendCultivatorTechniquesToClient(player);
+        }
+    }
+
+    // Turned on with every category OFF (not possible from the menu): sense everything
+    @Override
+    public void activate(Player player) {
+        if (senseMask == 0) {
+            senseMask = SENSE_ALL;
+        }
+
+        super.activate(player);
+    }
+
+    @Override
+    public CompoundTag writeNBT() {
+        CompoundTag nbt = super.writeNBT();
+        nbt.putInt("senseMask", senseMask);
+
+        return nbt;
+    }
+
+    @Override
+    public void readNBTData(CompoundTag nbt) {
+        super.readNBTData(nbt);
+
+        senseMask = nbt.contains("senseMask") ? nbt.getInt("senseMask") & SENSE_ALL : SENSE_ALL;
+    }
+
+    // The player's innate Divine Sense, active or not, when they can use it (it never takes a technique slot)
+    public static DivineSenseTechnique find(Player player) {
+        ICultivatorTechniques techniques = CultivatorTechniques.getCultivatorTechniques(player);
+        DivineSenseTechnique sense = techniques.getDivineSense();
+
+        return sense != null && sense.isValid(player) ? sense : null;
+    }
+
+    // The player's Divine Sense when it is active, on both sides
+    public static DivineSenseTechnique getActive(Player player) {
+        DivineSenseTechnique sense = find(player);
+
+        return sense != null && sense.isActive() ? sense : null;
+    }
+
+    public static boolean senses(Player player, int category) {
+        DivineSenseTechnique sense = getActive(player);
+
+        return sense != null && sense.senses(category);
+    }
+
+    // Realms compared by vigilance: Foundation Establishment < Qi Condensation < Core Forming, stages do not count
+    public static int getRealm(Player player) {
+        var cultivation = CultivatorStats.getCultivatorStats(player).getCultivation();
+
+        if (cultivation instanceof CoreFormingCultivation) {
+            return 3;
+        }
+        if (cultivation instanceof QiCondenserCultivation) {
+            return 2;
+        }
+        if (cultivation instanceof FoundationEstablishmentCultivation) {
+            return 1;
+        }
+        return 0;
+    }
+
     public static SenseProfile getSenseProfile(Player player) {
         var cultivation = CultivatorStats.getCultivatorStats(player).getCultivation();
         int minorStage = Mth.clamp(cultivation.getStage(), 1, Math.max(1, cultivation.getMaxStage())) - 1;
+
+        return getSenseProfile(getRealm(player), minorStage);
+    }
+
+    // Profile at a realm (see getRealm) and a stage counted from 0; also used to show the next stage and realm (DivineSenseScreen)
+    public static SenseProfile getSenseProfile(int realm, int minorStage) {
         // Realm entry bonuses are deliberately larger than the gains within a realm.
-        if (cultivation instanceof CoreFormingCultivation) {
+        if (realm == 3) {
             return new SenseProfile(192 + minorStage * 8, 128 + minorStage * 8, 0.94 + minorStage * 0.005);
         }
-        if (cultivation instanceof QiCondenserCultivation) {
+        if (realm == 2) {
             return new SenseProfile(64 + minorStage * 4, 64 + minorStage * 4, 0.85 + minorStage * 0.01);
         }
-        if (cultivation instanceof FoundationEstablishmentCultivation) {
+        if (realm == 1) {
             return new SenseProfile(16 + minorStage * 2, 30 + minorStage * 2, 0.75 + minorStage * 0.02);
         }
         return new SenseProfile(16, 30, 0.75);
@@ -84,7 +216,9 @@ public class DivineSenseTechnique extends Technique {
     public void tickClient(TickEvent.PlayerTickEvent event) {
         if (PlayerUtils.isClientPlayerCharacter(event.player)) {
             Renderer.QiSourcesVisible = true;
+            Renderer.DivineSenseMask = senseMask;
             Renderer.QiSenseRadius = getTechniqueStat(DETECTION_RADIUS, event.player);
+            Renderer.QiSenseTick = event.player.level.getGameTime();
         }
 
         // Resource depletion is decided on the server, not from a stale client reserve.
@@ -94,6 +228,8 @@ public class DivineSenseTechnique extends Technique {
     public void tickServer(TickEvent.PlayerTickEvent event) {
         super.tickServer(event);
 
+        pingSensedPlayers(event.player);
+
         if (CultivatorStats.getCultivatorStats(event.player).getCultivationType() == CultivationTypes.QI_CONDENSER) {
             if (!CultivatorStats.getCultivatorStats(event.player).getCultivation().consumeQi(event.player, getTechniqueStat(DefaultTechniqueStatIDs.qiCost, event.player) / 20f)) {
                 this.deactivate(event.player);
@@ -102,6 +238,43 @@ public class DivineSenseTechnique extends Technique {
         } else if (event.player.getFoodData().getFoodLevel() == 0) {
             this.deactivate(event.player);
             lNalator.Cultivationcraft.Network.PacketHandler.sendCultivatorTechniquesToClient(event.player);
+        }
+    }
+
+    // Players sensed of the same realm or above feel it. A higher realm observer goes unnoticed by lower realms,
+    // as long as it stays out of their own detection radius
+    protected void pingSensedPlayers(Player observer) {
+        if (observer.tickCount % VIGILANCE_INTERVAL != 0 || !senses(SENSE_PLAYERS) || observer.isSpectator()) {
+            return;
+        }
+
+        int radius = getSenseProfile(observer).radius();
+        int realm = getRealm(observer);
+        long now = observer.level.getGameTime();
+
+        for (Player target : observer.level.players()) {
+            if (target == observer || !(target instanceof ServerPlayer serverTarget) || target.isSpectator() || !target.isAlive()) {
+                continue;
+            }
+
+            double distance = target.distanceTo(observer);
+
+            if (distance > radius) {
+                continue;
+            }
+
+            if (getRealm(target) < realm && distance > getSenseProfile(target).radius()) {
+                continue;
+            }
+
+            Long last = lastPings.get(target.getUUID());
+
+            if (last != null && now - last < PING_COOLDOWN) {
+                continue;
+            }
+
+            lastPings.put(target.getUUID(), now);
+            PacketHandler.sendDivineSensePing(serverTarget, observer);
         }
     }
 

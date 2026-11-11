@@ -2,6 +2,8 @@ pluginManagement {
     repositories {
         gradlePluginPortal()
         maven { url = 'https://maven.minecraftforge.net/' }        
+        // MixinGradle, for the refmap of the mod's mixins
+        maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
         mavenCentral()
     }
 }

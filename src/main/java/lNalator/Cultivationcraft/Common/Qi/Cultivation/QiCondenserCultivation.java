@@ -1,20 +1,36 @@
 package lNalator.Cultivationcraft.Common.Qi.Cultivation;
 
-import lNalator.Cultivationcraft.Client.GUI.Screens.CultivationTypeScreens.QiCondenserScreen;
 import lNalator.Cultivationcraft.Common.Capabilities.CultivatorStats.CultivatorStats;
+import lNalator.Cultivationcraft.Common.CultivationNotifier;
 import lNalator.Cultivationcraft.Common.Qi.Elements.Elements;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.PassiveTechniques.CultivationPassives.QiCondenserPassive;
 import lNalator.Cultivationcraft.Cultivationcraft;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class QiCondenserCultivation extends CultivationType {
 
     protected HashMap<ResourceLocation, Float> elementProgression = new HashMap<ResourceLocation, Float>();
+
+    // Purge: while meditating, the Qi of one element is removed at a quarter of the absorption speed, the most recent
+    // stage first, and leaves a void in its stage. Cultivated Qi fills the voids first, the oldest stage first
+    public static final float PURGE_SPEED = 0.25f;
+    // Near a source of an element that presses the purged one (Water dissolves Fire), the purge goes faster
+    public static final float DOMINANT_PURGE_BONUS = 1.5f;
+    // Pure Qi feeds every element, but less well: 1 Pure Qi fills 0.5 void
+    public static final float PURE_VOID_FILL = 0.5f;
+
+    // Void left in this stage by purges
+    protected float voidQi = 0;
+    // Element being purged, kept from stage to stage
+    protected ResourceLocation purgingElement = Elements.noElement;
 
     public QiCondenserCultivation() {
         this(1);
@@ -25,7 +41,6 @@ public class QiCondenserCultivation extends CultivationType {
         passive = new QiCondenserPassive();
         maxedTechsToBreakthrough = 3;
         maxStage = 8;
-        screen = new QiCondenserScreen();
         tribulation = new Tribulation(maxStage, 50, 0.4f);
 
         advancements.add(new CoreFormingCultivation());
@@ -33,12 +48,33 @@ public class QiCondenserCultivation extends CultivationType {
         ID = new ResourceLocation(Cultivationcraft.MODID, "cultivation.qicondensation");
     }
 
+    @Override
+    public boolean hasSeaOfQi() {
+        return true;
+    }
+
     public void stageCalculations() {
         techLevel = 200 + (100 * stage);
     }
 
+    // Core Forming is blocked while a void is left
     public boolean canBreakthrough(Player player) {
+        if (stage == maxStage && getVoid() > 0) {
+            return false;
+        }
+
         return super.canBreakthrough(player);
+    }
+
+    @Override
+    public String breakthroughProgress(Player player) {
+        String progress = super.breakthroughProgress(player);
+
+        if (getVoid() > 0) {
+            progress += "\n" + Component.translatable("cultivationcraft.gui.purge.void_left", (int) Math.ceil(getVoid())).getString();
+        }
+
+        return progress;
     }
 
     @Override
@@ -46,6 +82,7 @@ public class QiCondenserCultivation extends CultivationType {
         if (stage < maxStage) {
             QiCondenserCultivation newCultivation = new QiCondenserCultivation(stage + 1);
             newCultivation.setPreviousCultivation(this);
+            newCultivation.purgingElement = purgingElement;
 
             CultivatorStats.getCultivatorStats(player).setCultivation(newCultivation);
         }
@@ -57,9 +94,16 @@ public class QiCondenserCultivation extends CultivationType {
             return 0;
         }
 
-        float changedQi = super.progressCultivation(player, Qi, element);
+        // The void left by purges is filled first, even when the stage is full
+        float remaining = fillVoid(Qi, element);
 
-        float usedQi = Qi - changedQi;
+        if (remaining <= 0) {
+            return 0;
+        }
+
+        float changedQi = super.progressCultivation(player, remaining, element);
+
+        float usedQi = remaining - changedQi;
 
         if (!elementProgression.containsKey(element)) {
             elementProgression.put(element, usedQi); 
@@ -75,6 +119,111 @@ public class QiCondenserCultivation extends CultivationType {
         super.reset(player);
 
         elementProgression = new HashMap<>();
+        voidQi = 0;
+        purgingElement = Elements.noElement;
+    }
+
+    // This stage then the previous Qi Condensation stages, the most recent first
+    protected List<QiCondenserCultivation> getStages() {
+        List<QiCondenserCultivation> stages = new ArrayList<>();
+
+        for (CultivationType cultivation = this; cultivation instanceof QiCondenserCultivation condenser; cultivation = cultivation.getPreviousCultivation()) {
+            stages.add(condenser);
+        }
+
+        return stages;
+    }
+
+    public ResourceLocation getPurgingElement() {
+        return purgingElement;
+    }
+
+    public boolean isPurging() {
+        return !purgingElement.equals(Elements.noElement);
+    }
+
+    // Any absorbed element can be purged, not Pure Qi
+    public boolean canPurge(ResourceLocation element) {
+        return !element.equals(Elements.anyElement) && getElementAmount(element) > 0;
+    }
+
+    public void setPurgingElement(ResourceLocation element) {
+        purgingElement = canPurge(element) ? element : Elements.noElement;
+    }
+
+    // Qi of this element absorbed over every Qi Condensation stage
+    public float getElementAmount(ResourceLocation element) {
+        return getCombinedElements().getOrDefault(element, 0f);
+    }
+
+    // Qi of each element absorbed over every Qi Condensation stage, Pure Qi under anyElement
+    public HashMap<ResourceLocation, Float> getElementAmounts() {
+        return new HashMap<>(getCombinedElements());
+    }
+
+    // Void left by purges over every Qi Condensation stage
+    public float getVoid() {
+        float total = 0;
+
+        for (QiCondenserCultivation stage : getStages()) {
+            total += stage.voidQi;
+        }
+
+        return total;
+    }
+
+    // Removes up to this much Qi of the purged element, the most recent stage first. Returns the Qi purged
+    public float purge(Player player, float amount) {
+        if (!isPurging()) {
+            return 0;
+        }
+
+        float purged = 0;
+
+        for (QiCondenserCultivation stage : getStages()) {
+            if (purged >= amount) {
+                break;
+            }
+
+            float held = stage.elementProgression.getOrDefault(purgingElement, 0f);
+            float removed = Math.min(held, amount - purged);
+
+            if (removed > 0) {
+                stage.elementProgression.put(purgingElement, held - removed);
+                stage.voidQi += removed;
+                purged += removed;
+            }
+        }
+
+        if (getElementAmount(purgingElement) <= 0) {
+            CultivationNotifier.notify(player, CultivationNotifier.Type.PROGRESS, Component.translatable("cultivationcraft.notify.purge_complete"),
+                    Component.translatable(purgingElement.getPath()));
+            purgingElement = Elements.noElement;
+        }
+
+        return purged;
+    }
+
+    // Fills the voids with this Qi, the oldest stage first. Returns the Qi left
+    protected float fillVoid(float qi, ResourceLocation element) {
+        float rate = element.equals(Elements.anyElement) ? PURE_VOID_FILL : 1;
+        List<QiCondenserCultivation> stages = getStages();
+
+        for (int i = stages.size() - 1; i >= 0 && qi > 0; i--) {
+            QiCondenserCultivation stage = stages.get(i);
+
+            if (stage.voidQi <= 0) {
+                continue;
+            }
+
+            float filled = Math.min(stage.voidQi, qi * rate);
+
+            stage.voidQi -= filled;
+            stage.elementProgression.put(element, stage.elementProgression.getOrDefault(element, 0f) + filled);
+            qi -= filled / rate;
+        }
+
+        return Math.max(0, qi);
     }
 
     // Returns the % of current cultivation that is of the selected element for this stage of cultivation
@@ -185,6 +334,9 @@ public class QiCondenserCultivation extends CultivationType {
             i++;
         }
 
+        nbt.putFloat("VOID", voidQi);
+        nbt.putString("PURGING", purgingElement.toString());
+
         return nbt;
     }
 
@@ -202,5 +354,7 @@ public class QiCondenserCultivation extends CultivationType {
         }
 
         elementProgression = values;
+        voidQi = nbt.getFloat("VOID");
+        purgingElement = nbt.contains("PURGING") ? new ResourceLocation(nbt.getString("PURGING")) : Elements.noElement;
     }
 }

@@ -45,7 +45,7 @@ import java.util.function.Consumer;
 public class Register {
 
     public enum keyPresses {
-        REFINEMENT_SCREEN, SKILLHOTBARSWITCH
+        REFINEMENT_SCREEN, SKILLHOTBARSWITCH, WIND_WRAP
     }
 
     public static DeferredRegister<EntityType<?>> ENTITY_TYPES = DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, Cultivationcraft.MODID);

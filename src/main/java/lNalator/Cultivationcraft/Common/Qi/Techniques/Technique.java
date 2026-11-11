@@ -9,6 +9,8 @@ import lNalator.Cultivationcraft.Common.Qi.Damage.QiDamageSource;
 import lNalator.Cultivationcraft.Common.Qi.Stats.BodyPartStatControl;
 import lNalator.Cultivationcraft.Common.Qi.Stats.PlayerStatModifications;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers.TechniqueModifier;
+import lNalator.Cultivationcraft.Common.Qi.Quests.Quest;
+import lNalator.Cultivationcraft.Common.Qi.Quests.QuestHandler;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueStats.DefaultTechniqueStatIDs;
 import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueStats.TechniqueStatModification;
 import lNalator.Cultivationcraft.Network.ClientPacketHandler;
@@ -155,7 +157,7 @@ public class Technique {
     }
 
     public ResourceLocation getFirstStatChange() {
-        return (ResourceLocation) statChangesPerLevel.keySet().toArray()[0];
+        return statChangesPerLevel.isEmpty() ? null : statChangesPerLevel.keySet().iterator().next();
     }
 
     protected void addTechniqueStat(ResourceLocation stat, double amount) {
@@ -165,10 +167,10 @@ public class Technique {
     public String getTechniqueStatString(Player player) {
         String statString = "";
 
-        for (ResourceLocation stat : getTechniqueStats()) {
-            statString += "\n" + Component.translatable(stat.getPath()).getString() + ": ";
+        for (ResourceLocation stat : getDisplayedStats(player)) {
+            statString += "\n" + getStatName(stat, player) + ": ";
 
-            double value = getTechniqueStat(stat, player);
+            double value = getDisplayedStat(stat, player);
             value = (int) (value * 1000) / 1000.0;
 
             if (value % 1.0 == 0) {
@@ -183,6 +185,19 @@ public class Technique {
 
     public Set<ResourceLocation> getTechniqueStats() {
         return defaultStats.keySet();
+    }
+
+    // The stats shown to the player, their name and value: a technique can show a stat differently or add derived ones (see FlightTechnique with Warp)
+    public Set<ResourceLocation> getDisplayedStats(Player player) {
+        return getTechniqueStats();
+    }
+
+    public String getStatName(ResourceLocation stat, Player player) {
+        return Component.translatable(stat.getPath()).getString();
+    }
+
+    public double getDisplayedStat(ResourceLocation stat, Player player) {
+        return getTechniqueStat(stat, player);
     }
 
     public boolean hasTechniqueStat(ResourceLocation stat) {
@@ -346,9 +361,31 @@ public class Technique {
 
         if (player instanceof ServerPlayer) {
             CultivationAdvancements.TECH_USE.trigger((ServerPlayer) player, this.getClass().getName(), 0);
+            QuestHandler.progressQuest(player, Quest.TECHNIQUE_USED, 1);
+
+            // Haste unlock: the same technique used 50 times in a row; toggled techniques (Flight...) do not count
+            if (type != useType.Toggle) {
+                progressSameTechniqueStreak(player);
+            }
         }
 
         addModifiers(player);
+    }
+
+    protected static final int SAME_TECHNIQUE_STREAK = 50;
+    // Per player: last technique class used and how many times in a row
+    protected static final java.util.HashMap<java.util.UUID, java.util.Map.Entry<Class<?>, Integer>> techniqueStreaks = new java.util.HashMap<>();
+
+    protected void progressSameTechniqueStreak(Player player) {
+        var last = techniqueStreaks.get(player.getUUID());
+        int count = last != null && last.getKey() == getClass() ? last.getValue() + 1 : 1;
+
+        if (count >= SAME_TECHNIQUE_STREAK) {
+            QuestHandler.progressQuest(player, Quest.TECHNIQUE_STREAK, 1);
+            count = 0;
+        }
+
+        techniqueStreaks.put(player.getUUID(), java.util.Map.entry(getClass(), count));
     }
 
     public void deactivate(Player player) {

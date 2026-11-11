@@ -3,6 +3,7 @@ package lNalator.Cultivationcraft.Server;
 import lNalator.Cultivationcraft.Common.Containers.RefinementMenuProvider;
 import lNalator.Cultivationcraft.Network.PacketHandler;
 import lNalator.Cultivationcraft.Common.Register;
+import lNalator.Cultivationcraft.Common.Qi.Techniques.TechniqueModifiers.WindWrap;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Player;
@@ -25,6 +26,11 @@ public class ServerItemControl {
 
         if (keyPressed == Register.keyPresses.SKILLHOTBARSWITCH) {
             SkillHotbarServer.switchActive(pressedBy.getUUID());
+        }
+
+        // Levitation + Wind synergy
+        if (keyPressed == Register.keyPresses.WIND_WRAP) {
+            WindWrap.keyPressed(pressedBy);
         }
     }
 }

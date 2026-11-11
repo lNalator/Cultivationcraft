@@ -1,5 +1,6 @@
 package lNalator.Cultivationcraft.Common.Qi.Techniques;
 
+import net.minecraft.world.effect.MobEffects;
 import lNalator.Cultivationcraft.Client.Animations.GenericQiPoses;
 import lNalator.Cultivationcraft.Common.Advancements.CultivationAdvancements;
 import lNalator.Cultivationcraft.Common.Capabilities.BodyModifications.BodyModifications;
@@ -13,6 +14,7 @@ import lNalator.Cultivationcraft.Common.Qi.BodyParts.PlayerHealthManager;
 import lNalator.Cultivationcraft.Common.Qi.Quests.Quest;
 import lNalator.Cultivationcraft.Common.Qi.Quests.QuestHandler;
 import lNalator.Cultivationcraft.Common.Qi.Cultivation.CultivationType;
+import lNalator.Cultivationcraft.Common.Qi.Cultivation.QiCondenserCultivation;
 import lNalator.Cultivationcraft.Common.Qi.CultivationTypes;
 import lNalator.Cultivationcraft.Common.Qi.Elements.Elements;
 import lNalator.Cultivationcraft.Common.Qi.QiSource;
@@ -74,6 +76,11 @@ public class MeditateTechnique extends MovementOverrideTechnique {
 
             List<QiSource> sources = ChunkQiSources.getQiSourcesInRange(event.player.level, event.player.position(), (int) cultivation.getCultivationStat(event.player, DefaultCultivationStatIDs.qiAbsorbRange));
 
+            // Poison unlock: meditating while poisoned
+            if (event.player.hasEffect(MobEffects.POISON)) {
+                QuestHandler.progressQuest(event.player, Quest.POISON_MEDITATION, 1.0 / 20.0);
+            }
+
             // If meditating in a Qi Source, give advancement
             if (sources.size() > 0 && event.side == LogicalSide.SERVER) {
                 CultivationAdvancements.TECH_USE.trigger((ServerPlayer) event.player, this.getClass().getName(), 1);
@@ -93,6 +100,17 @@ public class MeditateTechnique extends MovementOverrideTechnique {
                 QuestHandler.progressQuest(event.player, Quest.QI_SOURCE_MEDITATION, 1.0 / 20.0, source.getElement().toString());
             }
 
+            // Purge beside cultivation, at a quarter of the absorption speed, before absorbing so the void can be filled this tick
+            if (cultivation instanceof QiCondenserCultivation condenser && condenser.isPurging()) {
+                double purge = cultivation.getCultivationStat(event.player, DefaultCultivationStatIDs.qiAbsorbSpeed) / 20.0 * QiCondenserCultivation.PURGE_SPEED;
+
+                if (sources.stream().anyMatch(source -> Elements.presses(source.getElement(), condenser.getPurgingElement()))) {
+                    purge *= QiCondenserCultivation.DOMINANT_PURGE_BONUS;
+                }
+
+                condenser.purge(event.player, (float) purge);
+            }
+
             // absorb Qi through blood first
             double remaining = cultivation.getCultivationStat(event.player, DefaultCultivationStatIDs.qiAbsorbSpeed) / 20.0;
 
@@ -102,15 +120,18 @@ public class MeditateTechnique extends MovementOverrideTechnique {
                 remaining = ((QiFoodStats) event.player.getFoodData()).meditation(remaining, event.player);
             }
 
-            // Loop through every source and try to cultivate from it
-            for (QiSource source : sources) {
+            // Share the absorption between every source the player can cultivate in: the first source used to take
+            // all of it, so the others in range showed no stream
+            List<QiSource> usable = sources.stream().filter(source -> cultivation.canCultivate(source.getElement())).toList();
+            double share = usable.isEmpty() ? 0 : remaining / usable.size();
+
+            for (QiSource source : usable) {
                 if (remaining <= 0) {
                     break;
                 }
-                if (!cultivation.canCultivate(source.getElement())) {
-                    continue;
-                }
-                double absorbed = source.absorbQi(remaining, event.player);
+                // A dense source lets the player absorb faster
+                double bonus = source.getDensityBonus();
+                double absorbed = source.absorbQi(Math.min(share, remaining) * bonus, event.player);
                 float unused = cultivation.progressCultivation(event.player, (float) absorbed, source.getElement());
                 // progressCultivation returns unused Qi, not spent Qi. Return any
                 // surplus to the source when the current stage has reached its cap.
@@ -118,7 +139,7 @@ public class MeditateTechnique extends MovementOverrideTechnique {
                 if (returned > 0) {
                     source.subtractQi(-returned);
                 }
-                remaining = Math.max(0, remaining - (absorbed - returned));
+                remaining = Math.max(0, remaining - (absorbed - returned) / bonus);
             }
 
             // Passively cultivate
@@ -162,7 +183,7 @@ public class MeditateTechnique extends MovementOverrideTechnique {
                     if (element == null || element.compareTo(source.getElement()) == 0) // Do not absorb more qi than the players max absorb speed
                     {
                         if (remaining > 0) {
-                            double absorbed = source.absorbQi(remaining, event.player);
+                            double absorbed = source.absorbBodyQi(remaining, event.player);
                             remaining -= absorbed;
                             toAdd += absorbed;
                         }
