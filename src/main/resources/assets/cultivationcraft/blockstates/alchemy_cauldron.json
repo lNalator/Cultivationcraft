@@ -1,5 +1,8 @@
 {
-  "variants": {
-    "": { "model": "cultivationcraft:block/alchemy_cauldron" }
+ "variants": {
+    "facing=north": { "model": "cultivationcraft:block/alchemy_cauldron" },
+    "facing=east": { "model": "cultivationcraft:block/alchemy_cauldron", "y": 90 },
+    "facing=south": { "model": "cultivationcraft:block/alchemy_cauldron", "y": 180 },
+    "facing=west": { "model": "cultivationcraft:block/alchemy_cauldron", "y": 270 }
   }
 }

@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.5.1] - Alchemy Cauldron model
+
+### New features and changes
+
+- The Alchemy Cauldron has its own model and texture instead of the vanilla cauldron's: a closed cauldron on a foot, with two handles and a lid. Its hitbox now follows the model (foot, belly and lid) instead of the vanilla cauldron's.
+
 ## [0.5.0] - Realm passives and Core Forming concepts
 
 This release targets **Minecraft 1.19.2, Forge 43.1.52 or newer, and Java 17**, and requires **MLM Animator 0.2.3** or newer.

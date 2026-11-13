@@ -12,6 +12,13 @@ import net.minecraft.world.item.ItemStack;
 
 public class AlchemyCauldronRenderer implements BlockEntityRenderer<AlchemyCauldronBlockEntity> {
 
+    // Ingredients float inside the closed cauldron, at the height of the 2x2 px windows
+    // in its sides (8 to 10 px), so they can be seen passing behind them.
+    private static final double ORBIT_HEIGHT = 9 / 16.0;
+    private static final double ORBIT_RADIUS = 0.19;
+    private static final double ORBIT_RADIUS_SWING = 0.03;
+    private static final double BOB_HEIGHT = 0.03;
+
     private final ItemRenderer items;
 
     public AlchemyCauldronRenderer(BlockEntityRendererProvider.Context context) {
@@ -38,9 +45,9 @@ public class AlchemyCauldronRenderer implements BlockEntityRenderer<AlchemyCauld
             // One visual per occupied slot; the stack itself stays in the saved inventory.
             double phase = orbitIndex++ * Math.PI * 2 / occupied;
             double angle = time * 0.035 + phase;
-            double radius = 0.19 + Math.sin(time * 0.025 + phase * 2) * 0.045;
+            double radius = ORBIT_RADIUS + Math.sin(time * 0.025 + phase * 2) * ORBIT_RADIUS_SWING;
             pose.translate(0.5 + Math.cos(angle) * radius,
-                    0.82 + Math.sin(time * 0.05 + phase) * 0.065,
+                    ORBIT_HEIGHT + Math.sin(time * 0.05 + phase) * BOB_HEIGHT,
                     0.5 + Math.sin(angle) * radius);
             pose.mulPose(Vector3f.YP.rotationDegrees((float) ((time * 1.5 + slot * 40) % 360)));
             pose.scale(0.22f, 0.22f, 0.22f);
