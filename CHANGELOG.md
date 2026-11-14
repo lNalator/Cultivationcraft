@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.5.0] - Realm passives and Core Forming concepts
+## [0.4.5] - Realm passives and Core Forming concepts
 
 This release targets **Minecraft 1.19.2, Forge 43.1.52 or newer, and Java 17**, and requires **MLM Animator 0.2.3** or newer.
 
